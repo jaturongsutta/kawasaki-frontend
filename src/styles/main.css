@@ -1,0 +1,122 @@
+/**
+ * 
+ * Styles for a table with borders and centered header cells.
+ * 
+ * CSS Classes:
+ * - .n-table: Applies border to the table.
+ * - .n-table th: Applies border-left, text alignment, and background color to the table header cells.
+ * - .n-table td: Applies border-left to the table data cells.
+ * - .n-table th:last-child: Applies border-right to the last table header cell.
+ * - .n-table td:last-child: Applies border-right to the last table data cell.
+ */
+.n-table {
+  /* border: 1px solid #dee2e6; */
+}
+.n-table th,
+.n-table td {
+  border-left: 1px solid #dee2e6;
+}
+
+/* .n-table th:first-child,
+  .n-table td:first-child {
+    border-left: none;
+  }*/
+.n-table th:last-child,
+.n-table td:last-child {
+  border-right: 1px solid #dee2e6;
+}
+
+.n-table th {
+  text-align: center !important;
+  background-color: #f1f1f1;
+}
+
+.n-table thead th {
+  border-top: 1px solid #dee2e6;
+}
+
+.n-table tbody tr:last-child td {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.n-table.with-pagination tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Common button styles */
+.btn-alert {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+/* Confirm button styles */
+.btn-alert-confirm {
+  background-color: hwb(260 28% 0%) !important;
+  color: #fff !important;
+}
+
+.btn-alert-confirm:hover {
+  opacity: 0.8;
+}
+
+/* Cancel button styles */
+.btn-alert-cancel {
+  background-color: #6c757d;
+  color: #fff !important;
+}
+
+.btn-alert-cancel:hover {
+  opacity: 0.8;
+}
+
+/* Success button styles */
+.btn-alert-success {
+  background-color: hwb(260 28% 0%) !important;
+  color: #fff !important;
+}
+
+.btn-alert-success:hover {
+  opacity: 0.8;
+}
+
+/* Warning button styles */
+.btn-alert-warning {
+  background-color: hwb(260 28% 0%) !important;
+  color: #fff !important;
+}
+
+.btn-alert-warning:hover {
+  opacity: 0.8;
+}
+
+/* Error button styles */
+.btn-alert-error {
+  background-image: linear-gradient(310deg, #dc3545 0%, #c82333 100%);
+  color: #fff !important;
+}
+
+.btn-alert-error:hover {
+  opacity: 0.8;
+}
+
+.swal2-container {
+  z-index: 9999 !important;
+}
+
+.v-field__field:has(input[readonly]) ~ .v-field__outline {
+  opacity: 0.4;
+  background-color: #e9ecef;
+}
+
+.require-field {
+  position: relative;
+}
+
+.require-field::after {
+  content: "*";
+  color: red;
+  margin-left: 2px; /* Adjust spacing as needed */
+}
