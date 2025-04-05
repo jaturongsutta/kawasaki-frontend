@@ -1,5 +1,9 @@
 <template>
-  <v-btn prepend-icon="mdi mdi-content-save" v-show="canAccess" color="primary">
+  <v-btn
+    prepend-icon="mdi mdi-content-save"
+    v-show="canAccess"
+    class="bg-gradient-info"
+  >
     <template v-slot:prepend>
       <v-icon color="white" size="large"></v-icon>
     </template>
@@ -78,7 +82,7 @@ onMounted(() => {
 
 <style scoped>
 .bg-gradient-info {
-  background-image: linear-gradient(310deg, #1171ef 0%, #11cdef 100%);
+  background-image: linear-gradient(310deg, rgb(68 156 0 / 87%), #a3f862 100%);
   color: #fff;
 }
 </style>

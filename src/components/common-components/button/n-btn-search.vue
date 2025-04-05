@@ -1,5 +1,5 @@
 <template>
-  <v-btn prepend-icon="mdi mdi-magnify" color="primary">
+  <v-btn prepend-icon="mdi mdi-magnify" class="bg-gradient-info" elevation="5">
     <template v-slot:prepend>
       <v-icon color="white" size="large"></v-icon>
     </template>
@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, onMounted } from "vue";
+import { defineProps, onMounted } from "vue";
 
 const props = defineProps({
   label: String,
@@ -25,7 +25,7 @@ onMounted(() => {});
 
 <style scoped>
 .bg-gradient-info {
-  background-image: linear-gradient(310deg, #1171ef 0%, #11cdef 100%);
+  background-image: linear-gradient(310deg, rgb(68 156 0 / 87%), #a3f862 100%);
   color: #fff;
 }
 </style>

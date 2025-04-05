@@ -8,6 +8,7 @@
       class="logo-sta ml-3"
       src="@/assets/imgs/logo.png"
       @click="homeClick"
+      style="margin-top: 15px"
     />
     <v-spacer></v-spacer>
 
@@ -67,6 +68,7 @@ const homeClick = () => {
   padding: 0 16px;
   display: flex;
   align-items: center;
+  background-color: black;
 }
 
 .logo-sta {
@@ -85,12 +87,16 @@ const homeClick = () => {
 }
 
 .v-app-bar-nav-icon {
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
 }
 
 .v-app-bar.v-toolbar:not(.v-toolbar--flat) {
   border-bottom-color: black;
   box-shadow: unset;
+}
+
+.v-app-bar.v-toolbar {
+  background: rgb(0 0 0);
 }
 
 .v-toolbar {
