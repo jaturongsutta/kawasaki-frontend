@@ -9,8 +9,16 @@
           <v-sheet width="200" class="mr-3">
             <label>Line</label>
             <v-select
-              v-model="formSearch.isActive"
-              :items="[{ title: 'All', value: null }]"
+              v-model="formSearch.line"
+              :items="[
+                { title: 'All', value: null },
+                { title: 'Cylinder Head 1' },
+                { title: 'Cylinder Head 2' },
+                { title: 'Cylinder Head 3' },
+                { title: 'Cylinder Head 4' },
+                { title: 'Cylinder Head 5' },
+                { title: 'Cylinder Head 6', value: '1' },
+              ]"
             ></v-select>
           </v-sheet>
           <v-sheet width="200" class="mr-3">
@@ -244,7 +252,8 @@
                       { title: 'Cylinder Head 2' },
                       { title: 'Cylinder Head 3' },
                       { title: 'Cylinder Head 4' },
-                      { title: 'Cylinder Head 5', value: '1' },
+                      { title: 'Cylinder Head 5' },
+                      { title: 'Cylinder Head 6', value: '1' },
                     ]"
                   ></v-select>
                 </v-col>
@@ -371,7 +380,7 @@ import { onMounted, ref } from "vue";
 import rules from "@/utils/rules";
 const dialog = ref(false);
 
-const formSearch = ref({});
+const formSearch = ref({ line: "1" });
 const formInfo = ref({
   line: "1",
   plan_date: "2025-01-01",
