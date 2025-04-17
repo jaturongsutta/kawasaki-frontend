@@ -5,8 +5,36 @@
         <h4>Plan</h4>
       </v-card-title>
       <v-card-text class="mt-3">
-        <v-row></v-row>
-        <v-row>
+        <v-row justify="justify-start" class="ml-1">
+          <v-sheet width="200" class="mr-3">
+            <label>Line</label>
+            <v-select
+              v-model="formSearch.isActive"
+              :items="[{ title: 'All', value: null }]"
+            ></v-select>
+          </v-sheet>
+          <v-sheet width="200" class="mr-3">
+            <label>Plan Date From</label>
+            <n-date v-model="date1"></n-date>
+          </v-sheet>
+          <v-sheet width="200" class="mr-3">
+            <label>Plan Date To</label>
+            <n-date v-model="date2"></n-date>
+          </v-sheet>
+
+          <v-sheet width="200" class="mr-3">
+            <label>Status</label>
+            <v-select
+              v-model="formSearch.isActive"
+              :items="[{ title: 'All', value: null }]"
+            ></v-select>
+          </v-sheet>
+          <v-sheet width="250" class="mr-3 mt-5">
+            <n-btn-search @click="onSearch" />
+            <n-btn-reset @click="onReset" class="ml-3" />
+          </v-sheet>
+        </v-row>
+        <!-- <v-row>
           <v-col cols="8">
             <v-row>
               <v-col>
@@ -42,7 +70,7 @@
               </div>
             </div>
           </v-col>
-        </v-row>
+        </v-row> -->
         <v-row class="mb-3">
           <v-col>
             <hr />
