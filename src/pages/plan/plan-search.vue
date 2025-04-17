@@ -353,7 +353,11 @@
 
           <v-divider></v-divider>
           <div class="d-flex justify-center py-3">
-            <n-btn-save @click="saveClick" class="me-3"></n-btn-save>
+            <n-btn-save
+              no-permission
+              @click="saveClick"
+              class="me-3"
+            ></n-btn-save>
             <n-btn-cancel text @click="dialog = false"></n-btn-cancel>
           </div>
         </v-card>
