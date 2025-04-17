@@ -79,6 +79,67 @@
                   v-if="item.action2"
                 ></v-icon>
               </template>
+
+              <template v-slot:[`item.status`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.status }}
+                </div>
+              </template>
+              <template v-slot:[`item.production_date`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.production_date }}
+                </div>
+              </template>
+              <template v-slot:[`item.start_time`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.start_time }}
+                </div>
+              </template>
+              <template v-slot:[`item.finish_date`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.finish_date }}
+                </div>
+              </template>
+              <template v-slot:[`item.model`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.model }}
+                </div>
+              </template>
+              <template v-slot:[`item.shift`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.shift }}
+                </div>
+              </template>
+              <template v-slot:[`item.shift_time`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.shift_time }}
+                </div>
+              </template>
+              <template v-slot:[`item.ot`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.ot }}
+                </div>
+              </template>
+              <template v-slot:[`item.cycle_time`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.cycle_time }}
+                </div>
+              </template>
+              <template v-slot:[`item.shift`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.shift }}
+                </div>
+              </template>
+              <template v-slot:[`item.total_time`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.total_time }}
+                </div>
+              </template>
+              <template v-slot:[`item.target_fg`]="{ item }">
+                <div :class="{ textRunning: item.status == 'Running' }">
+                  {{ item.target_fg }}
+                </div>
+              </template>
             </v-data-table>
           </v-col>
         </v-row>
@@ -508,3 +569,10 @@ const newPlanClick = () => {
   dialog.value = true;
 };
 </script>
+
+<style>
+.textRunning {
+  color: #3366ff;
+  font-weight: bold;
+}
+</style>
