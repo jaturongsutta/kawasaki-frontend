@@ -138,6 +138,11 @@
           </template>
           <v-list-item-title>{{ menuItem.Menu_Name }}</v-list-item-title>
         </v-list-item>
+
+        <!-- Mockup -->
+        <v-list-item to="/plan" link>
+          <v-list-item-title>Plan</v-list-item-title>
+        </v-list-item>
       </template>
     </v-list>
   </v-navigation-drawer>

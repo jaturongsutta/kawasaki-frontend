@@ -145,8 +145,7 @@ import rules from "@/utils/rules";
 import moment from "moment";
 const Alert = inject("Alert");
 const frmInfo = ref(null);
-const formSearch = ref({
-});
+const formSearch = ref({});
 const form = ref({});
 const mode = ref("Add");
 const dialog = ref(false);
@@ -178,11 +177,10 @@ let currentPage = ref(1);
 let pageSize = ref(20);
 let totalItems = ref(0);
 
-
 onMounted(() => {
   ddlApi.getPredefine({ group: "Is_Active", sortby: "text" }).then((data) => {
     statusList.value = data;
-    formSearch.value.isActive = 'Y'
+    formSearch.value.isActive = "Y";
   });
 });
 
@@ -218,7 +216,6 @@ const loadData = async (paginate) => {
 const onReset = () => {
   formSearch.value = {
     isActive: "Y",
-    
   };
   items.value = [];
   totalItems.value = 0;

@@ -97,6 +97,19 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/plan",
+    meta: {
+      requireAuth: false,
+    },
+    children: [
+      {
+        path: "",
+        name: "plan-search",
+        component: () => import("@/pages/plan/plan-search.vue"),
+      },
+    ],
+  },
 ];
 
 export default routes;
