@@ -58,7 +58,8 @@
               <v-row>
                 <v-col cols="6">
                   <label class="require-field">Model </label>
-                  <v-text-field v-model="form.Model_CD" :rules="[rules.required]"></v-text-field>
+                  <v-text-field v-model="form.Model_CD" :rules="[rules.required]"
+                    :readonly="mode === 'Edit'"></v-text-field>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Product Code </label>
@@ -67,11 +68,11 @@
 
                 <v-col cols="6">
                   <label class="require-field">Cycle Time (mins) </label>
-                  <v-text-field v-model="form.Cycle_Time_Min" :rules="[rules.required]"></v-text-field>
+                  <v-text-field v-model="form.Cycle_Time_Min" :rules="[rules.required]" type="number"></v-text-field>
                 </v-col>
                 <v-col cols="6">
-                  <label class="require-field">Part Name </label>
-                  <v-text-field v-model="form.predefineCd" :rules="[rules.required]"></v-text-field>
+                  <label>Part Name </label>
+                  <v-text-field v-model="form.predefineCd"></v-text-field>
                 </v-col>
 
                 <v-col cols="6">
@@ -99,8 +100,8 @@
 
                 <v-col cols="6" v-if="mode === 'Edit'">
                   <label class="require-field">Updated Date </label>
-                  <v-text-field v-model="form.Updated_Date" :rules="[rules.required]"
-                    :readonly="mode === 'Edit'"></v-text-field>
+                  <v-text-field v-model="form.Updated_Date" :rules="[rules.required]" :readonly="mode === 'Edit'"
+                    placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
                 </v-col>
 
               </v-row>
@@ -119,7 +120,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject } from "vue";
+import { onMounted, ref, inject, computed } from "vue";
 import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/model.js";
@@ -161,7 +162,6 @@ let totalItems = ref(0);
 onMounted(() => {
   ddlApi.getPredefine({ group: "Is_Active", sortby: "text" }).then((data) => {
     statusList.value = data;
-    // formSearch.value.isActive = "Y";
   });
 });
 
@@ -222,6 +222,9 @@ const onEdit = (modelCd) => {
   dialog.value = true;
   api.getById(modelCd).then((res) => {
     form.value = res.data;
+    form.value.Updated_Date = form.value.Updated_Date
+      ? moment(form.value.Updated_Date).format('DD/MM/YYYY HH:mm:ss')
+      : ''
     console.log("form value is ", form.value)
   });
 };
@@ -236,7 +239,7 @@ const saveClick = async () => {
       res = await api.add(form.value);
     } else {
       console.log("Edit");
-      res = await api.edit(form.value);
+      res = await api.update(form.value.Model_CD, form.value);
     }
 
     if (res.status === 0) {
@@ -244,7 +247,7 @@ const saveClick = async () => {
       dialog.value = false;
       onSearch();
     } else {
-      Alert.warning(res.data.message);
+      Alert.warning(res.message);
     }
   } catch (error) {
     Alert.error(error.message);
