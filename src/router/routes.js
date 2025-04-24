@@ -110,6 +110,20 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/common-master/model",
+    meta: {
+      menuNo: "M1006",
+    },
+    children: [
+      {
+        path: "",
+        name: "model",
+        component: () =>
+          import("@/pages/common-master/model/model.vue"),
+      },
+    ],
+  },
 ];
 
 export default routes;
