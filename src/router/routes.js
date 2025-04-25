@@ -124,6 +124,25 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/common-master/machine",
+    meta: {
+      menuNo: "M1007",
+    },
+    children: [
+      {
+        path: "",
+        name: "machine",
+        component: () =>
+          import("@/pages/common-master/machine/machine.vue"),
+      },
+      {
+        path: "/common-master/machine-info/:id?",
+        name: "machine-info",
+        component: () => import("@/pages/common-master/machine/machine-info.vue"),
+      },
+    ],
+  },
 ];
 
 export default routes;
