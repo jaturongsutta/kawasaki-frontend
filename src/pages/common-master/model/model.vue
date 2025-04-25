@@ -115,6 +115,7 @@
           </div>
         </v-card>
       </v-form>
+      <n-loading :loading="isDialogLoading" />
     </v-dialog>
   </div>
 </template>
@@ -148,13 +149,14 @@ const headers = [
     value: (item) => {
       return item.Updated_Date
         ? moment(item.Updated_Date).utc().format("DD/MM/YYYY HH:mm:ss")
-        : "";
+        : "-";
     },
   },
 ];
 let items = ref([]);
 
 let isLoading = ref(false);
+let isDialogLoading = ref(false);
 let currentPage = ref(1);
 let pageSize = ref(20);
 let totalItems = ref(0);
@@ -207,12 +209,6 @@ const onAdd = () => {
   mode.value = "Add";
   console.log("Add");
   form.value = {
-    // predefineGroup: "",
-    // predefineCd: "",
-    // valueEn: "",
-    // valueTh: "",
-    // description: "",
-    // isActive: "Y",
   };
   dialog.value = true;
 };
@@ -225,12 +221,12 @@ const onEdit = (modelCd) => {
     form.value.Updated_Date = form.value.Updated_Date
       ? moment(form.value.Updated_Date).format('DD/MM/YYYY HH:mm:ss')
       : ''
-    console.log("form value is ", form.value)
   });
 };
 
 const saveClick = async () => {
   try {
+    isDialogLoading.value = true;
     const { valid } = await frmInfo.value.validate();
     if (!valid) return;
     let res = null;
@@ -241,7 +237,7 @@ const saveClick = async () => {
       console.log("Edit");
       res = await api.update(form.value.Model_CD, form.value);
     }
-
+    isDialogLoading.value = false;
     if (res.status === 0) {
       Alert.success();
       dialog.value = false;
@@ -250,6 +246,7 @@ const saveClick = async () => {
       Alert.warning(res.message);
     }
   } catch (error) {
+    isDialogLoading.value = false;
     Alert.error(error.message);
   }
 };
