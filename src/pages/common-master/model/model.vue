@@ -226,9 +226,9 @@ const onEdit = (modelCd) => {
 
 const saveClick = async () => {
   try {
-    isDialogLoading.value = true;
     const { valid } = await frmInfo.value.validate();
     if (!valid) return;
+    isDialogLoading.value = true;
     let res = null;
     if (mode.value === "Add") {
       console.log("Add");
