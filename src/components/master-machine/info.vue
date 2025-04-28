@@ -53,7 +53,7 @@ import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/machine.js";
 import rules from "@/utils/rules";
-import moment from "moment";
+import { getDateFormat } from "@/utils/utils";
 
 const route = useRoute();
 const router = useRouter();
@@ -74,7 +74,6 @@ let machineItem = ref({
 
 let isLoading = ref(false);
 let isDialogLoading = ref(false);
-
 let pageMode = ref("add");
 
 onMounted(() => {
@@ -102,9 +101,7 @@ const loadData = async () => {
         const response = await api.getById(id);
 
         machineItem.value = response.data;
-        machineItem.value.Updated_Date = machineItem.value.Updated_Date
-            ? moment(machineItem.value.Updated_Date).format('DD/MM/YYYY HH:mm:ss')
-            : ''
+        machineItem.value.Updated_Date = getDateFormat(machineItem.value.Updated_Date);
 
     } catch (error) {
         console.error("Error fetching API:", error);

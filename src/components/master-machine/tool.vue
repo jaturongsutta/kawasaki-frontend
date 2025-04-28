@@ -3,9 +3,9 @@
         <v-card-text>
             <n-btn-add label="Add Tool" @click="onAdd"></n-btn-add>
             <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
-                :items="items" :items-length="totalItems">
+                :items="items" :items-length="totalItems" @update:options="loadData">
                 <template v-slot:[`item.action`]="{ item }">
-                    <n-gbtn-edit @click="onEdit(item.Machine_No)"></n-gbtn-edit>
+                    <n-gbtn-edit @click="onEdit(item)"></n-gbtn-edit>
                 </template>
                 <template v-slot:bottom>
                     <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
@@ -91,24 +91,20 @@
 
 <script setup>
 import { onMounted, ref, inject } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/tool.js";
 import rules from "@/utils/rules";
-import moment from "moment";
+import { getDateFormat } from "@/utils/utils";
 
 const route = useRoute();
-const router = useRouter();
 const Alert = inject("Alert");
 const frmInfo = ref(null);
-const formSearch = ref({});
 const form = ref({});
 const mode = ref("Add");
 const dialog = ref(false);
 const statusList = ref([]);
-
-let tab = ref("main");
 
 const headers = [
     { title: "", key: "action", sortable: false },
@@ -123,47 +119,22 @@ const headers = [
         key: "Updated_Date",
         sortable: false,
         value: (item) => {
-            return item.Updated_Date
-                ? moment(item.Updated_Date).utc().format("DD/MM/YYYY HH:mm:ss")
-                : "-";
+            return getDateFormat(item.Updated_Date);
         },
     },
 ];
 let items = ref([]);
-let machineItem = ref({
-    Machine_No: '',
-    Process_CD: '',
-    Machine_Name: '',
-    Map_CD: '',
-    Status: '',
-    Updated_By: '',
-    Updated_Date: ''
-});
 
 let isLoading = ref(false);
 let isDialogLoading = ref(false);
 let currentPage = ref(1);
 let pageSize = ref(20);
 let totalItems = ref(0);
-let pageMode = ref("add");
-let Process_CD = ref('');
-
 
 onMounted(() => {
     ddlApi.getPredefine({ group: "Is_Active", sortby: "text" }).then((data) => {
         statusList.value = data;
     });
-
-    Process_CD.value = route.params.id;
-    console.log("process is ",Process_CD.value)
-    loadData({ page: currentPage.value, itemsPerPage: pageSize.value });
-    // if (route.params.id) {
-    //     // console.log("edit ")
-    //     // pageMode.value = "edit";
-    //     loadData();
-    // }
-
-  
 });
 
 const onSearch = async () => {
@@ -171,43 +142,26 @@ const onSearch = async () => {
     loadData({ page: currentPage.value, itemsPerPage: pageSize.value });
 };
 
-
 const loadData = async (paginate) => {
     const { page, itemsPerPage } = paginate;
-
     const searchOptions = getPaging({ page, itemsPerPage });
 
     try {
         const data = {
-            process_cd: Process_CD.value,
+            process_cd: route.params.id,
             searchOptions,
         };
-
         isLoading.value = true;
         const response = await api.search(data);
 
         items.value = response.data;
-        items.value.Updated_Date = items.value.Updated_Date
-            ? moment(items.value.Updated_Date).format('DD/MM/YYYY HH:mm:ss')
-            : ''
         totalItems.value = response.total_record;
-
-        console.log("item is ", items)
     } catch (error) {
         console.error("Error fetching API:", error);
         items.value = [];
         totalItems.value = 0;
     }
     isLoading.value = false;
-};
-
-const onReset = () => {
-    formSearch.value = {
-        isActive: "Y",
-    };
-    items.value = [];
-    totalItems.value = 0;
-    onSearch();
 };
 
 const onAdd = () => {
@@ -218,35 +172,28 @@ const onAdd = () => {
     dialog.value = true;
 };
 
-const onEdit = (id) => {
+const onEdit = (item) => {
     mode.value = "Edit";
+    form.value = { ...item };
+    form.value.Updated_Date = getDateFormat(form.value.Updated_Date)
     dialog.value = true;
-    api.getById(modelCd).then((res) => {
-        form.value = res.data;
-        form.value.Updated_Date = form.value.Updated_Date
-            ? moment(form.value.Updated_Date).format('DD/MM/YYYY HH:mm:ss')
-            : ''
-    });
 };
 
 const saveClick = async () => {
     try {
         const { valid } = await frmInfo.value.validate();
-        console.log('vali ', valid)
         if (!valid) return;
-        // isLoading.value = true;
         isDialogLoading.value = true;
         let res = null;
 
-        form.value.Process_CD = Process_CD.value;
+        form.value.Process_CD = route.params.id;
         if (mode.value === "Add") {
             console.log("Add");
             res = await api.add(form.value);
         } else {
             console.log("Edit");
-            res = await api.update(form.value.Machine_No, form.value);
+            res = await api.update(form.value.Tool_CD, form.value);
         }
-        // isLoading.value = false;
         isDialogLoading.value = false;
         if (res.status === 0) {
             dialog.value = false;
@@ -256,7 +203,6 @@ const saveClick = async () => {
             Alert.warning(res.message);
         }
     } catch (error) {
-        isLoading.value = false;
         isDialogLoading.value = false;
         Alert.error(error.message);
     }

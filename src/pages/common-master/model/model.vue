@@ -35,7 +35,7 @@
         <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
           :items="items" :items-length="totalItems" @update:options="loadData">
           <template v-slot:[`item.action`]="{ item }">
-            <n-gbtn-edit @click="onEdit(item.Model_CD)"></n-gbtn-edit>
+            <n-gbtn-edit @click="onEdit(item)"></n-gbtn-edit>
           </template>
           <template v-slot:bottom>
             <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
@@ -126,7 +126,8 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/model.js";
 import rules from "@/utils/rules";
-import moment from "moment";
+import { getDateFormat } from "@/utils/utils";
+
 const Alert = inject("Alert");
 const frmInfo = ref(null);
 const formSearch = ref({});
@@ -147,9 +148,7 @@ const headers = [
     key: "Updated_Date",
     sortable: false,
     value: (item) => {
-      return item.Updated_Date
-        ? moment(item.Updated_Date).utc().format("DD/MM/YYYY HH:mm:ss")
-        : "-";
+      return getDateFormat(item.Updated_Date);
     },
   },
 ];
@@ -213,15 +212,11 @@ const onAdd = () => {
   dialog.value = true;
 };
 
-const onEdit = (modelCd) => {
+const onEdit = (item) => {
   mode.value = "Edit";
   dialog.value = true;
-  api.getById(modelCd).then((res) => {
-    form.value = res.data;
-    form.value.Updated_Date = form.value.Updated_Date
-      ? moment(form.value.Updated_Date).format('DD/MM/YYYY HH:mm:ss')
-      : ''
-  });
+  form.value = { ...item };
+  form.value.Updated_Date = getDateFormat(form.value.Updated_Date)
 };
 
 const saveClick = async () => {

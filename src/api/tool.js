@@ -8,9 +8,9 @@ export const search = async (data) => {
   }
 };
 
-export const getByProcessCd = async (id) => {
+export const getById = async (processCd, id) => {
   try {
-    const response = await axios.get(`/tool/getByProcess_CD/${id}`);
+    const response = await axios.get(`/tool/getById/${processCd}/${id}`);
     return response.data;
   } catch (error) {
     throw error;

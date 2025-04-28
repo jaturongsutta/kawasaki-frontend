@@ -1,3 +1,4 @@
+import moment from "moment";
 export function generateRange(a, b) {
   const result = [];
   for (let i = a; i <= b; i++) {
@@ -25,4 +26,11 @@ export function getPaging({ page, itemsPerPage, sortBy }) {
       ? null
       : sortBy[0].order;
   return { rowFrom, rowTo, orderField, orderBy, page, itemsPerPage, sortBy };
+}
+
+export function getDateFormat(date) {
+  if (date) {
+    return moment(date).utc().format("DD/MM/YYYY HH:mm:ss");
+  }
+  return "-";
 }
