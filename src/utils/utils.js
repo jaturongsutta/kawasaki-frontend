@@ -34,3 +34,18 @@ export function getDateFormat(date) {
   }
   return "-";
 }
+
+export function commaFormattedNumber(v) {
+  if (v) {
+    return Number(v).toLocaleString('en-US')
+  }
+  return '-';
+}
+
+export const markNumberFormatOptions = {
+  mask: '9,99#',
+  tokens: {
+    9: { pattern: /[0-9]/, repeated: true },
+  },
+  reversed: true
+}

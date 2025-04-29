@@ -7,6 +7,10 @@
                 <template v-slot:[`item.action`]="{ item }">
                     <n-gbtn-edit @click="onEdit(item)"></n-gbtn-edit>
                 </template>
+                <template v-slot:[`item.reset`]="{ item }">
+                    <n-btn-reset @click="onSaveHistory(item)" />
+                </template>
+
                 <template v-slot:bottom>
                     <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
                         v-model:totalItems="totalItems"></n-pagination>
@@ -37,27 +41,35 @@
 
                                 <v-col cols="6">
                                     <label>Tool Life </label>
-                                    <v-text-field v-model="form.Tool_Life" type="number"></v-text-field>
+                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.Tool_Life"
+                                        type="text" inputmode="numeric"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label>Warning Alarm </label>
-                                    <v-text-field v-model="form.Warning_Amt" type="number"></v-text-field>
-                                </v-col>
-
-                                <v-col cols="6">
-                                    <label>Alert Alarm </label>
-                                    <v-text-field v-model="form.Alert_Amt" type="number"></v-text-field>
+                                    <label>Warning Amt </label>
+                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.Warning_Amt"
+                                        type="text"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label>Alarm Alarm </label>
-                                    <v-text-field v-model="form.Alarm_Amt" type="number"></v-text-field>
+                                    <label>Alert Amt </label>
+                                    <v-text-field v-maska="markNumberFormatOptions" v-model="form.Alert_Amt" type="text"
+                                        inputmode="numeric" reverse></v-text-field>
+                                </v-col>
+                                <v-col cols="6">
+                                    <label>Alarm Amt </label>
+                                    <v-text-field v-maska="markNumberFormatOptions" type="text" v-model="form.Alarm_Amt"
+                                        reverse></v-text-field>
+                                </v-col>
+                                <v-col v-if="mode === 'Edit'" cols="6">
+                                    <label>Actual Amt </label>
+                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.Actual_Amt"
+                                        type="number" readonly></v-text-field>
                                 </v-col>
 
                                 <v-col cols="6">
                                     <label>Map Code </label>
                                     <v-text-field v-model="form.Map_CD"></v-text-field>
                                 </v-col>
-                                <v-col cols="6">
+                                <v-col :cols="mode === 'Edit' ? '12' : '6'">
                                     <label class="require-field">Status </label>
                                     <v-select v-model="form.Status" :rules="[rules.required]"
                                         :items="[...statusList]"></v-select>
@@ -96,7 +108,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/tool.js";
 import rules from "@/utils/rules";
-import { getDateFormat } from "@/utils/utils";
+import { getDateFormat, commaFormattedNumber, markNumberFormatOptions } from "@/utils/utils";
 
 const route = useRoute();
 const Alert = inject("Alert");
@@ -110,8 +122,37 @@ const headers = [
     { title: "", key: "action", sortable: false },
     { title: "Tool Code", key: "Tool_CD", sortable: false },
     { title: "Tool Name", key: "Tool_Name", sortable: false },
-    { title: "Tool Life", key: "Tool_Life", sortable: false },
-    { title: "Warning Alarm", key: "Warning_Amt", sortable: false },
+    {
+        title: "Tool Life", key: "Tool_Life", sortable: false,
+        value: (item) => {
+            return commaFormattedNumber(item.Tool_Life);
+        },
+    },
+    {
+        title: "Warning Amt", key: "Warning_Amt", sortable: false,
+        value: (item) => {
+            return commaFormattedNumber(item.Warning_Amt);
+        },
+    },
+    {
+        title: "Alert Amt", key: "Alert_Amt", sortable: false,
+        value: (item) => {
+            return commaFormattedNumber(item.Alert_Amt);
+        },
+    },
+    {
+        title: "Alarm Amt", key: "Alarm_Amt", sortable: false,
+        value: (item) => {
+            return commaFormattedNumber(item.Alarm_Amt);
+        },
+    },
+    {
+        title: "Actual Amt", key: "Actual_Amt", sortable: false,
+        value: (item) => {
+            return commaFormattedNumber(item.Actual_Amt);
+        },
+    },
+    { title: "Reset", key: "reset", sortable: false },
     { title: "Status", key: "Status", sortable: false },
     { title: "Updated By", key: "Updated_By", sortable: false },
     {
@@ -123,8 +164,8 @@ const headers = [
         },
     },
 ];
-let items = ref([]);
 
+let items = ref([]);
 let isLoading = ref(false);
 let isDialogLoading = ref(false);
 let currentPage = ref(1);
@@ -153,7 +194,6 @@ const loadData = async (paginate) => {
         };
         isLoading.value = true;
         const response = await api.search(data);
-
         items.value = response.data;
         totalItems.value = response.total_record;
     } catch (error) {
@@ -179,6 +219,24 @@ const onEdit = (item) => {
     dialog.value = true;
 };
 
+const onSaveHistory = async (item) => {
+    try {
+        isLoading.value = true;
+        const res = await api.createHistory(item);
+        isLoading.value = false;
+        if (res.status === 0) {
+            dialog.value = false;
+            Alert.success(`Reset "${item.Tool_CD} : ${item.Tool_Name}" Successful`);
+            onSearch();
+        } else {
+            Alert.warning(res.message);
+        }
+    } catch (error) {
+        isLoading.value = false;
+        Alert.error(error.message);
+    }
+}
+
 const saveClick = async () => {
     try {
         const { valid } = await frmInfo.value.validate();
@@ -187,12 +245,19 @@ const saveClick = async () => {
         let res = null;
 
         form.value.Process_CD = route.params.id;
+        let params = { ...form.value }
+        params.Tool_Life = convertToPureNumber(params.Tool_Life);
+        params.Warning_Amt = convertToPureNumber(params.Warning_Amt);
+        params.Alarm_Amt = convertToPureNumber(params.Alarm_Amt);
+        params.Alert_Amt = convertToPureNumber(params.Alert_Amt);
+        params.Actual_Amt = convertToPureNumber(params.Actual_Amt);
+
         if (mode.value === "Add") {
             console.log("Add");
-            res = await api.add(form.value);
+            res = await api.add(params);
         } else {
             console.log("Edit");
-            res = await api.update(form.value.Tool_CD, form.value);
+            res = await api.update(params.Tool_CD, params);
         }
         isDialogLoading.value = false;
         if (res.status === 0) {
@@ -207,4 +272,12 @@ const saveClick = async () => {
         Alert.error(error.message);
     }
 };
+
+function convertToPureNumber(v) {
+    if (v) {
+        let n = Number(`${v}`.replace(/,/g, ''))
+        return n
+    }
+    return;
+}
 </script>
