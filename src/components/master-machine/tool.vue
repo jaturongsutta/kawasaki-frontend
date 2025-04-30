@@ -31,57 +31,57 @@
                             <v-row>
                                 <v-col cols="6">
                                     <label class="require-field">Tool Code </label>
-                                    <v-text-field v-model="form.Tool_CD" :rules="[rules.required]"
+                                    <v-text-field v-model="form.toolCd" :rules="[rules.required]"
                                         :readonly="mode === 'Edit'"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <label class="require-field">Tool Name </label>
-                                    <v-text-field v-model="form.Tool_Name" :rules="[rules.required]"></v-text-field>
+                                    <v-text-field v-model="form.toolName" :rules="[rules.required]"></v-text-field>
                                 </v-col>
 
                                 <v-col cols="6">
                                     <label>Tool Life </label>
-                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.Tool_Life"
+                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.toolLife"
                                         type="text" inputmode="numeric"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <label>Warning Amt </label>
-                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.Warning_Amt"
+                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.warningAmt"
                                         type="text"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <label>Alert Amt </label>
-                                    <v-text-field v-maska="markNumberFormatOptions" v-model="form.Alert_Amt" type="text"
+                                    <v-text-field v-maska="markNumberFormatOptions" v-model="form.alertAmt" type="text"
                                         inputmode="numeric" reverse></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <label>Alarm Amt </label>
-                                    <v-text-field v-maska="markNumberFormatOptions" type="text" v-model="form.Alarm_Amt"
+                                    <v-text-field v-maska="markNumberFormatOptions" type="text" v-model="form.alarmAmt"
                                         reverse></v-text-field>
                                 </v-col>
                                 <v-col v-if="mode === 'Edit'" cols="6">
                                     <label>Actual Amt </label>
-                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.Actual_Amt"
+                                    <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.actualAmt"
                                         type="number" readonly></v-text-field>
                                 </v-col>
 
                                 <v-col cols="6">
                                     <label>Map Code </label>
-                                    <v-text-field v-model="form.Map_CD"></v-text-field>
+                                    <v-text-field v-model="form.mapCd"></v-text-field>
                                 </v-col>
                                 <v-col :cols="mode === 'Edit' ? '12' : '6'">
                                     <label class="require-field">Status </label>
-                                    <v-select v-model="form.Status" :rules="[rules.required]"
+                                    <v-select v-model="form.isActive" :rules="[rules.required]"
                                         :items="[...statusList]"></v-select>
                                 </v-col>
                                 <v-col cols="6" v-if="mode === 'Edit'">
                                     <label>Updated By </label>
-                                    <v-text-field v-model="form.Updated_By" :readonly="mode === 'Edit'"></v-text-field>
+                                    <v-text-field v-model="form.updatedBy" :readonly="mode === 'Edit'"></v-text-field>
                                 </v-col>
 
                                 <v-col cols="6" v-if="mode === 'Edit'">
                                     <label>Updated Date </label>
-                                    <v-text-field v-model="form.Updated_Date" :readonly="mode === 'Edit'"
+                                    <v-text-field v-model="form.updatedDate" :readonly="mode === 'Edit'"
                                         placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
                                 </v-col>
 
@@ -212,11 +212,28 @@ const onAdd = () => {
     dialog.value = true;
 };
 
-const onEdit = (item) => {
+const onEdit = async (item) => {
     mode.value = "Edit";
-    form.value = { ...item };
-    form.value.Updated_Date = getDateFormat(form.value.Updated_Date)
+
+    form.value = {
+    };
     dialog.value = true;
+    isDialogLoading.value = true;
+    try {
+        const res = await api.getById(item.Process_CD, item.Tool_CD);
+        isDialogLoading.value = false;
+        if (res.status === 2) {
+            Alert.error("Error ", res.message);
+            return;
+        }
+        form.value = res.data;
+        form.value.updatedDate = getDateFormat(form.value.updatedDate);
+    }
+    catch (e) {
+        isDialogLoading.value = false;
+        console.log('Error: ', e);
+        Alert.error("Error ", e.message);
+    }
 };
 
 const onSaveHistory = async (item) => {
@@ -244,20 +261,20 @@ const saveClick = async () => {
         isDialogLoading.value = true;
         let res = null;
 
-        form.value.Process_CD = route.params.id;
+        form.value.processCd = route.params.id;
         let params = { ...form.value }
-        params.Tool_Life = convertCommaToPureNumber(params.Tool_Life);
-        params.Warning_Amt = convertCommaToPureNumber(params.Warning_Amt);
-        params.Alarm_Amt = convertCommaToPureNumber(params.Alarm_Amt);
-        params.Alert_Amt = convertCommaToPureNumber(params.Alert_Amt);
-        params.Actual_Amt = convertCommaToPureNumber(params.Actual_Amt);
+        params.toolLife = convertCommaToPureNumber(params.toolLife);
+        params.warningAmt = convertCommaToPureNumber(params.warningAmt);
+        params.alarmAmt = convertCommaToPureNumber(params.alarmAmt);
+        params.alertAmt = convertCommaToPureNumber(params.alertAmt);
+        params.actualAmt = convertCommaToPureNumber(params.actualAmt);
 
         if (mode.value === "Add") {
             console.log("Add");
             res = await api.add(params);
         } else {
             console.log("Edit");
-            res = await api.update(params.Tool_CD, params);
+            res = await api.update(params.toolCd, params);
         }
         isDialogLoading.value = false;
         if (res.status === 0) {
