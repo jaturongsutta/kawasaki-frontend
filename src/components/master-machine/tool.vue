@@ -108,7 +108,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/tool.js";
 import rules from "@/utils/rules";
-import { getDateFormat, commaFormattedNumber, markNumberFormatOptions } from "@/utils/utils";
+import { getDateFormat, commaFormattedNumber, markNumberFormatOptions, convertCommaToPureNumber } from "@/utils/utils";
 
 const route = useRoute();
 const Alert = inject("Alert");
@@ -246,11 +246,11 @@ const saveClick = async () => {
 
         form.value.Process_CD = route.params.id;
         let params = { ...form.value }
-        params.Tool_Life = convertToPureNumber(params.Tool_Life);
-        params.Warning_Amt = convertToPureNumber(params.Warning_Amt);
-        params.Alarm_Amt = convertToPureNumber(params.Alarm_Amt);
-        params.Alert_Amt = convertToPureNumber(params.Alert_Amt);
-        params.Actual_Amt = convertToPureNumber(params.Actual_Amt);
+        params.Tool_Life = convertCommaToPureNumber(params.Tool_Life);
+        params.Warning_Amt = convertCommaToPureNumber(params.Warning_Amt);
+        params.Alarm_Amt = convertCommaToPureNumber(params.Alarm_Amt);
+        params.Alert_Amt = convertCommaToPureNumber(params.Alert_Amt);
+        params.Actual_Amt = convertCommaToPureNumber(params.Actual_Amt);
 
         if (mode.value === "Add") {
             console.log("Add");
@@ -273,11 +273,4 @@ const saveClick = async () => {
     }
 };
 
-function convertToPureNumber(v) {
-    if (v) {
-        let n = Number(`${v}`.replace(/,/g, ''))
-        return n
-    }
-    return;
-}
 </script>

@@ -1,4 +1,4 @@
-import moment from "moment";
+import { DateTime } from 'luxon';
 export function generateRange(a, b) {
   const result = [];
   for (let i = a; i <= b; i++) {
@@ -30,7 +30,8 @@ export function getPaging({ page, itemsPerPage, sortBy }) {
 
 export function getDateFormat(date) {
   if (date) {
-    return moment(date).utc().format("DD/MM/YYYY HH:mm:ss");
+    return DateTime.fromISO(date, { zone: 'utc' })
+      .toFormat('dd/MM/yyyy HH:mm:ss');
   }
   return "-";
 }
@@ -48,4 +49,12 @@ export const markNumberFormatOptions = {
     9: { pattern: /[0-9]/, repeated: true },
   },
   reversed: true
+}
+
+export function convertCommaToPureNumber(v) {
+  if (v) {
+    let n = Number(`${v}`.replace(/,/g, ''))
+    return n
+  }
+  return;
 }

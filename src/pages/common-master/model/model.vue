@@ -58,49 +58,50 @@
               <v-row>
                 <v-col cols="6">
                   <label class="require-field">Model </label>
-                  <v-text-field v-model="form.Model_CD" :rules="[rules.required]"
+                  <v-text-field v-model="form.modelCd" :rules="[rules.required]"
                     :readonly="mode === 'Edit'"></v-text-field>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Product Code </label>
-                  <v-text-field v-model="form.Product_CD" :rules="[rules.required]"></v-text-field>
+                  <v-text-field v-model="form.productCd" :rules="[rules.required]"></v-text-field>
                 </v-col>
 
                 <v-col cols="6">
                   <label class="require-field">Cycle Time (mins) </label>
-                  <v-text-field v-model="form.Cycle_Time_Min" :rules="[rules.required]" type="number"></v-text-field>
+                  <v-text-field v-model="form.cycleTimeMins" v-maska="markNumberFormatOptions" reverse :rules="[rules.required,
+                  v => (parseInt(v.replace(/,/g, '')) <= 1439) || 'Maximum is 1439 minutes']" type="text"></v-text-field>
                 </v-col>
                 <v-col cols="6">
                   <label>Part Name </label>
-                  <v-text-field v-model="form.predefineCd"></v-text-field>
+                  <v-text-field v-model="form.partName"></v-text-field>
                 </v-col>
 
                 <v-col cols="6">
                   <label class="require-field">Part No </label>
-                  <v-text-field v-model="form.Part_No" :rules="[rules.required]"></v-text-field>
+                  <v-text-field v-model="form.partNo" :rules="[rules.required]"></v-text-field>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Part Upper </label>
-                  <v-text-field v-model="form.Part_Upper" :rules="[rules.required]"></v-text-field>
+                  <v-text-field v-model="form.partUpper" :rules="[rules.required]"></v-text-field>
                 </v-col>
 
                 <v-col cols="6">
                   <label class="require-field">Part Lower </label>
-                  <v-text-field v-model="form.Part_Lower" :rules="[rules.required]"></v-text-field>
+                  <v-text-field v-model="form.partLower" :rules="[rules.required]"></v-text-field>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Status </label>
-                  <v-select v-model="form.Status" :rules="[rules.required]" :items="[...statusList]"></v-select>
+                  <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
                 </v-col>
                 <v-col cols="6" v-if="mode === 'Edit'">
                   <label class="require-field">Updated By </label>
-                  <v-text-field v-model="form.Updated_By" :rules="[rules.required]"
+                  <v-text-field v-model="form.updatedBy" :rules="[rules.required]"
                     :readonly="mode === 'Edit'"></v-text-field>
                 </v-col>
 
                 <v-col cols="6" v-if="mode === 'Edit'">
                   <label class="require-field">Updated Date </label>
-                  <v-text-field v-model="form.Updated_Date" :rules="[rules.required]" :readonly="mode === 'Edit'"
+                  <v-text-field v-model="form.updatedDate" :rules="[rules.required]" :readonly="mode === 'Edit'"
                     placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
                 </v-col>
 
@@ -126,7 +127,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/model.js";
 import rules from "@/utils/rules";
-import { getDateFormat } from "@/utils/utils";
+import { getDateFormat, markNumberFormatOptions, convertCommaToPureNumber, commaFormattedNumber } from "@/utils/utils";
 
 const Alert = inject("Alert");
 const frmInfo = ref(null);
@@ -140,7 +141,11 @@ const headers = [
   { title: "", key: "action", sortable: false },
   { title: "Model", key: "Model_CD", sortable: false },
   { title: "Product Code", key: "Product_CD", sortable: false },
-  { title: "Cycle Time (mins)", key: "Cycle_Time_Min", sortable: false },
+  {
+    title: "Cycle Time (mins)", key: "Cycle_Time_Min", sortable: false, value: (item) => {
+      return commaFormattedNumber(item.Cycle_Time_Min);
+    },
+  },
   { title: "Status", key: "Status", sortable: false },
   { title: "Updated By", key: "Updated_By", sortable: false },
   {
@@ -212,11 +217,27 @@ const onAdd = () => {
   dialog.value = true;
 };
 
-const onEdit = (item) => {
+const onEdit = async (item) => {
   mode.value = "Edit";
+  form.value = {
+  };
   dialog.value = true;
-  form.value = { ...item };
-  form.value.Updated_Date = getDateFormat(form.value.Updated_Date)
+  isDialogLoading.value = true;
+  try {
+    const res = await api.getById(item.Model_CD);
+    isDialogLoading.value = false;
+    if (res.status === 2) {
+      Alert.error("Error ", res.message);
+      return;
+    }
+    form.value = res.data;
+    form.value.updatedDate = getDateFormat(form.value.updatedDate);
+  }
+  catch (e) {
+    isDialogLoading.value = false;
+    console.log('Error: ', e);
+    Alert.error("Error ", e.message);
+  }
 };
 
 const saveClick = async () => {
@@ -225,12 +246,14 @@ const saveClick = async () => {
     if (!valid) return;
     isDialogLoading.value = true;
     let res = null;
+    let params = { ...form.value }
+    params.cycleTimeMins = convertCommaToPureNumber(params.cycleTimeMins);
     if (mode.value === "Add") {
       console.log("Add");
-      res = await api.add(form.value);
+      res = await api.add(params);
     } else {
       console.log("Edit");
-      res = await api.update(form.value.Model_CD, form.value);
+      res = await api.update(params.modelCd, params);
     }
     isDialogLoading.value = false;
     if (res.status === 0) {
