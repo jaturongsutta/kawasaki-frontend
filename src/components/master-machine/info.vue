@@ -1,50 +1,48 @@
 <template>
-    <v-container>
-        <v-form ref="frmInfo">
-            <v-row>
-                <v-col md="4">
-                    <label class="require-field">Machine No</label>
-                    <v-text-field v-model="machineItem.Machine_No" :readonly="pageMode === 'edit'"
-                        :rules="[rules.required]"></v-text-field>
-                </v-col>
-                <v-col md="4">
-                    <label class="require-field">Process Code</label>
-                    <v-text-field v-model="machineItem.Process_CD" :readonly="pageMode === 'edit'"
-                        :rules="[rules.required]"></v-text-field>
-                </v-col>
-                <v-col md="4">
-                    <label>Map Code</label>
-                    <v-text-field v-model="machineItem.Map_CD"></v-text-field>
-                </v-col>
-                <v-col md="4" v-if="pageMode === 'edit'">
-                    <label>Updated By</label>
-                    <v-text-field v-model="machineItem.Updated_By" :readonly="pageMode === 'edit'"></v-text-field>
-                </v-col>
-                <v-col md="4" v-if="pageMode === 'edit'">
-                    <label>Updated Date</label>
-                    <v-text-field v-model="machineItem.Updated_Date" :readonly="pageMode === 'edit'"></v-text-field>
-                </v-col>
-                <v-col :md="pageMode === 'edit' ? '4' : '12'">
-                    <label>Status</label>
-                    <v-select v-model="machineItem.Status" :items="[{ title: 'All', value: null }, ...statusList]"
-                        :rules="[rules.required]"></v-select>
-                </v-col>
-                <v-col md="12">
-                    <label class="require-field">Machine Name</label>
-                    <v-text-field v-model="machineItem.Machine_Name" :rules="[rules.required]"></v-text-field>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col>
-                    <div class="d-flex justify-center mb-3">
-                        <n-btn-save @click="saveClick" />
-                        <n-btn-cancel @click="router.go(-1)" class="ml-3" />
-                    </div>
-                </v-col>
-            </v-row>
-            <n-loading :loading="isLoading" />
-        </v-form>
-    </v-container>
+    <v-form ref="frmInfo">
+        <v-row>
+            <v-col md="3">
+                <label class="require-field">Machine No</label>
+                <v-text-field v-model="machineItem.machineNo" :readonly="pageMode === 'edit'"
+                    :rules="[rules.required]"></v-text-field>
+            </v-col>
+            <v-col md="3">
+                <label class="require-field">Process Code</label>
+                <v-text-field v-model="machineItem.processCd" :readonly="pageMode === 'edit'"
+                    :rules="[rules.required]"></v-text-field>
+            </v-col>
+            <v-col md="6">
+                <label class="require-field">Machine Name</label>
+                <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+            </v-col>
+            <v-col :md="pageMode === 'edit' ? '3' : '6'">
+                <label>Map Code</label>
+                <v-text-field v-model="machineItem.mapCd"></v-text-field>
+            </v-col>
+            <v-col :md="pageMode === 'edit' ? '3' : '6'">
+                <label>Status</label>
+                <v-select v-model="machineItem.isActive" :items="[{ title: 'All', value: null }, ...statusList]"
+                    :rules="[rules.required]"></v-select>
+            </v-col>
+            <v-col md="3" v-if="pageMode === 'edit'">
+                <label>Updated By</label>
+                <v-text-field v-model="machineItem.updatedBy" :readonly="pageMode === 'edit'"></v-text-field>
+            </v-col>
+            <v-col md="3" v-if="pageMode === 'edit'">
+                <label>Updated Date</label>
+                <v-text-field v-model="machineItem.updatedDate" :readonly="pageMode === 'edit'"></v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <div class="d-flex justify-center mb-3">
+                    <n-btn-save @click="saveClick" />
+                    <n-btn-cancel @click="router.go(-1)" class="ml-3" />
+                </div>
+            </v-col>
+        </v-row>
+        <n-loading :loading="isLoading" />
+    </v-form>
 </template>
 
 <script setup>
@@ -63,13 +61,13 @@ const dialog = ref(false);
 const statusList = ref([]);
 
 let machineItem = ref({
-    Machine_No: '',
-    Process_CD: '',
-    Machine_Name: '',
-    Map_CD: '',
-    Status: '',
-    Updated_By: '',
-    Updated_Date: ''
+    machineNo: '',
+    processCd: '',
+    machineName: '',
+    mapCd: '',
+    isActive: '',
+    updatedBy: '',
+    updatedDate: ''
 });
 
 let isLoading = ref(false);
@@ -97,11 +95,15 @@ const onSearch = async () => {
 const loadData = async () => {
     try {
         isLoading.value = true;
-        let id = pageMode.value === 'edit' ? route.params.id : machineItem.value.Machine_No;
+        let id = pageMode.value === 'edit' ? route.params.id : machineItem.value.machineNo;
         const response = await api.getById(id);
 
+        if (response.status === 2) {
+            Alert.error("Error ", response.message);
+            return;
+        }
         machineItem.value = response.data;
-        machineItem.value.Updated_Date = getDateFormat(machineItem.value.Updated_Date);
+        machineItem.value.updatedDate = getDateFormat(machineItem.value.updatedDate);
 
     } catch (error) {
         console.error("Error fetching API:", error);
@@ -113,7 +115,6 @@ const loadData = async () => {
 const saveClick = async () => {
     try {
         const { valid } = await frmInfo.value.validate();
-        console.log('vali ', valid)
         if (!valid) return;
         isLoading.value = true;
         isDialogLoading.value = true;
@@ -123,7 +124,7 @@ const saveClick = async () => {
             res = await api.add(machineItem.value);
         } else {
             console.log("Edit");
-            res = await api.update(machineItem.value.Machine_No, machineItem.value);
+            res = await api.update(machineItem.value.processCd, machineItem.value);
         }
         isLoading.value = false;
         isDialogLoading.value = false;

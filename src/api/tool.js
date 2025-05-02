@@ -43,3 +43,12 @@ export const remove = async (id) => {
     throw error;
   }
 };
+
+export const createHistory = async (data) => {
+  try {
+    const response = await axios.post(`/tool/history`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

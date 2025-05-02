@@ -16,11 +16,14 @@ import App from "./App.vue";
 
 // Composables
 import { createApp } from "vue";
+import { vMaska } from "maska/vue"
 
 const app = createApp(App);
 
 registerPlugins(app);
 
 registerGlobalComponents(app);
+
+app.directive('maska', vMaska)
 
 app.mount("#app");

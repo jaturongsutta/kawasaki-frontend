@@ -3,7 +3,7 @@
     type="text"
     v-model="timeInput"
     @input="applyMask"
-    placeholder="HH:mm"
+    placeholder="mm:ss"
     maxlength="5"
     @change="onInputUpdated"
     @keypress="onKeypress"
@@ -13,6 +13,7 @@
 
 <script setup>
 import { ref, watch, defineProps, defineEmits } from "vue";
+
 // Define props
 const props = defineProps({
   modelValue: {
@@ -23,26 +24,55 @@ const props = defineProps({
 // Define emits
 const emit = defineEmits(["update:modelValue"]);
 
-const timeInput = ref(null);
+const timeInput = ref(""); // For display (mm:ss)
 
+// Watch for changes in modelValue and update timeInput for display
 watch(
   () => props.modelValue,
   (newValue) => {
-    timeInput.value = newValue;
+    if (newValue) {
+      let minutes, seconds;
+      const sp = newValue.split(":");
+      if (sp.length === 2) {
+        // hours = "00"; // fix 00
+        minutes = sp[0];
+        seconds = sp[1];
+        emit(
+          "update:modelValue",
+          `00:${minutes.padStart(2, "0")}:${seconds.padStart(2, "0")}`
+        );
+      } else if (sp.length === 3) {
+        // hours = sp[0]; // fix 00
+        minutes = sp[1];
+        seconds = sp[2];
+      }
+
+      timeInput.value = `${minutes.padStart(2, "0")}:${seconds}`;
+    } else {
+      timeInput.value = "";
+    }
   },
   { immediate: true }
 );
-watch(
-  timeInput,
-  (newValue) => {
-    emit("update:modelValue", newValue);
-  },
-  { deep: true }
-);
 
-// watch(timeInput, (newValue) => {
-//   emit("input", newValue);
-// });
+// Watch for changes in timeInput and update modelValue with hh:mm:ss format
+watch(timeInput, (newValue) => {
+  if (newValue) {
+    let minutes, seconds;
+    const sp = newValue.split(":");
+    if (sp.length === 2) {
+      // hours = "00"; // fix 00
+      minutes = sp[0];
+      seconds = sp[1];
+    } else if (sp.length === 3) {
+      // hours = sp[0]; // fix 00
+      minutes = sp[1];
+      seconds = sp[2];
+    }
+    const formattedValue = `00:${minutes.padStart(2, "0")}:${seconds}`;
+    emit("update:modelValue", formattedValue);
+  }
+});
 
 const onKeypress = (e) => {
   const key = e.key;
@@ -76,26 +106,26 @@ const onInputUpdated = () => {
   let value = timeInput.value;
 
   if (value.indexOf(":") !== -1) {
-    let [hours, minutes] = value.split(":");
-    hours = hours.padStart(2, "0");
+    let [minutes, seconds] = value.split(":");
     minutes = minutes.padStart(2, "0");
-    value = hours + ":" + minutes;
+    seconds = seconds.padStart(2, "0");
+    value = `${minutes}:${seconds}`;
   }
 
   if (value.indexOf(":") === -1 && value.length > 0) {
     value = value.padStart(2, "0") + ":00";
   }
 
-  let [hours, minutes] = value.split(":");
-  if (hours >= 24) {
-    hours = "24";
-    minutes = "00";
-  } else if (minutes && minutes.length === 1) {
-    minutes = "0" + minutes;
-  } else if (minutes && minutes >= 60) {
+  let [minutes, seconds] = value.split(":");
+  if (minutes >= 60) {
     minutes = "59";
+    seconds = "59";
+  } else if (seconds && seconds.length === 1) {
+    seconds = "0" + seconds;
+  } else if (seconds && seconds >= 60) {
+    seconds = "59";
   }
 
-  timeInput.value = [hours, minutes].filter(Boolean).join(":");
+  timeInput.value = `${minutes}:${seconds}`;
 };
 </script>
