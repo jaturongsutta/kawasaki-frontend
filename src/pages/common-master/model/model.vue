@@ -68,9 +68,7 @@
 
                 <v-col cols="6">
                   <label class="require-field">Cycle Time (mins) </label>
-                  <n-time v-model="form.cycleTime" :rules="[rules.required]"></n-time>
-                  <!-- <v-text-field v-model="form.cycleTimeMins" v-maska="markNumberFormatOptions" reverse :rules="[rules.required,
-                  v => (parseInt(v.replace(/,/g, '')) <= 1439) || 'Maximum is 1439 minutes']" type="text"></v-text-field> -->
+                  <n-time v-model="form.cycleTime" :rules="[rules.required]" reverse></n-time>
                 </v-col>
                 <v-col cols="6">
                   <label>Part Name </label>
@@ -82,13 +80,13 @@
                   <v-text-field v-model="form.partNo" :rules="[rules.required]"></v-text-field>
                 </v-col>
                 <v-col cols="6">
-                  <label class="require-field">Part Upper </label>
-                  <v-text-field v-model="form.partUpper" :rules="[rules.required]"></v-text-field>
+                  <label>Part Upper </label>
+                  <v-text-field v-model="form.partUpper"></v-text-field>
                 </v-col>
 
                 <v-col cols="6">
-                  <label class="require-field">Part Lower </label>
-                  <v-text-field v-model="form.partLower" :rules="[rules.required]"></v-text-field>
+                  <label>Part Lower </label>
+                  <v-text-field v-model="form.partLower"></v-text-field>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Status </label>
@@ -128,7 +126,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/model.js";
 import rules from "@/utils/rules";
-import { getDateFormat, convertCommaToPureNumber, commaFormattedNumber } from "@/utils/utils";
+import { getDateFormat} from "@/utils/utils";
 
 const Alert = inject("Alert");
 const frmInfo = ref(null);
@@ -143,9 +141,7 @@ const headers = [
   { title: "Model", key: "Model_CD", sortable: false },
   { title: "Product Code", key: "Product_CD", sortable: false },
   {
-    title: "Cycle Time (mins)", key: "Cycle_Time_Min", sortable: false, value: (item) => {
-      return commaFormattedNumber(item.Cycle_Time_Min);
-    },
+    title: "Cycle Time (mins)", key: "Cycle_Time", sortable: false
   },
   { title: "Status", key: "Status", sortable: false },
   { title: "Updated By", key: "Updated_By", sortable: false },

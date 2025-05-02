@@ -40,24 +40,24 @@
                                 </v-col>
 
                                 <v-col cols="6">
-                                    <label>Tool Life </label>
+                                    <label class="require-field">Tool Life </label>
                                     <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.toolLife"
-                                        type="text" inputmode="numeric"></v-text-field>
+                                        type="text" inputmode="numeric" :rules="[rules.required]"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label>Warning Amt </label>
+                                    <label class="require-field">Warning Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.warningAmt"
-                                        type="text"></v-text-field>
+                                        type="text" :rules="[rules.required]"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label>Alert Amt </label>
+                                    <label class="require-field">Alert Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" v-model="form.alertAmt" type="text"
-                                        inputmode="numeric" reverse></v-text-field>
+                                        inputmode="numeric" reverse :rules="[rules.required]"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label>Alarm Amt </label>
+                                    <label class="require-field">Alarm Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" type="text" v-model="form.alarmAmt"
-                                        reverse></v-text-field>
+                                        reverse :rules="[rules.required]"></v-text-field>
                                 </v-col>
                                 <v-col v-if="mode === 'Edit'" cols="6">
                                     <label>Actual Amt </label>
