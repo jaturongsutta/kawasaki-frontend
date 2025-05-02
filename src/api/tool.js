@@ -44,9 +44,9 @@ export const remove = async (id) => {
   }
 };
 
-export const createHistory = async (data) => {
+export const reset = async (data) => {
   try {
-    const response = await axios.post(`/tool/history`, data);
+    const response = await axios.post(`/tool/reset`, data);
     return response.data;
   } catch (error) {
     throw error;

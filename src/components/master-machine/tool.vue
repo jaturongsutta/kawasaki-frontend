@@ -239,7 +239,7 @@ const onEdit = async (item) => {
 const onSaveHistory = async (item) => {
     try {
         isLoading.value = true;
-        const res = await api.createHistory(item);
+        const res = await api.reset(item);
         isLoading.value = false;
         if (res.status === 0) {
             dialog.value = false;
