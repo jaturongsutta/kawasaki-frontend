@@ -71,6 +71,8 @@ watch(timeInput, (newValue) => {
     }
     const formattedValue = `00:${minutes.padStart(2, "0")}:${seconds}`;
     emit("update:modelValue", formattedValue);
+  } else {
+    emit("update:modelValue", null);
   }
 });
 
@@ -104,6 +106,11 @@ const applyMask = () => {
 
 const onInputUpdated = () => {
   let value = timeInput.value;
+
+  if (value === null || value.length === 0) {
+    timeInput.value = "";
+    return;
+  }
 
   if (value.indexOf(":") !== -1) {
     let [minutes, seconds] = value.split(":");
