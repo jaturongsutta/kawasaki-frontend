@@ -68,8 +68,9 @@
 
                 <v-col cols="6">
                   <label class="require-field">Cycle Time (mins) </label>
-                  <v-text-field v-model="form.cycleTimeMins" v-maska="markNumberFormatOptions" reverse :rules="[rules.required,
-                  v => (parseInt(v.replace(/,/g, '')) <= 1439) || 'Maximum is 1439 minutes']" type="text"></v-text-field>
+                  <n-time v-model="form.cycleTime" :rules="[rules.required]"></n-time>
+                  <!-- <v-text-field v-model="form.cycleTimeMins" v-maska="markNumberFormatOptions" reverse :rules="[rules.required,
+                  v => (parseInt(v.replace(/,/g, '')) <= 1439) || 'Maximum is 1439 minutes']" type="text"></v-text-field> -->
                 </v-col>
                 <v-col cols="6">
                   <label>Part Name </label>
@@ -127,7 +128,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/model.js";
 import rules from "@/utils/rules";
-import { getDateFormat, markNumberFormatOptions, convertCommaToPureNumber, commaFormattedNumber } from "@/utils/utils";
+import { getDateFormat, convertCommaToPureNumber, commaFormattedNumber } from "@/utils/utils";
 
 const Alert = inject("Alert");
 const frmInfo = ref(null);
@@ -247,7 +248,6 @@ const saveClick = async () => {
     isDialogLoading.value = true;
     let res = null;
     let params = { ...form.value }
-    params.cycleTimeMins = convertCommaToPureNumber(params.cycleTimeMins);
     if (mode.value === "Add") {
       console.log("Add");
       res = await api.add(params);
