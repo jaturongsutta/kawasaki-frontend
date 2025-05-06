@@ -46,6 +46,12 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   (response) => {
+    if (response.data.status === 2) {
+      notify({
+        type: "error",
+        text: response.data.message,
+      });
+    }
     return response;
   },
   async (error) => {
