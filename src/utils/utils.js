@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
 export function generateRange(a, b) {
   const result = [];
   for (let i = a; i <= b; i++) {
@@ -28,33 +28,35 @@ export function getPaging({ page, itemsPerPage, sortBy }) {
   return { rowFrom, rowTo, orderField, orderBy, page, itemsPerPage, sortBy };
 }
 
-export function getDateFormat(date) {
+export function getDateFormat(date, format) {
   if (date) {
-    return DateTime.fromISO(date, { zone: 'utc' })
-      .toFormat('dd/MM/yyyy HH:mm:ss');
+    if (format === undefined || format === null || format.length === 0) {
+      format = "dd/MM/yyyy HH:mm:ss";
+    }
+    return DateTime.fromISO(date, { zone: "utc" }).toFormat(format);
   }
   return "-";
 }
 
 export function commaFormattedNumber(v) {
   if (v) {
-    return Number(v).toLocaleString('en-US')
+    return Number(v).toLocaleString("en-US");
   }
-  return '-';
+  return "-";
 }
 
 export const markNumberFormatOptions = {
-  mask: '9,99#',
+  mask: "9,99#",
   tokens: {
     9: { pattern: /[0-9]/, repeated: true },
   },
-  reversed: true
-}
+  reversed: true,
+};
 
 export function convertCommaToPureNumber(v) {
   if (v) {
-    let n = Number(`${v}`.replace(/,/g, ''))
-    return n
+    let n = Number(`${v}`.replace(/,/g, ""));
+    return n;
   }
   return;
 }

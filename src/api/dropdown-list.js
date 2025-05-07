@@ -105,6 +105,16 @@ export const machine = async () => {
   }
 };
 
+export const lineModel = async (line) => {
+  try {
+    const { data } = await axios.get(`dropdown-list/line-model/${line}`);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 /// private function ///
 
 const getPredefineByGroup = async (group) => {

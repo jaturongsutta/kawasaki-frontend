@@ -100,7 +100,7 @@ const routes = [
   {
     path: "/plan",
     meta: {
-      requireAuth: false,
+      menuNo: "M2002",
     },
     children: [
       {
