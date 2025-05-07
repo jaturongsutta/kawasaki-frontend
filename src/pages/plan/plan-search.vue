@@ -539,13 +539,27 @@ const onPlanCurrentEditClick = (item) => {
 
 const onStopPlanClick = (item) => {
   console.log("onStopPlanClick", item);
-  Alert.confirm("Are you sure you want to delete this line ?").then(
-    ({ isConfirmed }) => {
-      if (isConfirmed) {
-        isLoading.value = true;
-      }
+  Alert.confirm("กรุณายืนยัน การหยุดแผนผลิต นี้").then(({ isConfirmed }) => {
+    if (isConfirmed) {
+      isLoading.value = true;
+      api
+        .stopPlan(item.id)
+        .then((response) => {
+          if (response.status === 0) {
+            Alert.success("Stop plan success");
+          } else {
+            Alert.warning("Stop plan failed");
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting line:", error);
+          Alert.error("Error deleting line");
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
     }
-  );
+  });
 };
 </script>
 
