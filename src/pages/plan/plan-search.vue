@@ -40,43 +40,7 @@
             <n-btn-search @click="onSearch" />
           </v-sheet>
         </v-row>
-        <!-- <v-row>
-          <v-col cols="8">
-            <v-row>
-              <v-col>
-                <label>Line</label>
-                <v-select
-                  v-model="formSearch.isActive"
-                  :items="[{ title: 'All', value: null }]"
-                ></v-select>
-              </v-col>
-              <v-col>
-                <label>Plan Date From</label>
-                <n-date v-model="date1"></n-date>
-              </v-col>
-              <v-col>
-                <label>Plan Date From</label>
-                <n-date v-model="date2"></n-date>
-              </v-col>
 
-              <v-col>
-                <label>Status</label>
-                <v-select
-                  v-model="formSearch.isActive"
-                  :items="[{ title: 'All', value: null }]"
-                ></v-select>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="4">
-            <div class="row">
-              <div class="d-flex justify-center">
-                <n-btn-search @click="onSearch" />
-                <n-btn-reset @click="onReset" class="ml-3" />
-              </div>
-            </div>
-          </v-col>
-        </v-row> -->
         <v-row class="mb-3">
           <v-col>
             <hr />
@@ -85,7 +49,7 @@
         <v-row>
           <v-col>
             <h3 style="color: #3366ff">
-              Current Production Plan 03/04/2025 10:10:00
+              Current Production Plan {{ currentPlanTime }}
             </h3>
           </v-col>
         </v-row>
@@ -100,18 +64,20 @@
               hide-default-footer
             >
               <template v-slot:[`item.action`]="{ item }">
-                <v-icon
-                  icon="mdi-pencil-outline"
-                  v-tooltip:end="'Edit'"
-                  class="text-warning"
-                ></v-icon>
+                <n-gbtn-edit
+                  @click="onPlanCurrentEditClick(item)"
+                ></n-gbtn-edit>
               </template>
               <template v-slot:[`item.action2`]="{ item }">
-                <v-icon
+                <n-gbtn-stop
+                  @click="onStopPlanClick(item)"
+                  v-if="['10', '20'].includes(item.status)"
+                ></n-gbtn-stop>
+                <!-- <v-icon
                   icon="mdi mdi-cancel"
                   style="color: red"
                   v-if="item.action2"
-                ></v-icon>
+                ></v-icon> -->
               </template>
 
               <template v-slot:[`item.status`]="{ item }">
@@ -207,15 +173,9 @@
               :items-per-page="pageSize"
             >
               <template v-slot:[`item.action`]="{ item }">
-                <n-gbtn-edit
-                  :permission="false"
-                  @click="onEdit(item.Menu_No)"
-                ></n-gbtn-edit>
+                <n-gbtn-edit @click="onEdit(item.Menu_No)"></n-gbtn-edit>
 
-                <n-gbtn-delete
-                  :permission="false"
-                  v-if="item.buttonDel"
-                ></n-gbtn-delete>
+                <n-gbtn-delete v-if="item.status === '00'"></n-gbtn-delete>
               </template>
 
               <template v-slot:bottom>
@@ -374,12 +334,14 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, inject } from "vue";
 import rules from "@/utils/rules";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/plan.js";
 
 import { getPaging, getDateFormat } from "@/utils/utils.js";
+import moment from "moment";
+const Alert = inject("Alert");
 
 const dialog = ref(false);
 
@@ -395,6 +357,8 @@ const formInfo = ref({
   partName: "a",
 });
 const isLoading = ref(false);
+
+const currentPlanTime = ref();
 const currentPage = ref(1);
 const pageSize = ref(10);
 const totalItems = ref(2);
@@ -408,17 +372,35 @@ const totalItemsDetail = ref(8);
 const headersPlanCurrent = [
   { title: "", key: "action", sortable: false },
   { title: "", key: "action2", sortable: false },
-  { title: "Status", key: "status", sortable: false },
-  { title: "Production Date", key: "production_date", sortable: false },
-  { title: "Start Time", key: "start_time", sortable: false },
-  { title: "Finish Time", key: "finish_date", sortable: false },
-  { title: "Model", key: "model", sortable: false },
-  { title: "Shift", key: "shift", sortable: false },
-  { title: "Shift Time", key: "shift_time", sortable: false },
-  { title: "OT", key: "ot", sortable: false },
-  { title: "Cycle Time(mins)", key: "cycle_time", sortable: false },
-  { title: "Total Time()mins", key: "total_time", sortable: false },
-  { title: "Target FG", key: "target_fg", sortable: false },
+  { title: "Status", key: "status_name", sortable: false },
+  {
+    title: "Production Date",
+    key: "Plan_Date",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Plan_Date, "dd/MM/yyyy");
+    },
+  },
+  {
+    title: "Start Time",
+    key: "Plan_Start_Time",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Plan_Start_Time, "HH:mm");
+    },
+  },
+  { title: "Model", key: "Model_CD", sortable: false },
+  { title: "Shift", key: "Team_Name", sortable: false },
+  { title: "Shift Time", key: "Shift_Period_Name", sortable: false },
+  { title: "Break1", key: "B1", sortable: false },
+  { title: "Lunch Break", key: "B2", sortable: false },
+  { title: "Break2", key: "B3", sortable: false },
+  { title: "Break OT", key: "B4", sortable: false },
+  { title: "OT", key: "OT", sortable: false },
+  { title: "Cycle Time", key: "Cycle_Times", sortable: false },
+  { title: "Total Time(mins)", key: "plan_total_time", sortable: false },
+  { title: "Target FG", key: "plan_fg_amt", sortable: false },
+  { title: "Actual FG", key: "actual_fg_amt", sortable: false },
 ];
 
 const itemsPlanCurrent = ref([]);
@@ -485,7 +467,7 @@ onMounted(() => {
 
   // Start interval to fetch data every 5 seconds
   intervalId.value = setInterval(() => {
-    console.log("Fetching data every 5 seconds");
+    console.log("Fetching data every 5 seconds ", formSearch.value.line);
     if (formSearch.value.line) {
       loadPlanCurrent(formSearch.value.line);
     }
@@ -507,6 +489,7 @@ const newPlanClick = () => {
 const loadPlanCurrent = (line) => {
   api.getPalnListCurrent(line).then((data) => {
     itemsPlanCurrent.value = data;
+    currentPlanTime.value = moment().format("YYYY-MM-DD HH:mm:ss");
   });
 };
 
@@ -546,6 +529,23 @@ const lineChange = (value) => {
     lineModelList.value = data;
   });
   loadPlanCurrent(value);
+};
+
+const onPlanCurrentEditClick = (item) => {
+  console.log("onPlanCurrentEditClick", item);
+
+  dialog.value = true;
+};
+
+const onStopPlanClick = (item) => {
+  console.log("onStopPlanClick", item);
+  Alert.confirm("Are you sure you want to delete this line ?").then(
+    ({ isConfirmed }) => {
+      if (isConfirmed) {
+        isLoading.value = true;
+      }
+    }
+  );
 };
 </script>
 

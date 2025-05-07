@@ -2,7 +2,7 @@
   <v-icon
     icon="mdi mdi-delete"
     v-tooltip:end="'Delete'"
-    style="margin-left: 5px; margin-right: 5px; color: red"
+    style="margin-left: 5px; margin-right: 5px; color: red; cursor: pointer"
   ></v-icon>
 </template>
 
