@@ -24,6 +24,7 @@ import NTime from "@/components/common-components/n-time.vue";
 import NBtnUpload from "@/components/common-components/button/n-btn-upload.vue";
 import NInputNumber from "@/components/common-components/n-input-number.vue";
 import NDatetime from "@/components/common-components/n-datetime.vue";
+import NGbtnStop from "@/components/common-components/table-button/n-gbtn-stop.vue";
 
 export function registerGlobalComponents(app) {
   app
@@ -46,6 +47,7 @@ export function registerGlobalComponents(app) {
     .component("n-gbtn-delete", NGbtnDelete)
     .component("n-gbtn-download", NGbtnDownload)
     .component("n-gbtn-export", NGbtnExport)
+    .component("n-gbtn-stop", NGbtnStop)
     .component("n-input-number", NInputNumber)
     .component("n-date", NDate)
     .component("n-time", NTime)

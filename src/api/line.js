@@ -17,6 +17,38 @@ export const getById = async (id) => {
   }
 };
 
+export const getProcessByModelCd = async (lineCd, modelCd) => {
+  try {
+    const response = await axios.get(
+      `/line/getProcessByModel/${lineCd}/${modelCd}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getTool = async (lineCd, modelCd, processCd) => {
+  try {
+    const response = await axios.get(
+      `/line/getTool/${lineCd}/${modelCd}/${processCd}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// get tool all data
+export const getToolAll = async () => {
+  try {
+    const response = await axios.get(`/line/getToolAll`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const add = async (data) => {
   try {
     const response = await axios.post(`/line/add`, data);

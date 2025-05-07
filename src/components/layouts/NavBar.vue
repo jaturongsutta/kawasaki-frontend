@@ -140,12 +140,9 @@
         </v-list-item>
 
         <!-- Mockup -->
-        <v-list-item to="/plan" link>
+        <!-- <v-list-item to="/plan" link>
           <v-list-item-title>Plan</v-list-item-title>
-        </v-list-item>
-        <v-list-item to="/ng" link>
-          <v-list-item-title>NG</v-list-item-title>
-        </v-list-item>
+        </v-list-item> -->
       </template>
     </v-list>
   </v-navigation-drawer>

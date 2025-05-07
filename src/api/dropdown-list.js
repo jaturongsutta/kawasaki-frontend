@@ -75,6 +75,46 @@ export const product = async () => {
   }
 };
 
+export const model = async () => {
+  try {
+    const { data } = await axios.get(`dropdown-list/model`);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const model_ = async () => {
+  try {
+    const { data } = await axios.get(`dropdown-list/model*`);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const machine = async () => {
+  try {
+    const { data } = await axios.get(`dropdown-list/machine`);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const lineModel = async (line) => {
+  try {
+    const { data } = await axios.get(`dropdown-list/line-model/${line}`);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 /// private function ///
 
 const getPredefineByGroup = async (group) => {

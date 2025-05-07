@@ -10,75 +10,37 @@
             <label>Line</label>
             <v-select
               v-model="formSearch.line"
-              :items="[
-                { title: 'All', value: null },
-                { title: 'Cylinder Head 1' },
-                { title: 'Cylinder Head 2' },
-                { title: 'Cylinder Head 3' },
-                { title: 'Cylinder Head 4' },
-                { title: 'Cylinder Head 5' },
-                { title: 'Cylinder Head 6', value: '1' },
-              ]"
+              :items="lineList"
+              @update:model-value="lineChange"
             ></v-select>
           </v-sheet>
-          <v-sheet width="200" class="mr-3">
+          <v-sheet width="160" class="mr-3">
             <label>Plan Date From</label>
             <n-date v-model="date1"></n-date>
           </v-sheet>
-          <v-sheet width="200" class="mr-3">
+          <v-sheet width="160" class="mr-3">
             <label>Plan Date To</label>
             <n-date v-model="date2"></n-date>
           </v-sheet>
-
           <v-sheet width="200" class="mr-3">
+            <label>Model</label>
+            <v-select
+              v-model="formSearch.model"
+              :items="[{ title: 'All', value: null }, ...lineModelList]"
+            ></v-select>
+          </v-sheet>
+          <v-sheet width="160" class="mr-3">
             <label>Status</label>
             <v-select
               v-model="formSearch.isActive"
-              :items="[{ title: 'All', value: null }]"
+              :items="[{ title: 'All', value: null }, ...statusList]"
             ></v-select>
           </v-sheet>
-          <v-sheet width="250" class="mr-3 mt-5">
+          <v-sheet class="pt-5" width="120">
             <n-btn-search @click="onSearch" />
-            <n-btn-reset @click="onReset" class="ml-3" />
           </v-sheet>
         </v-row>
-        <!-- <v-row>
-          <v-col cols="8">
-            <v-row>
-              <v-col>
-                <label>Line</label>
-                <v-select
-                  v-model="formSearch.isActive"
-                  :items="[{ title: 'All', value: null }]"
-                ></v-select>
-              </v-col>
-              <v-col>
-                <label>Plan Date From</label>
-                <n-date v-model="date1"></n-date>
-              </v-col>
-              <v-col>
-                <label>Plan Date From</label>
-                <n-date v-model="date2"></n-date>
-              </v-col>
 
-              <v-col>
-                <label>Status</label>
-                <v-select
-                  v-model="formSearch.isActive"
-                  :items="[{ title: 'All', value: null }]"
-                ></v-select>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="4">
-            <div class="row">
-              <div class="d-flex justify-center">
-                <n-btn-search @click="onSearch" />
-                <n-btn-reset @click="onReset" class="ml-3" />
-              </div>
-            </div>
-          </v-col>
-        </v-row> -->
         <v-row class="mb-3">
           <v-col>
             <hr />
@@ -87,7 +49,7 @@
         <v-row>
           <v-col>
             <h3 style="color: #3366ff">
-              Current Production Plan 03/04/2025 10:10:00
+              Current Production Plan {{ currentPlanTime }}
             </h3>
           </v-col>
         </v-row>
@@ -96,24 +58,26 @@
           <v-col>
             <v-data-table
               v-model:page="currentPage"
-              :headers="headers"
-              :items="items"
+              :headers="headersPlanCurrent"
+              :items="itemsPlanCurrent"
               :items-per-page="pageSize"
               hide-default-footer
             >
               <template v-slot:[`item.action`]="{ item }">
-                <v-icon
-                  icon="mdi-pencil-outline"
-                  v-tooltip:end="'Edit'"
-                  class="text-warning"
-                ></v-icon>
+                <n-gbtn-edit
+                  @click="onPlanCurrentEditClick(item)"
+                ></n-gbtn-edit>
               </template>
               <template v-slot:[`item.action2`]="{ item }">
-                <v-icon
+                <n-gbtn-stop
+                  @click="onStopPlanClick(item)"
+                  v-if="['10', '20'].includes(item.status)"
+                ></n-gbtn-stop>
+                <!-- <v-icon
                   icon="mdi mdi-cancel"
                   style="color: red"
                   v-if="item.action2"
-                ></v-icon>
+                ></v-icon> -->
               </template>
 
               <template v-slot:[`item.status`]="{ item }">
@@ -209,15 +173,9 @@
               :items-per-page="pageSize"
             >
               <template v-slot:[`item.action`]="{ item }">
-                <n-gbtn-edit
-                  :permission="false"
-                  @click="onEdit(item.Menu_No)"
-                ></n-gbtn-edit>
+                <n-gbtn-edit @click="onEdit(item.Menu_No)"></n-gbtn-edit>
 
-                <n-gbtn-delete
-                  :permission="false"
-                  v-if="item.buttonDel"
-                ></n-gbtn-delete>
+                <n-gbtn-delete v-if="item.status === '00'"></n-gbtn-delete>
               </template>
 
               <template v-slot:bottom>
@@ -376,11 +334,18 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, inject } from "vue";
 import rules from "@/utils/rules";
+import * as ddlApi from "@/api/dropdown-list.js";
+import * as api from "@/api/plan.js";
+
+import { getPaging, getDateFormat } from "@/utils/utils.js";
+import moment from "moment";
+const Alert = inject("Alert");
+
 const dialog = ref(false);
 
-const formSearch = ref({ line: "1" });
+const formSearch = ref({});
 const formInfo = ref({
   line: "1",
   plan_date: "2025-01-01",
@@ -391,223 +356,196 @@ const formInfo = ref({
   ot: "a",
   partName: "a",
 });
+const isLoading = ref(false);
+
+const currentPlanTime = ref();
 const currentPage = ref(1);
 const pageSize = ref(10);
 const totalItems = ref(2);
 
+const lineList = ref([]);
+const lineModelList = ref([]);
+const statusList = ref([]);
+
 const totalItemsDetail = ref(8);
 
-const headers = [
+const headersPlanCurrent = [
   { title: "", key: "action", sortable: false },
   { title: "", key: "action2", sortable: false },
-  { title: "Status", key: "status", sortable: false },
-  { title: "Production Date", key: "production_date", sortable: false },
-  { title: "Start Time", key: "start_time", sortable: false },
-  { title: "Finish Time", key: "finish_date", sortable: false },
-  { title: "Model", key: "model", sortable: false },
-  { title: "Shift", key: "shift", sortable: false },
-  { title: "Shift Time", key: "shift_time", sortable: false },
-  { title: "OT", key: "ot", sortable: false },
-  { title: "Cycle Time(mins)", key: "cycle_time", sortable: false },
-  { title: "Total Time()mins", key: "total_time", sortable: false },
-  { title: "Target FG", key: "target_fg", sortable: false },
+  { title: "Status", key: "status_name", sortable: false },
+  {
+    title: "Production Date",
+    key: "Plan_Date",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Plan_Date, "dd/MM/yyyy");
+    },
+  },
+  {
+    title: "Start Time",
+    key: "Plan_Start_Time",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Plan_Start_Time, "HH:mm");
+    },
+  },
+  { title: "Model", key: "Model_CD", sortable: false },
+  { title: "Shift", key: "Team_Name", sortable: false },
+  { title: "Shift Time", key: "Shift_Period_Name", sortable: false },
+  { title: "Break1", key: "B1", sortable: false },
+  { title: "Lunch Break", key: "B2", sortable: false },
+  { title: "Break2", key: "B3", sortable: false },
+  { title: "Break OT", key: "B4", sortable: false },
+  { title: "OT", key: "OT", sortable: false },
+  { title: "Cycle Time", key: "Cycle_Times", sortable: false },
+  { title: "Total Time(mins)", key: "plan_total_time", sortable: false },
+  { title: "Target FG", key: "plan_fg_amt", sortable: false },
+  { title: "Actual FG", key: "actual_fg_amt", sortable: false },
 ];
 
-const items = ref([
-  {
-    action2: true,
-    status: "Running",
-    production_date: "03/04/2025",
-    start_time: "08:00",
-    finish_date: "20:00",
-    model: "EX400",
-    shift: "Team A",
-    shift_time: "Day(08:00 - 20:00)",
-    ot: "Yes OT",
-    cycle_time: "8",
-    total_time: "620",
-    target_fg: "77",
-  },
-  {
-    action2: false,
-    status: "Next Production",
-    production_date: "03/04/2025",
-    start_time: "20:00",
-    finish_date: "08:00",
-    model: "EX400",
-    shift: "Team B",
-    shift_time: "Night(20:00 - 08:00)",
-    ot: "No OT",
-    cycle_time: "8",
-    total_time: "460",
-    target_fg: "52",
-  },
-]);
+const itemsPlanCurrent = ref([]);
 
 const headersDetail = [
   { title: "", key: "action", sortable: false, nowrap: true },
-  { title: "Plan Date", key: "plan_date", sortable: false },
-  { title: "Plan Start Time", key: "paln_time", sortable: false },
-  { title: "Shift", key: "shift", sortable: false },
-  { title: "Shift Time", key: "shift_date", sortable: false },
-  { title: "OT", key: "ot", sortable: false },
-  { title: "Model", key: "model", sortable: false },
-  { title: "Cycle Time(mins)", key: "cycle_time", sortable: false },
-  { title: "Total Time()mins", key: "totol_time", sortable: false },
-  { title: "Target FG", key: "target_fg", sortable: false },
-  { title: "Actual FG", key: "actual_fg", sortable: false },
-  { title: "NG", key: "ng", sortable: false },
-  { title: "Line/MC Stop", key: "line_mc_stop", sortable: false },
-  { title: "Status", key: "status", sortable: false },
-  { title: "Update By", key: "update_by", sortable: false },
-  { title: "Update Date", key: "update_date", sortable: false },
+  {
+    title: "Plan Date",
+    key: "Plan_Date",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Plan_Date, "dd/MM/yyyy");
+    },
+  },
+  {
+    title: "Plan Start Time",
+    key: "Plan_Start_Time",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Plan_Start_Time, "HH:mm");
+    },
+  },
+  { title: "Shift", key: "Team_Name", sortable: false },
+  { title: "Shift Period", key: "Shift_Period_Name", sortable: false },
+  { title: "Break1", key: "B1", sortable: false },
+  { title: "Lunch Break", key: "B2", sortable: false },
+  { title: "Break2", key: "B3", sortable: false },
+  { title: "Break OT", key: "B4", sortable: false },
+  { title: "OT", key: "OT", sortable: false },
+  { title: "Model", key: "Model_CD", sortable: false },
+  { title: "Cycle Time", key: "Cycle_Times", sortable: false },
+  { title: "Total Time(mins)", key: "plan_total_time", sortable: false },
+  { title: "Target FG", key: "plan_fg_amt", sortable: false },
+  { title: "Actual FG", key: "actual_fg_amt", sortable: false },
+  { title: "NG", key: "ng_amt", sortable: false },
+  { title: "Line Stop", key: "line_stop_amt", sortable: false },
+  { title: "Status", key: "status_name", sortable: false },
+  { title: "Update By", key: "updated_by", sortable: false },
+  {
+    title: "Update Date",
+    key: "updated_date",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.updated_date);
+    },
+  },
 ];
 
-const itemsDetail = ref([
-  {
-    plan_date: "01/04/2025",
-    paln_time: "08:00",
-    shift: "Team A",
-    shift_date: "Day(08:00 - 20:00)",
-    ot: "Yes OT",
-    model: "EX400",
-    cycle_time: "8",
-    totol_time: "620",
-    target_fg: "77",
-    actual_fg: "70",
-    ng: "2",
-    line_mc_stop: "0",
-    status: "Finish",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
-  {
-    plan_date: "01/04/2025",
-    paln_time: "20:00",
-    shift: "Team B",
-    shift_date: "Night(08:00 - 20:00)",
-    ot: "No OT",
-    model: "EX400",
-    cycle_time: "8",
-    totol_time: "460",
-    target_fg: "57",
-    actual_fg: "35",
-    ng: "0",
-    line_mc_stop: "1",
-    status: "Plan Stopped",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
-  {
-    plan_date: "01/04/2025",
-    paln_time: "08:00",
-    shift: "Team A",
-    shift_date: "Day(08:00 - 20:00)",
-    ot: "Yes OT",
-    model: "EX200",
-    cycle_time: "7",
-    totol_time: "620",
-    target_fg: "77",
-    actual_fg: "70",
-    ng: "2",
-    line_mc_stop: "0",
-    status: "Finish",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
-  {
-    plan_date: "01/04/2025",
-    paln_time: "20:00",
-    shift: "Team B",
-    shift_date: "Night(08:00 - 20:00)",
-    ot: "No OT",
-    model: "EX200",
-    cycle_time: "7",
-    totol_time: "460",
-    target_fg: "57",
-    actual_fg: "35",
-    ng: "0",
-    line_mc_stop: "1",
-    status: "Finish",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
+const itemsDetail = ref([]);
+const intervalId = ref(null); // To store the interval ID
 
-  {
-    plan_date: "01/04/2025",
-    paln_time: "20:00",
-    shift: "Team B",
-    shift_date: "Night(08:00 - 20:00)",
-    ot: "No OT",
-    model: "EX400",
-    cycle_time: "8",
-    totol_time: "460",
-    target_fg: "57",
-    actual_fg: "",
-    ng: "",
-    line_mc_stop: "",
-    status: "Running",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
-  {
-    buttonDel: true,
-    plan_date: "01/04/2025",
-    paln_time: "08:00",
-    shift: "Team A",
-    shift_date: "Day(08:00 - 20:00)",
-    ot: "Yes OT",
-    model: "EX400",
-    cycle_time: "8",
-    totol_time: "620",
-    target_fg: "77",
-    actual_fg: "",
-    ng: "",
-    line_mc_stop: "",
-    status: "New",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
-  {
-    buttonDel: true,
-    plan_date: "01/04/2025",
-    paln_time: "20:00",
-    shift: "Team B",
-    shift_date: "Night(08:00 - 20:00)",
-    ot: "No OT",
-    model: "EX400",
-    cycle_time: "8",
-    totol_time: "460",
-    target_fg: "57",
-    actual_fg: "",
-    ng: "",
-    line_mc_stop: "",
-    status: "New",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
-  {
-    buttonDel: true,
-    plan_date: "01/04/2025",
-    paln_time: "08:00",
-    shift: "Team A",
-    shift_date: "Day(08:00 - 20:00)",
-    ot: "Yes OT",
-    model: "EX400",
-    cycle_time: "8",
-    totol_time: "620",
-    target_fg: "77",
-    actual_fg: "",
-    ng: "",
-    line_mc_stop: "",
-    status: "New",
-    update_by: "Planner A",
-    update_date: "31/03/2025 13:45",
-  },
-]);
+onMounted(() => {
+  ddlApi.line().then((data) => {
+    lineList.value = data;
+  });
+
+  ddlApi.lineModel("").then((data) => {
+    lineModelList.value = data;
+  });
+
+  ddlApi.getPredefine("Plan_Status").then((data) => {
+    statusList.value = data;
+  });
+
+  // Start interval to fetch data every 5 seconds
+  intervalId.value = setInterval(() => {
+    console.log("Fetching data every 5 seconds ", formSearch.value.line);
+    if (formSearch.value.line) {
+      loadPlanCurrent(formSearch.value.line);
+    }
+  }, 5000); // 5000ms = 5 seconds
+});
+
+onUnmounted(() => {
+  // Clear the interval when the component is unmounted
+  if (intervalId.value) {
+    clearInterval(intervalId.value);
+    console.log("Interval cleared");
+  }
+});
 
 const newPlanClick = () => {
   dialog.value = true;
+};
+
+const loadPlanCurrent = (line) => {
+  api.getPalnListCurrent(line).then((data) => {
+    itemsPlanCurrent.value = data;
+    currentPlanTime.value = moment().format("YYYY-MM-DD HH:mm:ss");
+  });
+};
+
+const onSearch = async () => {
+  currentPage.value = 1;
+  loadData({ page: currentPage.value, itemsPerPage: pageSize.value });
+};
+
+const loadData = async (paginate) => {
+  const { page, itemsPerPage } = paginate;
+
+  const searchOptions = getPaging({ page, itemsPerPage });
+
+  try {
+    isLoading.value = true;
+    const data = {
+      ...formSearch.value,
+      searchOptions,
+    };
+
+    const response = await api.search(data);
+
+    itemsDetail.value = response.data;
+    totalItems.value = response.total_record;
+  } catch (error) {
+    console.error("Error fetching API:", error);
+    itemsDetail.value = [];
+    totalItems.value = 0;
+  }
+  isLoading.value = false;
+};
+
+const lineChange = (value) => {
+  console.log("lineChange", value);
+  lineModelList.value = [];
+  ddlApi.lineModel(value).then((data) => {
+    lineModelList.value = data;
+  });
+  loadPlanCurrent(value);
+};
+
+const onPlanCurrentEditClick = (item) => {
+  console.log("onPlanCurrentEditClick", item);
+
+  dialog.value = true;
+};
+
+const onStopPlanClick = (item) => {
+  console.log("onStopPlanClick", item);
+  Alert.confirm("Are you sure you want to delete this line ?").then(
+    ({ isConfirmed }) => {
+      if (isConfirmed) {
+        isLoading.value = true;
+      }
+    }
+  );
 };
 </script>
 

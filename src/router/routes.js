@@ -100,7 +100,7 @@ const routes = [
   {
     path: "/plan",
     meta: {
-      requireAuth: false,
+      menuNo: "M2002",
     },
     children: [
       {
@@ -137,8 +137,7 @@ const routes = [
       {
         path: "",
         name: "model",
-        component: () =>
-          import("@/pages/common-master/model/model.vue"),
+        component: () => import("@/pages/common-master/model/model.vue"),
       },
     ],
   },
@@ -151,13 +150,31 @@ const routes = [
       {
         path: "",
         name: "machine",
-        component: () =>
-          import("@/pages/common-master/machine/machine.vue"),
+        component: () => import("@/pages/common-master/machine/machine.vue"),
       },
       {
         path: "/common-master/machine-info/:id?",
         name: "machine-info",
-        component: () => import("@/pages/common-master/machine/machine-info.vue"),
+        component: () =>
+          import("@/pages/common-master/machine/machine-info.vue"),
+      },
+    ],
+  },
+  {
+    path: "/line",
+    meta: {
+      menuNo: "M2001",
+    },
+    children: [
+      {
+        path: "",
+        name: "line-search",
+        component: () => import("@/pages/line/line-search.vue"),
+      },
+      {
+        path: "line-info/:id?",
+        name: "line-info",
+        component: () => import("@/pages/line/line-info.vue"),
       },
     ],
   },

@@ -1,8 +1,9 @@
 <template>
   <v-icon
-    icon="mdi mdi-delete"
-    v-tooltip:end="'Delete'"
+    icon="mdi-cancel"
+    v-tooltip:end="'Stop'"
     style="margin-left: 5px; margin-right: 5px; color: red; cursor: pointer"
+    v-if="canAccess"
   ></v-icon>
 </template>
 
@@ -25,15 +26,15 @@ let canAccess = ref(false);
 
 onMounted(() => {
   const { meta } = route;
-
   if (props.permission) {
+    // console.log("props", props.permission);
+    // console.log("meta", meta.menuNo);
     if (meta.menuNo) {
       const access = authStore.permission.filter(
         (item) => item.Menu_No === meta.menuNo
       );
       if (access.length !== 0) {
         const { Can_Update } = access[0];
-
         if (Can_Update === "Y") {
           canAccess.value = true;
         } else {
