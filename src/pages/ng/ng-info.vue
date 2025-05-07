@@ -10,131 +10,115 @@
           <v-row class="align-center">
             <v-col md="3">
               <label>Line</label>
-              <v-text-field v-model="item.Line_CD" readonly :rules="[rules.required]"></v-text-field>
+              <v-text-field v-model="formInfo.Line_CD" readonly :rules="[rules.required]"></v-text-field>
             </v-col>
             <v-col md="3">
               <label>Plan Date</label>
-              <v-text-field v-model="item.Plan_Date" readonly></v-text-field>
+              <v-text-field v-model="formInfo.Plan_Date" readonly></v-text-field>
             </v-col>
             <v-col md="3">
               <label>Plan Start Time</label>
-              <v-text-field v-model="item.Plan_Start_Time" readonly></v-text-field>
+              <v-text-field v-model="formInfo.Plan_Start_Time" readonly></v-text-field>
             </v-col>
             <v-col md="3">
               <label>Shift</label>
-              <v-text-field v-model="item.Team_Name" readonly></v-text-field>
+              <v-text-field v-model="formInfo.Team_Name" readonly></v-text-field>
             </v-col>
             <v-col md="3">
               <label>Shift Period</label>
-              <v-text-field v-model="item.Shift_Period_Name" readonly></v-text-field>
+              <v-text-field v-model="formInfo.Shift_Period_Name" readonly></v-text-field>
             </v-col>
             <v-col cols="9">
               <v-row class="pt-5">
                 <v-col cols="2">
-                  <v-checkbox label="Break 1" color="success" value="success" readonly></v-checkbox>
+                  <v-checkbox :model-value="formInfo.B1 === 'Y'" label="Break 1" color="success" readonly></v-checkbox>
                 </v-col>
                 <v-col cols="3">
-                  <v-checkbox label="Lunch Break" color="success" value="success" readonly></v-checkbox>
+                  <v-checkbox :model-value="formInfo.B2 === 'Y'" label="Lunch Break" color="success"
+                    readonly></v-checkbox>
                 </v-col>
                 <v-col cols="2">
-                  <v-checkbox label="Break 2" color="success" value="success" readonly></v-checkbox>
+                  <v-checkbox :model-value="formInfo.B3 === 'Y'" label="Break 2" color="success" readonly></v-checkbox>
                 </v-col>
                 <v-col cols="3">
-                  <v-checkbox label="Break OT" color="success" value="success" readonly></v-checkbox>
+                  <v-checkbox :model-value="formInfo.B4 === 'Y'" label="Break OT" color="success" readonly></v-checkbox>
                 </v-col>
                 <v-col cols="2">
-                  <v-checkbox label="OT" color="success" value="success" readonly></v-checkbox>
+                  <v-checkbox :model-value="formInfo.OT === 'Y'" label="OT" color="success" readonly></v-checkbox>
                 </v-col>
               </v-row>
             </v-col>
 
             <v-col md="3">
               <label>Model</label>
-              <v-text-field v-model="item.Model_CD" readonly></v-text-field>
+              <v-text-field v-model="formInfo.Model_CD" readonly></v-text-field>
             </v-col>
             <v-col md="3">
               <label>Part No</label>
-              <v-text-field v-model="item.part_no" readonly></v-text-field>
+              <v-text-field v-model="formInfo.part_no" readonly></v-text-field>
             </v-col>
             <v-col md="3">
               <label>Part Upper</label>
-              <v-text-field v-model="item.Part_Upper" readonly></v-text-field>
+              <v-text-field v-model="formInfo.Part_Upper" readonly></v-text-field>
             </v-col>
             <v-col md="3">
               <label>Part Lower</label>
-              <v-text-field v-model="item.Part_Lower" readonly></v-text-field>
+              <v-text-field v-model="formInfo.Part_Lower" readonly></v-text-field>
             </v-col>
 
             <v-col cols="3">
-              <label>Process</label>
-              <v-select v-model="formSearch.line" :items="[
-                { title: 'All', value: null },
-                { title: 'Cylinder Head 1' },
-                { title: 'Cylinder Head 2' },
-                { title: 'Cylinder Head 3' },
-                { title: 'Cylinder Head 4' },
-                { title: 'Cylinder Head 5' },
-                { title: 'Cylinder Head 6', value: '1' },
-              ]"></v-select>
+              <label class="require-field">Process</label>
+              <v-select v-model="formInfo.Process_CD" :items="processList" :rules="[rules.required]"></v-select>
             </v-col>
             <v-col cols="3">
-              <label>NG Date</label>
-              <v-select v-model="formSearch.line" :items="[
-                { title: 'All', value: null },
-                { title: 'Cylinder Head 1' },
-                { title: 'Cylinder Head 2' },
-                { title: 'Cylinder Head 3' },
-                { title: 'Cylinder Head 4' },
-                { title: 'Cylinder Head 5' },
-                { title: 'Cylinder Head 6', value: '1' },
-              ]"></v-select>
+              <label class="require-field">NG Date</label>
+              <n-date v-model="formInfo.NG_Date" :rules="[rules.required]"></n-date>
             </v-col>
             <v-col cols="3">
               <label class="require-field">NG Time</label>
-              <v-text-field v-model="item.machineName" :rules="[rules.required]"></v-text-field>
+              <v-text-field placeholder="HH:mm" v-model="formInfo.NG_Time" v-maska="'##:##'" type="text"></v-text-field>
             </v-col>
             <v-col cols="3">
               <label class="require-field">Quantity</label>
-              <v-text-field v-model="item.machineName" :rules="[rules.required]"></v-text-field>
+              <v-text-field v-model="formInfo.Quantity" v-maska="{
+                mask: '#',
+                tokens: {
+                  '#': { pattern: /[0-9]/, repeated: true },
+                },
+              }" type="text" :rules="[rules.required]"></v-text-field>
             </v-col>
 
             <v-col cols="3">
-              <label>Reason</label>
-              <v-select v-model="formSearch.line" :items="[
-                { title: 'All', value: null },
-                { title: 'Cylinder Head 1' },
-                { title: 'Cylinder Head 2' },
-                { title: 'Cylinder Head 3' },
-                { title: 'Cylinder Head 4' },
-                { title: 'Cylinder Head 5' },
-                { title: 'Cylinder Head 6', value: '1' },
-              ]"></v-select>
+              <label class="require-field">Reason</label>
+              <v-select v-model="formInfo.Reason_CD" :items="reasonList" item-value="predefine_cd" item-title="Value_EN"
+                :rules="[rules.required]"></v-select>
             </v-col>
-            <v-col :cols="pageMode === 'add' ? '6' : '9'">
+            <v-col cols="9">
               <label class="require-field">Comment</label>
-              <v-text-field v-model="item.machineName" :rules="[rules.required]"></v-text-field>
+              <v-text-field v-model="formInfo.Comment" :rules="[rules.required]"></v-text-field>
             </v-col>
 
-            <v-col :cols="pageMode === 'add' ? '3' : '6'">
-              <label>Status</label>
-              <v-select v-model="item.isActive" :items="[{ title: 'All', value: null }, ...statusList]"
+            <v-col cols="6" v-if="pageMode === 'edit'">
+              <label class="require-field">Status</label>
+              <v-select v-model="formInfo.isActive" :items="[{ title: 'All', value: null }, ...statusList]"
                 :rules="[rules.required]"></v-select>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">
               <label>Updated By</label>
-              <v-text-field v-model="item.updatedBy" :readonly="pageMode === 'edit'"></v-text-field>
+              <v-text-field v-model="formInfo.updatedBy" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">
               <label>Updated Date</label>
-              <v-text-field v-model="item.updatedDate" :readonly="pageMode === 'edit'"></v-text-field>
+              <v-text-field v-model="formInfo.updatedDate" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
           </v-row>
           <v-divider class="mt-8 mb-6"></v-divider>
           <v-row>
             <v-col>
               <div class="d-flex justify-center mb-3">
-                <n-btn-save />
-                <n-btn-cancel @click="router.go(-1)" class="ml-3" />
+                <n-btn-save no-permission @click="saveClick('save')" class="me-3"></n-btn-save>
+                <n-btn-cancel @click="router.go(-1)" class="me-3" />
+                <n-btn-save no-permission @click="saveClick('confirmed')"></n-btn-save>
               </div>
             </v-col>
           </v-row>
@@ -149,9 +133,10 @@
 import { onMounted, ref, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
-import * as api from "@/api/machine.js";
+import * as api from "@/api/ng.js";
 import rules from "@/utils/rules";
-import { getDateFormat, getTimeFormat } from "@/utils/utils";
+import { getCurrrentDate, getDateFormat } from "@/utils/utils";
+import { DateTime } from 'luxon'
 
 const route = useRoute();
 const router = useRouter();
@@ -159,9 +144,10 @@ const Alert = inject("Alert");
 const frmInfo = ref(null);
 const dialog = ref(false);
 const statusList = ref([]);
-const formSearch = ref({ line: "1" });
+const reasonList = ref([]);
+const processList = ref([]);
 
-let item = ref({
+let formInfo = ref({
   "B1": "",
   "B2": "",
   "B3": "",
@@ -186,7 +172,13 @@ let item = ref({
   "status": "",
   "status_name": "",
   "updated_by": "",
-  "updated_date": ""
+  "updated_date": "",
+  "Process_CD": "",
+  "NG_Time": "",
+  "NG_Date": "",
+  "Quantity": "",
+  "Reason_CD": "",
+  "Comment": ""
 });
 
 let isLoading = ref(false);
@@ -194,8 +186,8 @@ let isDialogLoading = ref(false);
 let pageMode = ref("add");
 
 onMounted(() => {
-  ddlApi.getPredefine({ group: "Is_Active", sortby: "text" }).then((data) => {
-    statusList.value = data;
+  ddlApi.getPredefine("NG_Reason").then((data) => {
+    reasonList.value = data;
   });
 
   if (route.params.id) {
@@ -203,16 +195,25 @@ onMounted(() => {
     pageMode.value = "edit";
     // loadData();
   }
-  const v = localStorage.getItem("ng-new");
-  if (v) {
-    const d = JSON.parse(v);
-    item.value = d;
-    item.value.Plan_Date = getDateFormat(item.value.Plan_Date);
-    item.value.Plan_Start_Time = getTimeFormat(item.value.Plan_Start_Time);
-    console.log('item is ', d);
-    // localStorage.setItem("ng-new", '');
-  }
+  else {
+    const v = localStorage.getItem("ng-new");
+    if (v) {
+      const d = JSON.parse(v);
+      formInfo.value = d;
+      formInfo.value.Plan_Date = getDateFormat(formInfo.value.Plan_Date, "dd/MM/yyyy");
+      formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
+      console.log('item is ', d);
+      // localStorage.setItem("ng-new", '');
 
+      formInfo.value.Model_CD = 'EN650'
+      ddlApi.lineMachine(formInfo.value.Line_CD, formInfo.value.Model_CD).then((data) => {
+        processList.value = data;
+      });
+    }
+
+    formInfo.value.NG_Date = getCurrrentDate();
+    formInfo.value.NG_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
+  }
 
 });
 
@@ -224,40 +225,55 @@ const onSearch = async () => {
 const loadData = async () => {
   try {
     isLoading.value = true;
-    let id = pageMode.value === 'edit' ? route.params.id : item.value.machineNo;
+    let id = pageMode.value === 'edit' ? route.params.id : formInfo.value.machineNo;
     const response = await api.getById(id);
 
     if (response.status === 2) {
       Alert.error("Error ", response.message);
       return;
     }
-    item.value = response.data;
-    item.value.Plan_Date = getDateFormat(item.value.Plan_Date);
-    item.value.Plan_Start_Time = getTimeFormat(item.value.Plan_Start_Time);
+    formInfo.value = response.data;
+    formInfo.value.Plan_Date = getDateFormat(formInfo.value.Plan_Date, "dd/MM/yyyy");
+    formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm:ss");
 
   } catch (error) {
     console.error("Error fetching API:", error);
-    item.value = {}
+    formInfo.value = {}
   }
   isLoading.value = false;
 };
 
-const saveClick = async () => {
+const saveClick = async (mode) => {
   try {
     const { valid } = await frmInfo.value.validate();
+    console.log('value is ', formInfo.value)
     if (!valid) return;
+
     isLoading.value = true;
-    isDialogLoading.value = true;
     let res = null;
+
+    const v = { ...formInfo.value };
+    const info = {
+      planId: `${v.id}`,
+      lineCd: v.Line_CD,
+      processCd: v.Process_CD,
+      ngDate: v.NG_Date,
+      ngTime: `${v.NG_Time}:00`,
+      quantity: Number(v.Quantity),
+      reason: v.Reason_CD,
+      comment: v.Comment,
+      idRef: '-',
+      status: mode === 'save' ? '00' : '90'
+    }
+
     if (pageMode.value === "add") {
       console.log("Add");
-      res = await api.add(item.value);
+      res = await api.add(info);
     } else {
       console.log("Edit");
-      res = await api.update(item.value.processCd, item.value);
+      res = await api.update(route.params.id, info);
     }
     isLoading.value = false;
-    isDialogLoading.value = false;
     if (res.status === 0) {
       dialog.value = false;
       if (pageMode.value === 'edit') {

@@ -10,8 +10,7 @@
           <v-row>
             <v-col cols="5">
               <label>Line </label>
-              <v-select v-model="formSearch.lineCd" :items="lineList" item-value="lineCd"
-                item-title="lineCd"></v-select>
+              <v-select v-model="formSearch.lineCd" :items="lineList"></v-select>
             </v-col>
             <v-col cols="5">
               <label>Plan Date</label>
@@ -49,7 +48,8 @@ import { onMounted, ref } from "vue";
 import rules from "@/utils/rules";
 import { useRouter } from "vue-router";
 import * as api from "@/api/ng.js";
-import { getCurrrentDate, getDateFormat, getTimeFormat } from "@/utils/utils";
+import * as ddlApi from "@/api/dropdown-list.js";
+import { getCurrrentDate, getDateFormat } from "@/utils/utils";
 
 const router = useRouter();
 const formSearch = ref({ lineCd: '', plantDate: `${getCurrrentDate()}` });
@@ -63,12 +63,12 @@ const headersDetail = [
   { title: "", key: "action", sortable: false, nowrap: true },
   {
     title: "Plan Date", key: "Plan_Date", sortable: false, value: (item) => {
-      return getDateFormat(item.Plan_Date);
+      return getDateFormat(item.Plan_Date, "dd/MM/yyyy");
     }
   },
   {
     title: "Plan Start Time", key: "Plan_Start_Time", sortable: false, value: (item) => {
-      return getTimeFormat(item.Plan_Start_Time);
+      return getDateFormat(item.Plan_Start_Time, "HH:mm:ss");
     }
   },
   { title: "Break1", key: "B1", sortable: false },
@@ -80,11 +80,10 @@ const headersDetail = [
   { title: "Status", key: "status_name", sortable: false },
 ];
 
-onMounted(async () => {
-  api.getLineList('Y').then((data) => {
-    lineList.value = data.data;
+onMounted(() => {
+  ddlApi.line().then((data) => {
+    lineList.value = data;
   });
-
 });
 
 const onSearch = () => {

@@ -127,7 +127,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/machine.js";
 import rules from "@/utils/rules";
-import { getDateTimeFormat } from "@/utils/utils";
+import { getDateFormat } from "@/utils/utils";
 
 const router = useRouter();
 const Alert = inject("Alert");
@@ -150,7 +150,7 @@ const headers = [
     key: "Updated_Date",
     sortable: false,
     value: (item) => {
-      return getDateTimeFormat(item.Updated_Date);
+      return getDateFormat(item.Updated_Date);
     },
   },
 ];

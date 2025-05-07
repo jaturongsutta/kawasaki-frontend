@@ -38,22 +38,6 @@ export function getDateFormat(date, format) {
   return "-";
 }
 
-export function getDateFormat(date) {
-  if (date) {
-    return DateTime.fromISO(date, { zone: 'utc' })
-      .toFormat('dd/MM/yyyy');
-  }
-  return "-";
-}
-
-export function getTimeFormat(date) {
-  if (date) {
-    return DateTime.fromISO(date, { zone: 'utc' })
-      .toFormat('HH:mm:ss');
-  }
-  return "-";
-}
-
 export function getCurrrentDate() {
   return DateTime.now().toISODate();
 }

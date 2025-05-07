@@ -51,7 +51,7 @@ import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/machine.js";
 import rules from "@/utils/rules";
-import { getDateTimeFormat } from "@/utils/utils";
+import { getDateFormat } from "@/utils/utils";
 
 const route = useRoute();
 const router = useRouter();
@@ -103,7 +103,7 @@ const loadData = async () => {
             return;
         }
         machineItem.value = response.data;
-        machineItem.value.updatedDate = getDateTimeFormat(machineItem.value.updatedDate);
+        machineItem.value.updatedDate = getDateFormat(machineItem.value.updatedDate);
 
     } catch (error) {
         console.error("Error fetching API:", error);
