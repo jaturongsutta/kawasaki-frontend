@@ -126,7 +126,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/model.js";
 import rules from "@/utils/rules";
-import { getDateFormat} from "@/utils/utils";
+import { getDateTimeFormat} from "@/utils/utils";
 
 const Alert = inject("Alert");
 const frmInfo = ref(null);
@@ -150,7 +150,7 @@ const headers = [
     key: "Updated_Date",
     sortable: false,
     value: (item) => {
-      return getDateFormat(item.Updated_Date);
+      return getDateTimeFormat(item.Updated_Date);
     },
   },
 ];
@@ -228,7 +228,7 @@ const onEdit = async (item) => {
       return;
     }
     form.value = res.data;
-    form.value.updatedDate = getDateFormat(form.value.updatedDate);
+    form.value.updatedDate = getDateTimeFormat(form.value.updatedDate);
   }
   catch (e) {
     isDialogLoading.value = false;

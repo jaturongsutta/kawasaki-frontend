@@ -2,69 +2,67 @@
   <div>
     <v-card>
       <v-card-title>
-        <h4>NG Rejection</h4>
+        <h4>{{ pageMode === "add" ? "New" : "Edit" }} : NG Rejection</h4>
       </v-card-title>
       <v-divider class="mb-8"></v-divider>
       <v-card-text>
         <v-form ref="frmInfo">
           <v-row class="align-center">
             <v-col md="3">
-              <label class="require-field">Line</label>
-              <v-text-field v-model="machineItem.machineNo" :readonly="pageMode === 'edit'"
-                :rules="[rules.required]"></v-text-field>
+              <label>Line</label>
+              <v-text-field v-model="item.Line_CD" readonly :rules="[rules.required]"></v-text-field>
             </v-col>
             <v-col md="3">
-              <label class="require-field">Plan Date</label>
-              <v-text-field v-model="machineItem.processCd" :readonly="pageMode === 'edit'"
-                :rules="[rules.required]"></v-text-field>
+              <label>Plan Date</label>
+              <v-text-field v-model="item.Plan_Date" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label class="require-field">Plan Start Time</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <label>Plan Start Time</label>
+              <v-text-field v-model="item.Plan_Start_Time" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label class="require-field">Shift</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <label>Shift</label>
+              <v-text-field v-model="item.Team_Name" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label class="require-field">Shift Time</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <label>Shift Period</label>
+              <v-text-field v-model="item.Shift_Period_Name" readonly></v-text-field>
             </v-col>
             <v-col cols="9">
               <v-row class="pt-5">
                 <v-col cols="2">
-                  <v-checkbox label="Break 1" color="success" value="success"></v-checkbox>
+                  <v-checkbox label="Break 1" color="success" value="success" readonly></v-checkbox>
                 </v-col>
                 <v-col cols="3">
-                  <v-checkbox label="Lunch Break" color="success" value="success"></v-checkbox>
+                  <v-checkbox label="Lunch Break" color="success" value="success" readonly></v-checkbox>
                 </v-col>
                 <v-col cols="2">
-                  <v-checkbox label="Break 2" color="success" value="success"></v-checkbox>
+                  <v-checkbox label="Break 2" color="success" value="success" readonly></v-checkbox>
                 </v-col>
                 <v-col cols="3">
-                  <v-checkbox label="Break OT" color="success" value="success"></v-checkbox>
+                  <v-checkbox label="Break OT" color="success" value="success" readonly></v-checkbox>
                 </v-col>
                 <v-col cols="2">
-                  <v-checkbox label="OT" color="success" value="success"></v-checkbox>
+                  <v-checkbox label="OT" color="success" value="success" readonly></v-checkbox>
                 </v-col>
               </v-row>
             </v-col>
 
             <v-col md="3">
-              <label class="require-field">Model</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <label>Model</label>
+              <v-text-field v-model="item.Model_CD" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label class="require-field">Part No</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <label>Part No</label>
+              <v-text-field v-model="item.part_no" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label class="require-field">Part Upper</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <label>Part Upper</label>
+              <v-text-field v-model="item.Part_Upper" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label class="require-field">Part Lower</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <label>Part Lower</label>
+              <v-text-field v-model="item.Part_Lower" readonly></v-text-field>
             </v-col>
 
             <v-col cols="3">
@@ -93,11 +91,11 @@
             </v-col>
             <v-col cols="3">
               <label class="require-field">NG Time</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <v-text-field v-model="item.machineName" :rules="[rules.required]"></v-text-field>
             </v-col>
             <v-col cols="3">
               <label class="require-field">Quantity</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <v-text-field v-model="item.machineName" :rules="[rules.required]"></v-text-field>
             </v-col>
 
             <v-col cols="3">
@@ -112,30 +110,30 @@
                 { title: 'Cylinder Head 6', value: '1' },
               ]"></v-select>
             </v-col>
-            <v-col cols="9">
+            <v-col :cols="pageMode === 'add' ? '6' : '9'">
               <label class="require-field">Comment</label>
-              <v-text-field v-model="machineItem.machineName" :rules="[rules.required]"></v-text-field>
+              <v-text-field v-model="item.machineName" :rules="[rules.required]"></v-text-field>
             </v-col>
 
-            <v-col :md="6">
+            <v-col :cols="pageMode === 'add' ? '3' : '6'">
               <label>Status</label>
-              <v-select v-model="machineItem.isActive" :items="[{ title: 'All', value: null }, ...statusList]"
+              <v-select v-model="item.isActive" :items="[{ title: 'All', value: null }, ...statusList]"
                 :rules="[rules.required]"></v-select>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">
               <label>Updated By</label>
-              <v-text-field v-model="machineItem.updatedBy" :readonly="pageMode === 'edit'"></v-text-field>
+              <v-text-field v-model="item.updatedBy" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">
               <label>Updated Date</label>
-              <v-text-field v-model="machineItem.updatedDate" :readonly="pageMode === 'edit'"></v-text-field>
+              <v-text-field v-model="item.updatedDate" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
           </v-row>
           <v-divider class="mt-8 mb-6"></v-divider>
           <v-row>
             <v-col>
               <div class="d-flex justify-center mb-3">
-                <n-btn-save  />
+                <n-btn-save />
                 <n-btn-cancel @click="router.go(-1)" class="ml-3" />
               </div>
             </v-col>
@@ -153,7 +151,7 @@ import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/machine.js";
 import rules from "@/utils/rules";
-import { getDateFormat } from "@/utils/utils";
+import { getDateFormat, getTimeFormat } from "@/utils/utils";
 
 const route = useRoute();
 const router = useRouter();
@@ -163,14 +161,32 @@ const dialog = ref(false);
 const statusList = ref([]);
 const formSearch = ref({ line: "1" });
 
-let machineItem = ref({
-  machineNo: '',
-  processCd: '',
-  machineName: '',
-  mapCd: '',
-  isActive: '',
-  updatedBy: '',
-  updatedDate: ''
+let item = ref({
+  "B1": "",
+  "B2": "",
+  "B3": "",
+  "B4": "",
+  "Cycle_Times": "",
+  "Line_CD": "",
+  "Model_CD": "",
+  "OT": "",
+  "Part_Lower": "",
+  "Part_Upper": "",
+  "Plan_Date": "",
+  "Plan_Start_Time": "",
+  "Shift_Period_Name": "",
+  "Team_Name": "",
+  "actual_fg_amt": "",
+  "id": "",
+  "line_stop": "",
+  "ng_amt": "",
+  "part_no": "",
+  "plan_fg_amt": "",
+  "plan_total_time": "",
+  "status": "",
+  "status_name": "",
+  "updated_by": "",
+  "updated_date": ""
 });
 
 let isLoading = ref(false);
@@ -187,6 +203,16 @@ onMounted(() => {
     pageMode.value = "edit";
     // loadData();
   }
+  const v = localStorage.getItem("ng-new");
+  if (v) {
+    const d = JSON.parse(v);
+    item.value = d;
+    item.value.Plan_Date = getDateFormat(item.value.Plan_Date);
+    item.value.Plan_Start_Time = getTimeFormat(item.value.Plan_Start_Time);
+    console.log('item is ', d);
+    // localStorage.setItem("ng-new", '');
+  }
+
 
 });
 
@@ -198,19 +224,20 @@ const onSearch = async () => {
 const loadData = async () => {
   try {
     isLoading.value = true;
-    let id = pageMode.value === 'edit' ? route.params.id : machineItem.value.machineNo;
+    let id = pageMode.value === 'edit' ? route.params.id : item.value.machineNo;
     const response = await api.getById(id);
 
     if (response.status === 2) {
       Alert.error("Error ", response.message);
       return;
     }
-    machineItem.value = response.data;
-    machineItem.value.updatedDate = getDateFormat(machineItem.value.updatedDate);
+    item.value = response.data;
+    item.value.Plan_Date = getDateFormat(item.value.Plan_Date);
+    item.value.Plan_Start_Time = getTimeFormat(item.value.Plan_Start_Time);
 
   } catch (error) {
     console.error("Error fetching API:", error);
-    machineItem.value = {}
+    item.value = {}
   }
   isLoading.value = false;
 };
@@ -224,10 +251,10 @@ const saveClick = async () => {
     let res = null;
     if (pageMode.value === "add") {
       console.log("Add");
-      res = await api.add(machineItem.value);
+      res = await api.add(item.value);
     } else {
       console.log("Edit");
-      res = await api.update(machineItem.value.processCd, machineItem.value);
+      res = await api.update(item.value.processCd, item.value);
     }
     isLoading.value = false;
     isDialogLoading.value = false;

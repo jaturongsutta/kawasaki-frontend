@@ -8,9 +8,18 @@ export const search = async (data) => {
   }
 };
 
-export const getLineList = async (id) => {
+export const searchPlan = async (data) => {
   try {
-    const response = await axios.get(`/ng/lineList`);
+    const response = await axios.post(`/ng/searchPlan`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLineList = async (filterActive = 'N') => {
+  try {
+    const response = await axios.get(`/ng/lineList/${filterActive}`);
     return response.data;
   } catch (error) {
     throw error;
