@@ -229,7 +229,9 @@ const onDelete = (id) => {
 const loadData = async (paginate) => {
   const { page, itemsPerPage } = paginate;
 
-  const searchOptions = getPaging({ page, itemsPerPage });
+  const searchOptions = getPaging({
+    page, itemsPerPage
+  });
 
   try {
     isLoading.value = true;

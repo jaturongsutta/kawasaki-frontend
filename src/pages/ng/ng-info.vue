@@ -68,29 +68,33 @@
 
             <v-col cols="3">
               <label class="require-field">Process</label>
-              <v-select v-model="formInfo.Process_CD" :items="processList" :rules="[rules.required]"></v-select>
+              <v-select v-model="formInfo.Process_CD" :items="processList" :rules="[rules.required]"
+                :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
             <v-col cols="3">
               <label class="require-field">NG Date</label>
-              <n-date v-model="formInfo.NG_Date" :rules="[rules.required]"></n-date>
+              <n-date v-model="formInfo.NG_Date" :rules="[rules.required]"
+                :readonly="formInfo.Status === '90'"></n-date>
             </v-col>
             <v-col cols="3">
               <label class="require-field">NG Time</label>
-              <v-text-field placeholder="HH:mm" v-model="formInfo.NG_Time" v-maska="'##:##'" type="text"></v-text-field>
+              <v-text-field placeholder="HH:mm" v-model="formInfo.NG_Time" v-maska="'##:##'" type="text"
+                :readonly="formInfo.Status === '90'"></v-text-field>
             </v-col>
             <v-col cols="3">
               <label class="require-field">Quantity</label>
-              <n-input-number v-model="formInfo.Quantity" :rules="[rules.required]" />
+              <n-input-number v-model="formInfo.Quantity" :rules="[rules.required]"
+                :readonly="formInfo.Status === '90'" />
             </v-col>
 
             <v-col cols="3">
               <label class="require-field">Reason</label>
               <v-select v-model="formInfo.Reason_CD" :items="reasonList" item-value="predefine_cd" item-title="Value_EN"
-                :rules="[rules.required]"></v-select>
+                :rules="[rules.required]" :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
             <v-col cols="9">
               <label>Comment</label>
-              <v-text-field v-model="formInfo.Comment"></v-text-field>
+              <v-text-field v-model="formInfo.Comment" :readonly="formInfo.Status === '90'"></v-text-field>
             </v-col>
 
             <v-col cols="6" v-if="pageMode === 'edit'">
@@ -248,15 +252,15 @@ const saveClick = async (mode) => {
     const v = { ...formInfo.value };
     let info = {
       processCd: v.Process_CD,
+      modelCd: v.Model_CD,
       ngDate: v.NG_Date,
       ngTime: `${v.NG_Time}:00`,
       quantity: Number(v.Quantity),
       reason: v.Reason_CD,
       comment: v.Comment,
-      idRef: '-',
+      idRef: v.ID_Ref,
       status: mode === 'save' ? '00' : '90'
     }
-
     if (pageMode.value === "add") {
       console.log("Add");
       info = {
