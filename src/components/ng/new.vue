@@ -68,7 +68,7 @@ const headersDetail = [
   },
   {
     title: "Plan Start Time", key: "Plan_Start_Time", sortable: false, value: (item) => {
-      return getDateFormat(item.Plan_Start_Time, "HH:mm:ss");
+      return getDateFormat(item.Plan_Start_Time, "HH:mm");
     }
   },
   { title: "Break1", key: "B1", sortable: false },

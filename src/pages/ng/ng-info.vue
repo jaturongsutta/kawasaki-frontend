@@ -94,31 +94,32 @@
                 :rules="[rules.required]"></v-select>
             </v-col>
             <v-col cols="9">
-              <label class="require-field">Comment</label>
-              <v-text-field v-model="formInfo.Comment" :rules="[rules.required]"></v-text-field>
+              <label>Comment</label>
+              <v-text-field v-model="formInfo.Comment"></v-text-field>
             </v-col>
 
             <v-col cols="6" v-if="pageMode === 'edit'">
-              <label class="require-field">Status</label>
-              <v-select v-model="formInfo.isActive" :items="[{ title: 'All', value: null }, ...statusList]"
-                :rules="[rules.required]"></v-select>
+              <label>Status</label>
+              <v-text-field v-model="formInfo.status_name" readonly></v-text-field>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">
               <label>Updated By</label>
-              <v-text-field v-model="formInfo.updatedBy" :readonly="pageMode === 'edit'"></v-text-field>
+              <v-text-field v-model="formInfo.Updated_By" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">
               <label>Updated Date</label>
-              <v-text-field v-model="formInfo.updatedDate" :readonly="pageMode === 'edit'"></v-text-field>
+              <v-text-field v-model="formInfo.Updated_Date" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
           </v-row>
           <v-divider class="mt-8 mb-6"></v-divider>
           <v-row>
             <v-col>
               <div class="d-flex justify-center mb-3">
-                <n-btn-save no-permission @click="saveClick('save')" class="me-3"></n-btn-save>
+                <n-btn-save no-permission @click="saveClick('save')" class="me-3"
+                  :disabled="formInfo.Status === '90'"></n-btn-save>
                 <n-btn-cancel @click="router.go(-1)" class="me-3" />
-                <n-btn-save no-permission @click="saveClick('confirmed')"></n-btn-save>
+                <n-btn-save no-permission @click="saveClick('confirmed')"
+                  :disabled="formInfo.Status === '90'"></n-btn-save>
               </div>
             </v-col>
           </v-row>
@@ -143,7 +144,6 @@ const router = useRouter();
 const Alert = inject("Alert");
 const frmInfo = ref(null);
 const dialog = ref(false);
-const statusList = ref([]);
 const reasonList = ref([]);
 const processList = ref([]);
 
@@ -169,10 +169,10 @@ let formInfo = ref({
   "part_no": "",
   "plan_fg_amt": "",
   "plan_total_time": "",
-  "status": "",
+  "Status": "",
   "status_name": "",
-  "updated_by": "",
-  "updated_date": "",
+  "Updated_By": "",
+  "Updated_Date": "",
   "Process_CD": "",
   "NG_Time": "",
   "NG_Date": "",
@@ -193,22 +193,17 @@ onMounted(() => {
   if (route.params.id) {
     console.log("edit ")
     pageMode.value = "edit";
-    // loadData();
+    loadData();
   }
   else {
+    console.log("add ")
     const v = localStorage.getItem("ng-new");
     if (v) {
       const d = JSON.parse(v);
       formInfo.value = d;
       formInfo.value.Plan_Date = getDateFormat(formInfo.value.Plan_Date, "dd/MM/yyyy");
       formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
-      console.log('item is ', d);
-      // localStorage.setItem("ng-new", '');
-
-      formInfo.value.Model_CD = 'EN650'
-      ddlApi.lineMachine(formInfo.value.Line_CD, formInfo.value.Model_CD).then((data) => {
-        processList.value = data;
-      });
+      getProcessList();
     }
 
     formInfo.value.NG_Date = getCurrrentDate();
@@ -217,15 +212,17 @@ onMounted(() => {
 
 });
 
-const onSearch = async () => {
-  console.log("search ")
-  // loadData();
-};
+const getProcessList = () => {
+  formInfo.value.Model_CD = 'EN650'
+  ddlApi.lineMachine(formInfo.value.Line_CD, formInfo.value.Model_CD).then((data) => {
+    processList.value = data;
+  });
+}
 
 const loadData = async () => {
   try {
     isLoading.value = true;
-    let id = pageMode.value === 'edit' ? route.params.id : formInfo.value.machineNo;
+    let id = route.params.id;
     const response = await api.getById(id);
 
     if (response.status === 2) {
@@ -234,8 +231,11 @@ const loadData = async () => {
     }
     formInfo.value = response.data;
     formInfo.value.Plan_Date = getDateFormat(formInfo.value.Plan_Date, "dd/MM/yyyy");
-    formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm:ss");
-
+    formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
+    formInfo.value.NG_Date = getDateFormat(formInfo.value.NG_Date, "yyyy-MM-dd");
+    formInfo.value.NG_Time = getDateFormat(formInfo.value.NG_Time, "HH:mm");
+    formInfo.value.Updated_Date = getDateFormat(formInfo.value.Updated_Date);
+    getProcessList();
   } catch (error) {
     console.error("Error fetching API:", error);
     formInfo.value = {}
@@ -246,16 +246,13 @@ const loadData = async () => {
 const saveClick = async (mode) => {
   try {
     const { valid } = await frmInfo.value.validate();
-    console.log('value is ', formInfo.value)
     if (!valid) return;
 
     isLoading.value = true;
     let res = null;
 
     const v = { ...formInfo.value };
-    const info = {
-      planId: `${v.id}`,
-      lineCd: v.Line_CD,
+    let info = {
       processCd: v.Process_CD,
       ngDate: v.NG_Date,
       ngTime: `${v.NG_Time}:00`,
@@ -268,6 +265,11 @@ const saveClick = async (mode) => {
 
     if (pageMode.value === "add") {
       console.log("Add");
+      info = {
+        ...info,
+        planId: `${v.id}`,
+        lineCd: v.Line_CD
+      }
       res = await api.add(info);
     } else {
       console.log("Edit");
@@ -276,14 +278,13 @@ const saveClick = async (mode) => {
     isLoading.value = false;
     if (res.status === 0) {
       dialog.value = false;
-      if (pageMode.value === 'edit') {
-        Alert.success();
-        onSearch();
+      if (mode === "save") {
+        await Alert.success();
       }
       else {
-        await Alert.success();
-        router.back();
+        await Alert.success("Confirmed Successful");
       }
+      router.back();
     } else {
       Alert.warning(res.message);
     }

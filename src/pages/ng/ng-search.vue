@@ -53,9 +53,10 @@
           <v-col>
             <v-data-table v-model:page="currentPage" :headers="headersDetail" :items="items" :items-per-page="pageSize">
               <template v-slot:[`item.action`]="{ item }">
-                <n-gbtn-edit :permission="false" @click="onEdit(item.Menu_No)"></n-gbtn-edit>
+                <n-gbtn-edit :permission="false" @click="onEdit(item.id)"></n-gbtn-edit>
 
-                <n-gbtn-delete :permission="false" v-if="item.buttonDel"></n-gbtn-delete>
+                <n-gbtn-delete :permission="false" v-if="item.status === '00'"
+                  @click="onDelete(item.id)"></n-gbtn-delete>
               </template>
 
               <template v-slot:bottom>
@@ -71,7 +72,7 @@
             <label>Total Rejection Quantity</label>
           </v-col>
           <v-col cols="2">
-            <v-text-field readonly v-model="rejectionQuantity" reverse></v-text-field>
+            <v-text-field readonly v-model="rejectionQuantity" reverse placeholder="0"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
@@ -79,7 +80,7 @@
             <label>Total Rejection Loss</label>
           </v-col>
           <v-col cols="2">
-            <v-text-field readonly v-model="rejectionLoss" reverse></v-text-field>
+            <v-text-field readonly v-model="rejectionLoss" reverse placeholder="HH:mm"></v-text-field>
           </v-col>
         </v-row>
       </v-card-text>
@@ -94,14 +95,18 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, inject } from "vue";
 import rules from "@/utils/rules";
 import New from "@/components/ng/new.vue";
 import * as api from "@/api/ng.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import { getDateFormat, getPaging } from "@/utils/utils.js";
+import { useRouter } from "vue-router";
+import NgInfo from "./ng-info.vue";
 
+const router = useRouter();
 const dialog = ref(false);
+const Alert = inject("Alert");
 
 const formSearch = ref({
   lineCd: '',
@@ -113,7 +118,7 @@ const formSearch = ref({
 });
 
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(20);
 const totalItems = ref(0);
 const lineList = ref([]);
 const lineModelList = ref([]);
@@ -144,10 +149,10 @@ const headersDetail = [
   { title: "Reason", key: "reason_name", sortable: false },
   { title: "Comment", key: "comment", sortable: false },
   { title: "Status", key: "status_name", sortable: false },
-  { title: "Update By", key: "updated_by", sortable: false },
+  { title: "Update By", key: "Updated_By", sortable: false },
   {
-    title: "Update Date", key: "updated_date", sortable: false, value: (item) => {
-      return getDateFormat(item.updated_date);
+    title: "Update Date", key: "Updated_Date", sortable: false, value: (item) => {
+      return getDateFormat(item.Updated_Date);
     }
   },
 ];
@@ -177,6 +182,49 @@ const onSearch = () => {
   currentPage.value = 1;
   loadData({ page: currentPage.value, itemsPerPage: pageSize.value });
 }
+
+const onReset = () => {
+  formSearch.value = {
+    isActive: "Y",
+  };
+  items.value = [];
+  totalItems.value = 0;
+  onSearch();
+};
+
+const onEdit = (id) => {
+  router.push({ name: `ng-info`, params: { id: id } });
+}
+
+const onDelete = (id) => {
+  console.log("onDelete : ", id);
+  Alert.confirm("Are you sure you want to delete this NG ?").then(
+    ({ isConfirmed }) => {
+      if (isConfirmed) {
+        isLoading.value = true;
+        api
+          .remove(id)
+          .then((res) => {
+            isLoading.value = false;
+            if (res.status === 0) {
+              Alert.success("Delete successfully");
+              onSearch();
+            } else if (res.status === 1) {
+              Alert.warning(res.message);
+            } else {
+              Alert.error(res.message);
+            }
+          })
+          .catch((error) => {
+            isLoading.value = false;
+            console.error("Error fetching API:", error);
+            Alert.error(error.message);
+          });
+      }
+    }
+  );
+
+};
 
 const loadData = async (paginate) => {
   const { page, itemsPerPage } = paginate;
@@ -219,4 +267,5 @@ const loadData = async (paginate) => {
 const newNGClick = () => {
   dialog.value = true;
 };
+
 </script>
