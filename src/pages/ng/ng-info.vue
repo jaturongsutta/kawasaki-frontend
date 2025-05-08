@@ -80,12 +80,7 @@
             </v-col>
             <v-col cols="3">
               <label class="require-field">Quantity</label>
-              <v-text-field v-model="formInfo.Quantity" v-maska="{
-                mask: '#',
-                tokens: {
-                  '#': { pattern: /[0-9]/, repeated: true },
-                },
-              }" type="text" :rules="[rules.required]"></v-text-field>
+              <n-input-number v-model="formInfo.Quantity" :rules="[rules.required]" />
             </v-col>
 
             <v-col cols="3">
@@ -115,11 +110,11 @@
           <v-row>
             <v-col>
               <div class="d-flex justify-center mb-3">
-                <n-btn-save no-permission @click="saveClick('save')" class="me-3"
-                  :disabled="formInfo.Status === '90'"></n-btn-save>
-                <n-btn-cancel @click="router.go(-1)" class="me-3" />
-                <n-btn-save no-permission @click="saveClick('confirmed')"
-                  :disabled="formInfo.Status === '90'"></n-btn-save>
+                <n-btn-save-white no-permission @click="saveClick('save')" class="me-5"
+                  :disabled="formInfo.Status === '90'"></n-btn-save-white>
+                <n-btn-cancel @click="router.go(-1)" class="me-5" />
+                <n-btn-confirm no-permission @click="saveClick('confirmed')"
+                  :disabled="formInfo.Status === '90'"></n-btn-confirm>
               </div>
             </v-col>
           </v-row>
@@ -213,7 +208,6 @@ onMounted(() => {
 });
 
 const getProcessList = () => {
-  formInfo.value.Model_CD = 'EN650'
   ddlApi.lineMachine(formInfo.value.Line_CD, formInfo.value.Model_CD).then((data) => {
     processList.value = data;
   });

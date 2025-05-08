@@ -21,18 +21,17 @@
 
           <v-col cols="2">
             <label>Model</label>
-            <v-select v-model="formSearch.modelCd" :items="lineModelList"></v-select>
+            <v-select v-model="formSearch.modelCd"
+              :items="[{ title: 'All', value: null }, ...lineModelList]"></v-select>
           </v-col>
           <v-col cols="2">
             <label>Reason</label>
-            <v-select v-model="formSearch.reasonCd" :items="reasonList" item-value="predefine_cd"
-              item-title="Value_EN"></v-select>
+            <v-select v-model="formSearch.reasonCd" :items="[{ title: 'All', value: null }, ...reasonList]"></v-select>
           </v-col>
 
           <v-col cols="2">
             <label>Status</label>
-            <v-select v-model="formSearch.statusCd" :items="statusList" item-value="predefine_cd"
-              item-title="Value_EN"></v-select>
+            <v-select v-model="formSearch.statusCd" :items="[{ title: 'All', value: null }, ...statusList]"></v-select>
           </v-col>
         </v-row>
         <div class="row mt-1 mb-1">
@@ -189,6 +188,7 @@ const onReset = () => {
   };
   items.value = [];
   totalItems.value = 0;
+  lineModelList.value = [];
   onSearch();
 };
 

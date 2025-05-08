@@ -64,3 +64,10 @@ export function convertCommaToPureNumber(v) {
   }
   return;
 }
+
+export const getCheckBreak = (v) => {
+  if (v === null || v === 'N') {
+    return 'N';
+  }
+  return 'Y';
+}
