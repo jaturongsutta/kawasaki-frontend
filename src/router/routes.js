@@ -1,6 +1,6 @@
 import Home from "@/pages/home.vue";
 import Login from "@/pages/login.vue";
-
+import planningInformation from "@/pages/plan/planning-information.vue";
 const routes = [
   {
     path: "/",
@@ -107,6 +107,11 @@ const routes = [
         path: "",
         name: "plan-search",
         component: () => import("@/pages/plan/plan-search.vue"),
+      },
+      {
+        path: "/plan/planning-info/:id?",
+        name: "planning-info",
+        component: planningInformation,
       },
     ],
   },

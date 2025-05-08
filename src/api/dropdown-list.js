@@ -56,6 +56,15 @@ export const line = async () => {
   }
 };
 
+export const line_ = async () => {
+  try {
+    const { data } = await axios.get(`dropdown-list/line*`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const lineTank = async () => {
   try {
     const { data } = await axios.get(`dropdown-list/line-tank`);

@@ -65,7 +65,7 @@
             >
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit
-                  @click="onPlanCurrentEditClick(item)"
+                  @click="onPlanCurrentEditClick(item.id)"
                 ></n-gbtn-edit>
               </template>
               <template v-slot:[`item.action2`]="{ item }">
@@ -154,15 +154,6 @@
             class="ma-5"
             @click="newPlanClick"
           ></n-btn-add>
-          <v-btn
-            prepend-icon="mdi mdi-file-document-arrow-right-outline"
-            class="bg-gradient-info export-btn mt-5"
-          >
-            <template v-slot:prepend>
-              <v-icon color="write" size="large"></v-icon>
-            </template>
-            Export to Excel
-          </v-btn>
         </v-row>
         <v-row>
           <v-col>
@@ -341,11 +332,14 @@ import * as api from "@/api/plan.js";
 
 import { getPaging, getDateFormat } from "@/utils/utils.js";
 import moment from "moment";
+import router from "@/router";
 const Alert = inject("Alert");
 
 const dialog = ref(false);
 
-const formSearch = ref({});
+const formSearch = ref({
+  line: "CYH6",
+});
 const formInfo = ref({
   line: "1",
   plan_date: "2025-01-01",
@@ -454,6 +448,7 @@ const intervalId = ref(null); // To store the interval ID
 
 onMounted(() => {
   ddlApi.line().then((data) => {
+    console.log("lineList", data);
     lineList.value = data;
   });
 
@@ -483,7 +478,12 @@ onUnmounted(() => {
 });
 
 const newPlanClick = () => {
-  dialog.value = true;
+  // dialog.value = true;
+
+  router.push({
+    name: "planning-info",
+    params: {},
+  });
 };
 
 const loadPlanCurrent = (line) => {
@@ -534,7 +534,12 @@ const lineChange = (value) => {
 const onPlanCurrentEditClick = (item) => {
   console.log("onPlanCurrentEditClick", item);
 
-  dialog.value = true;
+  router.push({
+    name: "planning-info",
+    params: {
+      id: item.id,
+    },
+  });
 };
 
 const onStopPlanClick = (item) => {
