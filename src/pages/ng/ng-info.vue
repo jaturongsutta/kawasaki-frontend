@@ -252,6 +252,7 @@ const saveClick = async (mode) => {
     const v = { ...formInfo.value };
     let info = {
       processCd: v.Process_CD,
+      lineCd: v.Line_CD,
       modelCd: v.Model_CD,
       ngDate: v.NG_Date,
       ngTime: `${v.NG_Time}:00`,
@@ -266,7 +267,6 @@ const saveClick = async (mode) => {
       info = {
         ...info,
         planId: `${v.id}`,
-        lineCd: v.Line_CD
       }
       res = await api.add(info);
     } else {
