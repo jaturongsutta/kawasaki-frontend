@@ -133,6 +133,24 @@ const routes = [
     ],
   },
   {
+    path: "/line-stop",
+    meta: {
+      requireAuth: false,
+    },
+    children: [
+      {
+        path: "",
+        name: "line-stop-search",
+        component: () => import("@/pages/line-stop/line-stop-search.vue"),
+      },
+      {
+        path: "/line-stop-info/:id?",
+        name: "line-stop-info",
+        component: () => import("@/pages/line-stop/line-stop-info.vue"),
+      },
+    ],
+  },
+  {
     path: "/common-master/model",
     meta: {
       menuNo: "M1006",

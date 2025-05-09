@@ -1,7 +1,7 @@
 import axios from "@/utils/axios";
 export const search = async (data) => {
   try {
-    const response = await axios.post(`/ng/search`, data);
+    const response = await axios.post(`/line-stop/search`, data);
     return response.data;
   } catch (error) {
     throw error;
@@ -10,7 +10,7 @@ export const search = async (data) => {
 
 export const searchPlan = async (data) => {
   try {
-    const response = await axios.post(`/ng/searchPlan`, data);
+    const response = await axios.post(`/line-stop/searchPlan`, data);
     return response.data;
   } catch (error) {
     throw error;
@@ -19,7 +19,7 @@ export const searchPlan = async (data) => {
 
 export const getById = async (id) => {
   try {
-    const response = await axios.get(`/ng/getById/${id}`);
+    const response = await axios.get(`/line-stop/getById/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -28,7 +28,7 @@ export const getById = async (id) => {
 
 export const add = async (data) => {
   try {
-    const response = await axios.post(`/ng/add`, data);
+    const response = await axios.post(`/line-stop/add`, data);
     return response.data;
   } catch (error) {
     throw error;
@@ -37,7 +37,7 @@ export const add = async (data) => {
 
 export const update = async (id, data) => {
   try {
-    const response = await axios.put(`/ng/update/${id}`, data);
+    const response = await axios.put(`/line-stop/update/${id}`, data);
     return response.data;
   } catch (error) {
     throw error;
@@ -46,7 +46,7 @@ export const update = async (id, data) => {
 
 export const remove = async (id) => {
   try {
-    const response = await axios.delete(`/ng/delete/${id}`);
+    const response = await axios.delete(`/line-stop/delete/${id}`);
     return response.data;
   } catch (error) {
     throw error;
