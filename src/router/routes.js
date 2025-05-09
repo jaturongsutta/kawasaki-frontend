@@ -115,6 +115,24 @@ const routes = [
     ],
   },
   {
+    path: "/ng",
+    meta: {
+      requireAuth: false,
+    },
+    children: [
+      {
+        path: "",
+        name: "ng-search",
+        component: () => import("@/pages/ng/ng-search.vue"),
+      },
+      {
+        path: "/ng-info/:id?",
+        name: "ng-info",
+        component: () => import("@/pages/ng/ng-info.vue"),
+      },
+    ],
+  },
+  {
     path: "/common-master/model",
     meta: {
       menuNo: "M1006",

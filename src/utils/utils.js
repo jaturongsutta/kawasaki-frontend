@@ -38,6 +38,10 @@ export function getDateFormat(date, format) {
   return "-";
 }
 
+export function getCurrrentDate() {
+  return DateTime.now().toISODate();
+}
+
 export function commaFormattedNumber(v) {
   if (v) {
     return Number(v).toLocaleString("en-US");
@@ -59,4 +63,11 @@ export function convertCommaToPureNumber(v) {
     return n;
   }
   return;
+}
+
+export const getCheckBreak = (v) => {
+  if (v === null || v === 'N') {
+    return 'N';
+  }
+  return 'Y';
 }
