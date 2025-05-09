@@ -482,7 +482,6 @@ const newPlanClick = () => {
 
   router.push({
     name: "planning-info",
-    params: {},
   });
 };
 

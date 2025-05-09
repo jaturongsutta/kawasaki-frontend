@@ -38,6 +38,11 @@ export const getYear = async () => {
   return years;
 };
 
+export const user = async () => {
+  const { data } = await axios.get(`dropdown-list/user`);
+  return data;
+};
+
 export const role = async () => {
   try {
     const { data } = await axios.get(`dropdown-list/role`);
@@ -122,6 +127,11 @@ export const lineModel = async (line) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const shift = async () => {
+  const { data } = await axios.get(`dropdown-list/shift`);
+  return data;
 };
 
 /// private function ///

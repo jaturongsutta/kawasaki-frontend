@@ -1,6 +1,6 @@
 <template>
   <v-icon
-    icon="mdi-cancel"
+    icon="mdi-stop-circle-outline"
     v-tooltip:end="'Stop'"
     style="margin-left: 5px; margin-right: 5px; color: red; cursor: pointer"
     v-if="canAccess"
