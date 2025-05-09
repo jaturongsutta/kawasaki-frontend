@@ -67,8 +67,8 @@
             </v-col>
 
             <v-col cols="3">
-              <label class="require-field">Process</label>
-              <v-select v-model="formInfo.Process_CD" :items="processList" :rules="[rules.required]"
+              <label>Process</label>
+              <v-select v-model="formInfo.Process_CD" :items="processList"
                 :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
             <v-col cols="3">
