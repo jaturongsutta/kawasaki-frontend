@@ -111,9 +111,9 @@ const formSearch = ref({
   lineCd: '',
   dateFrom: '',
   dateTo: '',
-  modelCd: '',
-  reasonCd: '',
-  statusCd: '',
+  modelCd: null,
+  reasonCd: null,
+  statusCd: null,
 });
 
 const currentPage = ref(1);
@@ -171,7 +171,7 @@ onMounted(async () => {
 });
 
 const getLineModelList = (lineCd) => {
-  formSearch.value.modelCd = '';
+  formSearch.value.modelCd = null;
   ddlApi.lineModel(lineCd).then((data) => {
     lineModelList.value = data;
   });
