@@ -82,7 +82,7 @@ onMounted(() => {
 
 <style scoped>
 .bg-gradient-info {
-  background-image: linear-gradient(310deg, rgb(68 156 0 / 87%), #a3f862 100%);
+  background-image: linear-gradient(310deg, rgb(0 24 156 / 87%), #6299f8 100%);
   color: #fff;
 }
 </style>

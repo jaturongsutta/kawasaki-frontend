@@ -114,8 +114,8 @@
           <v-row>
             <v-col>
               <div class="d-flex justify-center mb-3">
-                <n-btn-save-white no-permission @click="saveClick('save')" class="me-5"
-                  :disabled="formInfo.Status === '90'"></n-btn-save-white>
+                <n-btn-save no-permission @click="saveClick('save')" class="me-5"
+                  :disabled="formInfo.Status === '90'"></n-btn-save>
                 <n-btn-cancel @click="router.go(-1)" class="me-5" />
                 <n-btn-confirm no-permission @click="saveClick('confirmed')"
                   :disabled="formInfo.Status === '90'"></n-btn-confirm>
