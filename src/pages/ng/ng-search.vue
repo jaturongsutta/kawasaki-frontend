@@ -54,7 +54,7 @@
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit :permission="false" @click="onEdit(item.id)"></n-gbtn-edit>
 
-                <n-gbtn-delete :permission="false" v-if="item.status === '00'"
+                <n-gbtn-delete :permission="false" v-if="item.status === '00' && item.ID_Ref === null"
                   @click="onDelete(item.id)"></n-gbtn-delete>
               </template>
 
