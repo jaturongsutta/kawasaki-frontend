@@ -206,6 +206,7 @@ onMounted(() => {
 
     formInfo.value.NG_Date = getCurrrentDate();
     formInfo.value.NG_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
+    formInfo.value.Quantity = 1;
   }
 
 });
