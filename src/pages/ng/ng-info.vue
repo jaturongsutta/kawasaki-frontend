@@ -78,8 +78,7 @@
             </v-col>
             <v-col cols="3">
               <label class="require-field">NG Time</label>
-              <v-text-field placeholder="HH:mm" v-model="formInfo.NG_Time" v-maska="'##:##'" type="text"
-                :readonly="formInfo.Status === '90'"></v-text-field>
+              <n-time v-model="formInfo.NG_Time" :rules="[rules.required]" :readonly="formInfo.Status === '90'" />
             </v-col>
             <v-col cols="3">
               <label class="require-field">Quantity</label>

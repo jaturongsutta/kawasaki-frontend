@@ -11,11 +11,11 @@
             <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getLineModelList"></v-select>
           </v-col>
           <v-col cols="2">
-            <label>Plan Date From</label>
+            <label>Date From</label>
             <n-date v-model="formSearch.dateFrom"></n-date>
           </v-col>
           <v-col cols="2">
-            <label>Plan Date To</label>
+            <label>Date To</label>
             <n-date v-model="formSearch.dateTo"></n-date>
           </v-col>
 

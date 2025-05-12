@@ -68,7 +68,7 @@
 
                 <v-col cols="6">
                   <label class="require-field">Cycle Time (mins) </label>
-                  <n-time v-model="form.cycleTime" :rules="[rules.required]" reverse></n-time>
+                  <n-time-mins v-model="form.cycleTime" :rules="[rules.required]" reverse />
                 </v-col>
                 <v-col cols="6">
                   <label>Part Name </label>
@@ -126,7 +126,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/model.js";
 import rules from "@/utils/rules";
-import { getDateFormat} from "@/utils/utils";
+import { getDateFormat } from "@/utils/utils";
 
 const Alert = inject("Alert");
 const frmInfo = ref(null);
