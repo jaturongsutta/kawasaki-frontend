@@ -35,6 +35,15 @@ export const add = async (data) => {
   }
 };
 
+export const addFromPLC = async (data) => {
+  try {
+    const response = await axios.post(`/line-stop/add-plc`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const update = async (id, data) => {
   try {
     const response = await axios.put(`/line-stop/update/${id}`, data);

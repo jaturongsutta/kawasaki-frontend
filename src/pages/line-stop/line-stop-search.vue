@@ -8,12 +8,12 @@
         <v-row justify="justify-start">
           <v-col cols="2">
             <label>Line</label>
-            <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getLineModelList"></v-select>
+            <v-select v-model="formSearch.lineCd" :items="lineList"></v-select>
           </v-col>
           <v-col cols="2">
             <label>Machine</label>
-            <v-select v-model="formSearch.modelCd"
-              :items="[{ title: 'All', value: null }, ...lineModelList]"></v-select>
+            <v-select v-model="formSearch.machineNo"
+              :items="[{ title: 'All', value: null }, ...machineList]"></v-select>
           </v-col>
           <v-col cols="2">
             <label>Date From</label>
@@ -45,8 +45,8 @@
       <v-card-text>
         <v-row>
           <div class="d-flex justify-center ma-5">
-            <n-btn-add no-permission label="New Line Stop" @click="newNGClick"></n-btn-add>
-            <n-btn-add no-permission label="New Line Stop from PLC" class="ml-3" @click="newNGClick"></n-btn-add>
+            <n-btn-add no-permission label="New Line Stop" @click="newClick(false)"></n-btn-add>
+            <n-btn-add no-permission label="New Line Stop from PLC" class="ml-3" @click="newClick(true)"></n-btn-add>
           </div>
         </v-row>
         <v-row>
@@ -69,18 +69,18 @@
         <v-divider class="mb-8"></v-divider>
         <v-row>
           <v-col cols="2" class="pt-2">
-            <label>Total Rejection Quantity</label>
+            <label>Total Line Stop Loss</label>
           </v-col>
           <v-col cols="2">
-            <v-text-field readonly v-model="rejectionQuantity" reverse placeholder="0"></v-text-field>
+            <v-text-field readonly v-model="totalLineStopLoss" reverse placeholder="0"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="2" class="pt-2">
-            <label>Total Rejection Loss</label>
+            <label>% Loss</label>
           </v-col>
           <v-col cols="2">
-            <v-text-field readonly v-model="rejectionLoss" reverse placeholder="HH:mm"></v-text-field>
+            <v-text-field readonly v-model="percentLoss" reverse placeholder="0"></v-text-field>
           </v-col>
         </v-row>
       </v-card-text>
@@ -88,7 +88,7 @@
     </v-card>
 
     <v-dialog v-model="dialog" max-width="1024px">
-      <New></New>
+      <New :is-p-l-c="isPLC" @on-add-successful="dialog = false; onSearch();"></New>
     </v-dialog>
 
   </div>
@@ -97,8 +97,8 @@
 <script setup>
 import { onMounted, ref, inject } from "vue";
 import rules from "@/utils/rules";
-import New from "@/components/ng/new.vue";
-import * as api from "@/api/ng.js";
+import New from "@/components/line-stop/new.vue";
+import * as api from "@/api/line-stop.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import { getDateFormat, getPaging } from "@/utils/utils.js";
 import { useRouter } from "vue-router";
@@ -112,7 +112,7 @@ const formSearch = ref({
   lineCd: '',
   dateFrom: '',
   dateTo: '',
-  modelCd: null,
+  machineNo: null,
   reasonCd: null,
   statusCd: null,
 });
@@ -121,31 +121,32 @@ const currentPage = ref(1);
 const pageSize = ref(20);
 const totalItems = ref(0);
 const lineList = ref([]);
-const lineModelList = ref([]);
+const machineList = ref([]);
 const reasonList = ref([]);
 const statusList = ref([]);
 let items = ref([]);
 let isLoading = ref(false);
 
-const rejectionQuantity = ref('');
-const rejectionLoss = ref('');
+const totalLineStopLoss = ref('');
+const percentLoss = ref('');
+
+const isPLC = ref(false);
 
 const headersDetail = [
   { title: "", key: "action", sortable: false, nowrap: true },
   { title: "Line", key: "Line_CD", sortable: false },
+  { title: "Machine", key: "Machine_No", sortable: false },
   {
-    title: "Date", key: "NG_Date", sortable: false, value: (item) => {
+    title: "Date", key: "Line_Stop_Date", sortable: false, value: (item) => {
       return getDateFormat(item.NG_Date, "dd/MM/yyyy");
     }
   },
   {
-    title: "Time", key: "NG_Time", sortable: false, value: (item) => {
+    title: "Time", key: "Line_Stop_Time", sortable: false, value: (item) => {
       return getDateFormat(item.NG_Time, "HH:mm");
     }
   },
-  { title: "Model", key: "Model_CD", sortable: false },
-  { title: "Part No", key: "part_no", sortable: false },
-  { title: "Quantity", key: "quantity", sortable: false },
+  { title: "Line Stop mins", key: "Loss_Time", sortable: false },
   { title: "Reason", key: "reason_name", sortable: false },
   { title: "Comment", key: "comment", sortable: false },
   { title: "Status", key: "status_name", sortable: false },
@@ -158,25 +159,23 @@ const headersDetail = [
 ];
 
 onMounted(async () => {
-  ddlApi.getPredefine("NG_Status").then((data) => {
+  ddlApi.getPredefine("Stop_Status").then((data) => {
     statusList.value = data;
   });
 
-  ddlApi.getPredefine("NG_Reason").then((data) => {
+  ddlApi.getPredefine("Stop_Reason").then((data) => {
     reasonList.value = data;
   });
 
   ddlApi.lineAll().then((data) => {
     lineList.value = data;
   });
-});
 
-const getLineModelList = (lineCd) => {
-  formSearch.value.modelCd = null;
-  ddlApi.lineModel(lineCd).then((data) => {
-    lineModelList.value = data;
+  ddlApi.machine().then((data) => {
+    machineList.value = data;
+    reAssignMachineListValue(machineList.value);
   });
-}
+});
 
 const onSearch = () => {
   currentPage.value = 1;
@@ -246,18 +245,13 @@ const loadData = async (paginate) => {
     items.value = response.data;
     totalItems.value = response.total_record;
 
+    /* Total line stop loss calculate */
+    console.log("total is ", items.value.reduce((sum, row) => sum + row.Loss_Time, 0))
+    totalLineStopLoss.value = items.value.reduce((sum, row) => sum + row.Loss_Time, 0)
 
-    rejectionQuantity.value = items.value.reduce((sum, row) => sum + row.quantity, 0)
+    /* Percent Loss calculate */
 
-    const totalSeconds = items.value.reduce((sum, row) => {
-      const cycleTime = new Date(row.Cycle_Time)
-      const seconds = cycleTime.getUTCHours() * 3600 + cycleTime.getUTCMinutes() * 60 + cycleTime.getUTCSeconds()
-      return sum + (seconds * row.quantity)
-    }, 0)
-
-    const hours = Math.floor(totalSeconds / 3600)
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-    rejectionLoss.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    percentLoss.value = calculateLossPercentage(items.value);
 
   } catch (error) {
     console.error("Error fetching API:", error);
@@ -267,8 +261,25 @@ const loadData = async (paginate) => {
   isLoading.value = false;
 };
 
-const newNGClick = () => {
+const calculateLossPercentage = (data) => {
+  const totalLossTime = data.reduce((sum, item) => sum + Number(item.Loss_Time || 0), 0)
+  const totalPlanTime = data.reduce((sum, item) => sum + Number(item.plan_total_time || 0), 0)
+
+  if (totalPlanTime === 0) return 0
+  const percentage = (totalLossTime / totalPlanTime) * 100
+
+  return percentage.toFixed(2)
+}
+
+const newClick = (v) => {
+  isPLC.value = v;
   dialog.value = true;
 };
+
+const reAssignMachineListValue = (data) => {
+  data.forEach(item => {
+    item.value = item.title
+  })
+}
 
 </script>
