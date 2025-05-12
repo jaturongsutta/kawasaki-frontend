@@ -26,6 +26,16 @@ export const getById = async (id) => {
   }
 };
 
+export const getMachineDDL = async (id) => {
+  try {
+    const response = await axios.get(`/line-stop/machineDDL/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export const add = async (data) => {
   try {
     const response = await axios.post(`/line-stop/add`, data);

@@ -31,7 +31,7 @@
             <v-data-table v-model:page="currentPage" :headers="headersDetail" :items="items" :items-per-page="pageSize"
               hide-default-footer>
               <template v-slot:[`item.action`]="{ item }">
-                <n-btn label="Select" no-permission @click="onSelect(item)" />
+                <n-btn :label="mainProps.isPLC ? 'Create' : 'Select'" no-permission @click="onSelect(item)" />
               </template>
             </v-data-table>
             <v-divider></v-divider>
@@ -163,8 +163,8 @@ const onSelect = async (item) => {
     }
   }
   else {
-    localStorage.setItem("ng-new", JSON.stringify(item));
-    router.push({ name: `ng-info`, query: { lineCd: item.Line_CD } });
+    localStorage.setItem("line-stop-new", JSON.stringify(item));
+    router.push({ name: `line-stop-info`, query: { lineCd: item.Line_CD } });
   }
 }
 

@@ -8,7 +8,7 @@
         <v-row justify="justify-start">
           <v-col cols="2">
             <label>Line</label>
-            <v-select v-model="formSearch.lineCd" :items="lineList"></v-select>
+            <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getMachineList"></v-select>
           </v-col>
           <v-col cols="2">
             <label>Machine</label>
@@ -72,7 +72,7 @@
             <label>Total Line Stop Loss</label>
           </v-col>
           <v-col cols="2">
-            <v-text-field readonly v-model="totalLineStopLoss" reverse placeholder="0"></v-text-field>
+            <v-text-field readonly v-model="totalLineStopLoss" reverse placeholder="HH:mm:ss"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
@@ -100,7 +100,7 @@ import rules from "@/utils/rules";
 import New from "@/components/line-stop/new.vue";
 import * as api from "@/api/line-stop.js";
 import * as ddlApi from "@/api/dropdown-list.js";
-import { getDateFormat, getPaging } from "@/utils/utils.js";
+import { getDateFormat, getPaging, secondsToHHMMSS, secondsToMMSS } from "@/utils/utils.js";
 import { useRouter } from "vue-router";
 
 
@@ -138,15 +138,19 @@ const headersDetail = [
   { title: "Machine", key: "Machine_No", sortable: false },
   {
     title: "Date", key: "Line_Stop_Date", sortable: false, value: (item) => {
-      return getDateFormat(item.NG_Date, "dd/MM/yyyy");
+      return getDateFormat(item.Line_Stop_Date, "dd/MM/yyyy");
     }
   },
   {
     title: "Time", key: "Line_Stop_Time", sortable: false, value: (item) => {
-      return getDateFormat(item.NG_Time, "HH:mm");
+      return getDateFormat(item.Line_Stop_Time, "HH:mm");
     }
   },
-  { title: "Line Stop mins", key: "Loss_Time", sortable: false },
+  {
+    title: "Line Stop mins", key: "Loss_Time", sortable: false, value: (item) => {
+      return secondsToMMSS(item.Loss_Time);
+    }
+  },
   { title: "Reason", key: "reason_name", sortable: false },
   { title: "Comment", key: "comment", sortable: false },
   { title: "Status", key: "status_name", sortable: false },
@@ -170,11 +174,6 @@ onMounted(async () => {
   ddlApi.lineAll().then((data) => {
     lineList.value = data;
   });
-
-  ddlApi.machine().then((data) => {
-    machineList.value = data;
-    reAssignMachineListValue(machineList.value);
-  });
 });
 
 const onSearch = () => {
@@ -193,12 +192,12 @@ const onReset = () => {
 };
 
 const onEdit = (id) => {
-  router.push({ name: `ng-info`, params: { id: id } });
+  router.push({ name: `line-stop-info`, params: { id: id } });
 }
 
 const onDelete = (id) => {
   console.log("onDelete : ", id);
-  Alert.confirm("Are you sure you want to delete this NG ?").then(
+  Alert.confirm("Are you sure you want to delete this Line Stop ?").then(
     ({ isConfirmed }) => {
       if (isConfirmed) {
         isLoading.value = true;
@@ -246,11 +245,10 @@ const loadData = async (paginate) => {
     totalItems.value = response.total_record;
 
     /* Total line stop loss calculate */
-    console.log("total is ", items.value.reduce((sum, row) => sum + row.Loss_Time, 0))
-    totalLineStopLoss.value = items.value.reduce((sum, row) => sum + row.Loss_Time, 0)
+    totalLineStopLoss.value = secondsToHHMMSS(items.value.reduce((sum, row) => sum + row.Loss_Time, 0));
+
 
     /* Percent Loss calculate */
-
     percentLoss.value = calculateLossPercentage(items.value);
 
   } catch (error) {
@@ -260,6 +258,13 @@ const loadData = async (paginate) => {
   }
   isLoading.value = false;
 };
+
+const getMachineList = () => {
+  formSearch.value.machineNo = null;
+  api.getMachineDDL(formSearch.value.lineCd).then((v) => {
+    machineList.value = v.data;
+  });
+}
 
 const calculateLossPercentage = (data) => {
   const totalLossTime = data.reduce((sum, item) => sum + Number(item.Loss_Time || 0), 0)
@@ -275,11 +280,5 @@ const newClick = (v) => {
   isPLC.value = v;
   dialog.value = true;
 };
-
-const reAssignMachineListValue = (data) => {
-  data.forEach(item => {
-    item.value = item.title
-  })
-}
 
 </script>

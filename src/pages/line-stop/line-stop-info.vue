@@ -2,97 +2,42 @@
   <div>
     <v-card>
       <v-card-title>
-        <h4>{{ pageMode === "add" ? "New" : "Edit" }} : NG Rejection</h4>
+        <h4>{{ pageMode === "add" ? "New" : "Edit" }} : Line Stop</h4>
       </v-card-title>
       <v-divider class="mb-8"></v-divider>
       <v-card-text>
         <v-form ref="frmInfo">
           <v-row class="align-center">
-            <v-col md="3">
+            <v-col cols="6">
               <label>Line</label>
               <v-text-field v-model="formInfo.Line_CD" readonly :rules="[rules.required]"></v-text-field>
             </v-col>
-            <v-col md="3">
-              <label>Plan Date</label>
-              <v-text-field v-model="formInfo.Plan_Date" readonly></v-text-field>
-            </v-col>
-            <v-col md="3">
-              <label>Plan Start Time</label>
-              <v-text-field v-model="formInfo.Plan_Start_Time" readonly></v-text-field>
-            </v-col>
-            <v-col md="3">
-              <label>Shift</label>
-              <v-text-field v-model="formInfo.Team_Name" readonly></v-text-field>
-            </v-col>
-            <v-col md="3">
-              <label>Shift Period</label>
-              <v-text-field v-model="formInfo.Shift_Period_Name" readonly></v-text-field>
-            </v-col>
-            <v-col cols="9">
-              <v-row class="pt-5">
-                <v-col cols="2">
-                  <v-checkbox :model-value="formInfo.B1 === 'Y'" label="Break 1" color="success" readonly></v-checkbox>
-                </v-col>
-                <v-col cols="3">
-                  <v-checkbox :model-value="formInfo.B2 === 'Y'" label="Lunch Break" color="success"
-                    readonly></v-checkbox>
-                </v-col>
-                <v-col cols="2">
-                  <v-checkbox :model-value="formInfo.B3 === 'Y'" label="Break 2" color="success" readonly></v-checkbox>
-                </v-col>
-                <v-col cols="3">
-                  <v-checkbox :model-value="formInfo.B4 === 'Y'" label="Break OT" color="success" readonly></v-checkbox>
-                </v-col>
-                <v-col cols="2">
-                  <v-checkbox :model-value="formInfo.OT === 'Y'" label="OT" color="success" readonly></v-checkbox>
-                </v-col>
-              </v-row>
-            </v-col>
-
-            <v-col md="3">
-              <label>Model</label>
-              <v-text-field v-model="formInfo.Model_CD" readonly></v-text-field>
-            </v-col>
-            <v-col md="3">
-              <label>Part No</label>
-              <v-text-field v-model="formInfo.part_no" readonly></v-text-field>
-            </v-col>
-            <v-col md="3">
-              <label>Part Upper</label>
-              <v-text-field v-model="formInfo.Part_Upper" readonly></v-text-field>
-            </v-col>
-            <v-col md="3">
-              <label>Part Lower</label>
-              <v-text-field v-model="formInfo.Part_Lower" readonly></v-text-field>
-            </v-col>
-
-            <v-col cols="3">
-              <label>Process</label>
-              <v-select v-model="formInfo.Process_CD" :items="processList"
+            <v-col cols="6">
+              <label class="require-field">Machine</label>
+              <v-select v-model="formInfo.Machine_No" :items="machineList" :rules="[rules.required]"
                 :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
-            <v-col cols="3">
-              <label class="require-field">NG Date</label>
-              <n-date v-model="formInfo.NG_Date" :rules="[rules.required]"
-                :readonly="formInfo.Status === '90'"></n-date>
+            <v-col cols="6">
+              <label class="require-field">Stop Date</label>
+              <n-date v-model="formInfo.Line_Stop_Date" :readonly="formInfo.Status === '90'" />
             </v-col>
             <v-col cols="3">
-              <label class="require-field">NG Time</label>
-              <v-text-field placeholder="HH:mm" v-model="formInfo.NG_Time" v-maska="'##:##'" type="text"
-                :readonly="formInfo.Status === '90'"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <label class="require-field">Quantity</label>
-              <n-input-number v-model="formInfo.Quantity" :rules="[rules.required]"
+              <label class="require-field">Stop Time</label>
+              <n-time v-model="formInfo.Line_Stop_Time" :rules="[rules.required]"
                 :readonly="formInfo.Status === '90'" />
             </v-col>
 
             <v-col cols="3">
-              <label class="require-field">Reason</label>
-              <v-select v-model="formInfo.Reason_CD" :items="reasonList" item-value="predefine_cd" item-title="Value_EN"
-                :rules="[rules.required]" :readonly="formInfo.Status === '90'"></v-select>
+              <label class="require-field">Lost Time (mins)</label>
+              <n-time-mins v-model="formInfo.Loss_Time" :rules="[rules.required]"
+                :readonly="formInfo.Status === '90'" />
             </v-col>
-            <v-col cols="9">
+            <v-col cols="12">
+              <label class="require-field">Reason</label>
+              <v-select v-model="formInfo.Reason_CD" :items="reasonList" :rules="[rules.required]"
+                :readonly="formInfo.Status === '90'"></v-select>
+            </v-col>
+            <v-col cols="12">
               <label>Comment</label>
               <v-text-field v-model="formInfo.Comment" :readonly="formInfo.Status === '90'"></v-text-field>
             </v-col>
@@ -101,11 +46,11 @@
               <label>Status</label>
               <v-text-field v-model="formInfo.status_name" readonly></v-text-field>
             </v-col>
-            <v-col md="3" v-if="pageMode === 'edit'">
+            <v-col cols="3" v-if="pageMode === 'edit'">
               <label>Updated By</label>
               <v-text-field v-model="formInfo.Updated_By" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
-            <v-col md="3" v-if="pageMode === 'edit'">
+            <v-col cols="3" v-if="pageMode === 'edit'">
               <label>Updated Date</label>
               <v-text-field v-model="formInfo.Updated_Date" :readonly="pageMode === 'edit'"></v-text-field>
             </v-col>
@@ -133,9 +78,9 @@
 import { onMounted, ref, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
-import * as api from "@/api/ng.js";
+import * as api from "@/api/line-stop.js";
 import rules from "@/utils/rules";
-import { getCurrrentDate, getDateFormat } from "@/utils/utils";
+import { getCurrrentDate, getDateFormat, secondsToMMSS } from "@/utils/utils";
 import { DateTime } from 'luxon'
 
 const route = useRoute();
@@ -144,7 +89,7 @@ const Alert = inject("Alert");
 const frmInfo = ref(null);
 const dialog = ref(false);
 const reasonList = ref([]);
-const processList = ref([]);
+const machineList = ref([]);
 
 let formInfo = ref({
   "B1": "",
@@ -173,11 +118,13 @@ let formInfo = ref({
   "Updated_By": "",
   "Updated_Date": "",
   "Process_CD": "",
-  "NG_Time": "",
-  "NG_Date": "",
+  "Line_Stop_Date": "",
+  "Line_Stop_Time": "",
+  "Loss_Time": "",
   "Quantity": "",
   "Reason_CD": "",
-  "Comment": ""
+  "Comment": "",
+  "Machine_No": ''
 });
 
 let isLoading = ref(false);
@@ -185,7 +132,7 @@ let isDialogLoading = ref(false);
 let pageMode = ref("add");
 
 onMounted(() => {
-  ddlApi.getPredefine("NG_Reason").then((data) => {
+  ddlApi.getPredefine("Stop_Reason").then((data) => {
     reasonList.value = data;
   });
 
@@ -196,24 +143,22 @@ onMounted(() => {
   }
   else {
     console.log("add ")
-    const v = localStorage.getItem("ng-new");
+    const v = localStorage.getItem("line-stop-new");
     if (v) {
       const d = JSON.parse(v);
       formInfo.value = d;
-      formInfo.value.Plan_Date = getDateFormat(formInfo.value.Plan_Date, "dd/MM/yyyy");
-      formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
-      getProcessList();
     }
 
-    formInfo.value.NG_Date = getCurrrentDate();
-    formInfo.value.NG_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
+    formInfo.value.Line_Stop_Date = getCurrrentDate();
+    formInfo.value.Line_Stop_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
+    getMachineDDL();
   }
 
 });
 
-const getProcessList = () => {
-  ddlApi.lineMachine(formInfo.value.Line_CD, formInfo.value.Model_CD).then((data) => {
-    processList.value = data;
+const getMachineDDL = () => {
+  api.getMachineDDL(formInfo.value.Line_CD).then((v) => {
+    machineList.value = v.data;
   });
 }
 
@@ -228,12 +173,12 @@ const loadData = async () => {
       return;
     }
     formInfo.value = response.data;
-    formInfo.value.Plan_Date = getDateFormat(formInfo.value.Plan_Date, "dd/MM/yyyy");
-    formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
-    formInfo.value.NG_Date = getDateFormat(formInfo.value.NG_Date, "yyyy-MM-dd");
-    formInfo.value.NG_Time = getDateFormat(formInfo.value.NG_Time, "HH:mm");
+    formInfo.value.Line_Stop_Date = getDateFormat(formInfo.value.Line_Stop_Date, "yyyy-MM-dd");
+    formInfo.value.Line_Stop_Time = getDateFormat(formInfo.value.Line_Stop_Time, "HH:mm");
     formInfo.value.Updated_Date = getDateFormat(formInfo.value.Updated_Date);
-    getProcessList();
+    formInfo.value.Loss_Time = secondsToMMSS(formInfo.value.Loss_Time);
+
+    getMachineDDL();
   } catch (error) {
     console.error("Error fetching API:", error);
     formInfo.value = {}
@@ -253,10 +198,10 @@ const saveClick = async (mode) => {
     let info = {
       processCd: v.Process_CD,
       lineCd: v.Line_CD,
-      modelCd: v.Model_CD,
-      ngDate: v.NG_Date,
-      ngTime: `${v.NG_Time}:00`,
-      quantity: Number(v.Quantity),
+      machineNo: v.Machine_No,
+      lineStopDate: v.Line_Stop_Date,
+      lineStopTime: `${v.Line_Stop_Time}:00`,
+      lossTime: v.Loss_Time,
       reason: v.Reason_CD,
       comment: v.Comment,
       idRef: v.ID_Ref,
