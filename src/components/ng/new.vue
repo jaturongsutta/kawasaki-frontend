@@ -18,7 +18,7 @@
             </v-col>
             <div class="row mt-6 ml-2">
               <div class="d-flex justify-center">
-                <n-btn-search  @click="onSearch" />
+                <n-btn-search @click="onSearch" />
               </div>
             </div>
           </v-row>
@@ -71,6 +71,12 @@ const headersDetail = [
     title: "Plan Start Time", key: "Plan_Start_Time", sortable: false, value: (item) => {
       return getDateFormat(item.Plan_Start_Time, "HH:mm");
     }
+  },
+  {
+    title: "Shift", key: "Team_Name", sortable: false
+  },
+  {
+    title: "Shift Time", key: "Shift_Period_Name", sortable: false
   },
   {
     title: "Break1", key: "B1", sortable: false, value: (item) => {

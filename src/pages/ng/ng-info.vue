@@ -82,8 +82,9 @@
             </v-col>
             <v-col cols="3">
               <label class="require-field">Quantity</label>
-              <n-input-number v-model="formInfo.Quantity" :rules="[rules.required]"
-                :readonly="formInfo.Status === '90'" />
+              <n-input-number v-model="formInfo.Quantity"
+                :rules="[rules.required, v => /^\d{1,3}$/.test(v) || 'Only 3 digits allowed']"
+                :readonly="formInfo.Status === '90'" v-maska="'###'" />
             </v-col>
 
             <v-col cols="3">

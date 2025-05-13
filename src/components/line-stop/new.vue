@@ -82,6 +82,12 @@ const headersDetail = [
     }
   },
   {
+    title: "Shift", key: "Team_Name", sortable: false
+  },
+  {
+    title: "Shift Time", key: "Shift_Period_Name", sortable: false
+  },
+  {
     title: "Break1", key: "B1", sortable: false, value: (item) => {
       return getCheckBreak(item.B1);
     }
