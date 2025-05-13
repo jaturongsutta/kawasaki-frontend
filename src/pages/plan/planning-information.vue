@@ -215,6 +215,15 @@
         </v-col>
       </v-row>
       <n-loading :loading="isLoading" />
+
+      <v-row>
+        <v-col>
+          <div v-if="status !== ''">
+            <hr class="my-5" />
+            <plan-product-data :plan-id="form.id"></plan-product-data>
+          </div>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
