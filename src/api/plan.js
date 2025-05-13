@@ -25,6 +25,11 @@ export const getLineModel = async (line) => {
   return response.data;
 };
 
+export const getPlanById = async (id) => {
+  const response = await axios.get(`/plan/${id}`);
+  return response.data;
+};
+
 export const newPlan = async (data) => {
   const response = await axios.post(`/plan/new-plan`, data);
   return response.data;
