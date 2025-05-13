@@ -211,6 +211,7 @@
           <div class="d-flex justify-center">
             <n-btn-save @click="onSave" />
             <n-btn-cancel @click="router.go(-1)" class="ml-3" />
+            <n-btn-copy v-if="status !== ''" @click="onCopy" class="ml-3" />
           </div>
         </v-col>
       </v-row>
@@ -220,7 +221,7 @@
         <v-col>
           <div v-if="status !== ''">
             <hr class="my-5" />
-            <plan-product-data :plan-id="form.id"></plan-product-data>
+            <plan-product-data v-model="route.params.id"></plan-product-data>
           </div>
         </v-col>
       </v-row>
@@ -241,6 +242,8 @@ const Alert = inject("Alert");
 const route = useRoute();
 
 const frmInfo = ref(null);
+let mode = "NEW";
+const planId = ref(null);
 
 const router = useRouter();
 const form = ref({
@@ -263,6 +266,7 @@ const status = computed(() => {
 });
 
 onMounted(() => {
+  console.log("onMounted");
   ddlApi.user().then((data) => {
     userList.value = data;
   });
@@ -281,6 +285,8 @@ onMounted(() => {
   });
   if (route.params.id) {
     // Edit mode
+    mode = "EDIT";
+    planId.value = route.params.id;
     api.getPlanById(route.params.id).then((data) => {
       form.value = data;
 
@@ -300,6 +306,7 @@ onMounted(() => {
     });
   } else {
     // New mode
+    mode = "NEW";
     form.value.status = "";
   }
 });
@@ -471,6 +478,12 @@ const onshiftChange = (shiftCd) => {
   form.value.leader = shift ? shift.defaultLeader : "";
 };
 
+const onCopy = () => {
+  mode = "NEW";
+  form.value.status = "";
+  form.value.statusName = "Draft";
+};
+
 const onSave = async () => {
   const { valid } = await frmInfo.value.validate();
   if (!valid) return;
@@ -485,9 +498,10 @@ const onSave = async () => {
   form.value.cycleTime = cycleTimeString;
 
   let res = null;
-  if (route.params.id) {
+  if (mode === "EDIT") {
     res = await api.updatePlan(route.params.id, form.value);
   } else {
+    // New and Copy mode
     res = await api.newPlan(form.value);
   }
 

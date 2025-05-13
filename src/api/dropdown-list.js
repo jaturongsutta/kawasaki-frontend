@@ -149,7 +149,9 @@ export const shift = async () => {
 
 export const lineMachine = async (line, model) => {
   try {
-    const { data } = await axios.get(`dropdown-list/line-machine/${line}/${model}`);
+    const { data } = await axios.get(
+      `dropdown-list/line-machine/${line}/${model}`
+    );
 
     return data;
   } catch (error) {

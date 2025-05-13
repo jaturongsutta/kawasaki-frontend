@@ -30,6 +30,16 @@ export const getPlanById = async (id) => {
   return response.data;
 };
 
+export const getProductData = async (id) => {
+  const response = await axios.get(`/plan/product-data/${id}`);
+  return response.data;
+};
+
+export const getProductDataById = async (id) => {
+  const response = await axios.get(`/plan/product-data-by-id/${id}`);
+  return response.data;
+};
+
 export const newPlan = async (data) => {
   const response = await axios.post(`/plan/new-plan`, data);
   return response.data;
@@ -37,5 +47,23 @@ export const newPlan = async (data) => {
 
 export const updatePlan = async (id, data) => {
   const response = await axios.put(`/plan/update-plan/${id}`, data);
+  return response.data;
+};
+
+export const deletePlan = async (id) => {
+  const response = await axios.delete(`/plan/delete-plan/${id}`);
+  return response.data;
+};
+
+export const updateProductionData = async (id, data) => {
+  const response = await axios.put(`/plan/update-production-data/${id}`, data);
+  return response.data;
+};
+
+export const confirmList = async (data) => {
+  const payload = {
+    confirmList: data,
+  };
+  const response = await axios.post(`/plan/confirm-list`, payload);
   return response.data;
 };

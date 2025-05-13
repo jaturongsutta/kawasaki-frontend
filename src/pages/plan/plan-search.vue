@@ -166,7 +166,10 @@
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit @click="onEditPlan(item)"></n-gbtn-edit>
 
-                <n-gbtn-delete v-if="item.status === '00'"></n-gbtn-delete>
+                <n-gbtn-delete
+                  v-if="item.status === '00'"
+                  @click="onDelete(item.id)"
+                ></n-gbtn-delete>
               </template>
 
               <template v-slot:bottom>
@@ -433,6 +436,34 @@ const onStopPlanClick = (item) => {
         });
     }
   });
+};
+
+const onDelete = (id) => {
+  Alert.confirm("Are you sure you want to delete this line ?").then(
+    ({ isConfirmed }) => {
+      if (isConfirmed) {
+        isLoading.value = true;
+        api
+          .deletePlan(id)
+          .then((res) => {
+            isLoading.value = false;
+            if (res.status === 0) {
+              Alert.success("Delete successfully");
+              onSearch();
+            } else if (res.status === 1) {
+              Alert.warning(res.message);
+            } else {
+              Alert.error(res.message);
+            }
+          })
+          .catch((error) => {
+            isLoading.value = false;
+            console.error("Error fetching API:", error);
+            Alert.error(error.message);
+          });
+      }
+    }
+  );
 };
 </script>
 
