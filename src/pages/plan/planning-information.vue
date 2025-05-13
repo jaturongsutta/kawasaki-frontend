@@ -14,6 +14,7 @@
               :items="lineList"
               @update:model-value="onLineChange"
               :rules="[rules.required]"
+              :readonly="status !== ''"
             ></v-select>
           </v-col>
           <v-col md="2">
@@ -26,7 +27,12 @@
           </v-col>
           <v-col md="2">
             <label>Plan Date</label>
-            <n-date v-model="form.planDate" :rules="[rules.required]"> </n-date>
+            <n-date
+              v-model="form.planDate"
+              :rules="[rules.required]"
+              :readonly="status > '00'"
+            >
+            </n-date>
           </v-col>
           <v-col md="2">
             <label>Plan Start Time</label>
@@ -34,6 +40,7 @@
               v-model="form.planStartTime"
               @update:model-value="onPlanStartTimeChange"
               :rules="[rules.required]"
+              :readonly="status > '00'"
             ></n-time>
           </v-col>
 
@@ -49,6 +56,8 @@
               :items="shiftList"
               @update:model-value="onshiftChange"
               :rules="[rules.required]"
+              item-value="col_value"
+              :readonly="status > '00'"
             ></v-select>
           </v-col>
 
@@ -116,6 +125,7 @@
               item-value="Model_CD"
               @update:model-value="onModelChange"
               :rules="[rules.required]"
+              :readonly="status > '00'"
             ></v-select>
           </v-col>
 
@@ -141,7 +151,11 @@
 
           <v-col md="1">
             <label>Cycle Time(mins)</label>
-            <n-input-number v-model="cycleTimeVModel" :rules="[rules.required]">
+            <n-input-number
+              v-model="cycleTimeVModel"
+              :rules="[rules.required, validateCycleTime]"
+              :readonly="status > '00'"
+            >
             </n-input-number>
           </v-col>
 
@@ -156,6 +170,7 @@
               v-model="form.operator"
               :items="userList"
               item-value="col_value"
+              :readonly="status > '00'"
             ></v-select>
           </v-col>
 
@@ -166,6 +181,7 @@
               :items="userList"
               item-value="col_value"
               :rules="[rules.required]"
+              :readonly="status > '00'"
             ></v-select>
           </v-col>
 
@@ -181,12 +197,12 @@
 
           <v-col md="2">
             <label>Update By</label>
-            <v-text-field v-model="form.updateBy" readonly></v-text-field>
+            <v-text-field v-model="form.updatedByName" readonly></v-text-field>
           </v-col>
 
           <v-col md="2">
             <label>Update Date</label>
-            <v-text-field v-model="form.updateDate" readonly></v-text-field>
+            <v-text-field v-model="form.updatedDate" readonly></v-text-field>
           </v-col>
         </v-row>
       </v-form>
@@ -195,26 +211,39 @@
           <div class="d-flex justify-center">
             <n-btn-save @click="onSave" />
             <n-btn-cancel @click="router.go(-1)" class="ml-3" />
+            <n-btn-copy v-if="status !== ''" @click="onCopy" class="ml-3" />
           </div>
         </v-col>
       </v-row>
       <n-loading :loading="isLoading" />
+
+      <v-row>
+        <v-col>
+          <div v-if="status !== ''">
+            <hr class="my-5" />
+            <plan-product-data v-model="route.params.id"></plan-product-data>
+          </div>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
 
 <script setup>
-import { onMounted, ref, inject, watch } from "vue";
+import { onMounted, ref, inject, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as api from "@/api/plan.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import { useAuthStore } from "@/stores/auth";
 import rules from "@/utils/rules";
+import { getDateFormat } from "@/utils/utils";
 const authStore = useAuthStore();
 const Alert = inject("Alert");
 const route = useRoute();
 
 const frmInfo = ref(null);
+let mode = "NEW";
+const planId = ref(null);
 
 const router = useRouter();
 const form = ref({
@@ -232,7 +261,12 @@ let totalWorkingTime = 0;
 
 const cycleTimeVModel = ref(null);
 
+const status = computed(() => {
+  return form.value.status;
+});
+
 onMounted(() => {
+  console.log("onMounted");
   ddlApi.user().then((data) => {
     userList.value = data;
   });
@@ -251,8 +285,29 @@ onMounted(() => {
   });
   if (route.params.id) {
     // Edit mode
+    mode = "EDIT";
+    planId.value = route.params.id;
+    api.getPlanById(route.params.id).then((data) => {
+      form.value = data;
+
+      form.value.updatedDate = getDateFormat(data.updatedDate);
+
+      cycleTimeVModel.value = convertCycleTime(data.cycleTime);
+
+      api.getLineModel(form.value.lineCd).then((data) => {
+        modelList.value = data;
+        if (data.length > 0) {
+          form.value.productCd = data[0].Product_CD;
+          form.value.partNo = data[0].Part_No;
+          form.value.partUpper = data[0].Part_Upper;
+          form.value.partLower = data[0].Part_Lower;
+        }
+      });
+    });
   } else {
     // New mode
+    mode = "NEW";
+    form.value.status = "";
   }
 });
 
@@ -303,10 +358,20 @@ const onModelChange = (modelCd) => {
 
   // convert Cycle_Time to minutes
   const cycleTime = model ? model.Cycle_Time : "";
+  // const cycleTimeParts = cycleTime.split(":");
+  // const cycleTimeInMinutes =
+  //   parseInt(cycleTimeParts[0]) * 60 + parseInt(cycleTimeParts[1]);
+  // cycleTimeVModel.value = cycleTimeInMinutes;
+
+  cycleTimeVModel.value = convertCycleTime(cycleTime);
+};
+
+const convertCycleTime = (cycleTime) => {
+  if (!cycleTime) return "";
   const cycleTimeParts = cycleTime.split(":");
   const cycleTimeInMinutes =
     parseInt(cycleTimeParts[0]) * 60 + parseInt(cycleTimeParts[1]);
-  cycleTimeVModel.value = cycleTimeInMinutes;
+  return cycleTimeInMinutes;
 };
 
 const onPlanStartTimeChange = (planStartTime) => {
@@ -413,6 +478,12 @@ const onshiftChange = (shiftCd) => {
   form.value.leader = shift ? shift.defaultLeader : "";
 };
 
+const onCopy = () => {
+  mode = "NEW";
+  form.value.status = "";
+  form.value.statusName = "Draft";
+};
+
 const onSave = async () => {
   const { valid } = await frmInfo.value.validate();
   if (!valid) return;
@@ -426,13 +497,27 @@ const onSave = async () => {
   ).padStart(2, "0")}:00`;
   form.value.cycleTime = cycleTimeString;
 
-  api.newPlan(form.value).then(async (res) => {
-    if (res.status === 0) {
-      await Alert.success();
-      router.go(-1);
-    } else {
-      Alert.warning(res.data.message);
-    }
-  });
+  let res = null;
+  if (mode === "EDIT") {
+    res = await api.updatePlan(route.params.id, form.value);
+  } else {
+    // New and Copy mode
+    res = await api.newPlan(form.value);
+  }
+
+  if (res.status === 0) {
+    await Alert.success();
+    router.go(-1);
+  } else {
+    Alert.error(res.message);
+  }
+};
+
+// Validation for Cycle Time !== 0
+const validateCycleTime = (value) => {
+  if (value == 0) {
+    return "Cycle Time must be greater than 0";
+  }
+  return true;
 };
 </script>

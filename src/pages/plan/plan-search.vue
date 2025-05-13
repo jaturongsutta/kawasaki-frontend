@@ -164,9 +164,12 @@
               :items-per-page="pageSize"
             >
               <template v-slot:[`item.action`]="{ item }">
-                <n-gbtn-edit @click="onEdit(item.Menu_No)"></n-gbtn-edit>
+                <n-gbtn-edit @click="onEditPlan(item)"></n-gbtn-edit>
 
-                <n-gbtn-delete v-if="item.status === '00'"></n-gbtn-delete>
+                <n-gbtn-delete
+                  v-if="item.status === '00'"
+                  @click="onDelete(item.id)"
+                ></n-gbtn-delete>
               </template>
 
               <template v-slot:bottom>
@@ -181,146 +184,6 @@
         </v-row>
       </v-card-text>
     </v-card>
-
-    <v-dialog v-model="dialog" max-width="800px">
-      <v-form ref="frmInfo">
-        <v-card>
-          <v-card-title>
-            <span class="headline">{{ mode }} Planning Information</span>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col cols="4">
-                  <label>Line </label>
-                  <v-select
-                    v-model="formInfo.line"
-                    :items="[
-                      { title: 'Cylinder Head 1' },
-                      { title: 'Cylinder Head 2' },
-                      { title: 'Cylinder Head 3' },
-                      { title: 'Cylinder Head 4' },
-                      { title: 'Cylinder Head 5' },
-                      { title: 'Cylinder Head 6', value: '1' },
-                    ]"
-                  ></v-select>
-                </v-col>
-                <v-col cols="4">
-                  <label>Plan Date</label>
-                  <n-date v-model="formInfo.plan_date"></n-date>
-                </v-col>
-
-                <v-col cols="4">
-                  <label>Plan Start Time </label>
-                  <n-time v-model="formInfo.plan_start_time"></n-time>
-                </v-col>
-
-                <v-col cols="4">
-                  <label>Shift </label>
-                  <v-select
-                    v-model="formInfo.shift"
-                    :items="[
-                      { title: 'Team A', value: 'a' },
-                      { title: 'Team B' },
-                    ]"
-                  ></v-select>
-                </v-col>
-                <v-col cols="4">
-                  <label>Shift Time</label>
-                  <v-select
-                    v-model="formInfo.shift_time"
-                    :items="[{ title: 'Day (08:00 - 20:00)', value: 'a' }]"
-                  ></v-select>
-                </v-col>
-                <v-col cols="4">
-                  <label>OT</label>
-                  <v-select
-                    v-model="formInfo.ot"
-                    :items="[{ title: 'Yes OT', value: 'a' }]"
-                  ></v-select>
-                </v-col>
-                <v-col cols="4">
-                  <label>Model</label>
-                  <v-select
-                    v-model="formInfo.model"
-                    :items="[{ title: 'EX400', value: 'a' }]"
-                  ></v-select>
-                </v-col>
-                <v-col cols="4">
-                  <label>Cycle Time(mins)</label>
-                  <v-text-field
-                    v-model="formInfo.cycle_time"
-                    readonly
-                    value="8.00"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Part Name</label>
-                  <v-select
-                    v-model="formInfo.partName"
-                    :items="[{ title: 'Cylinder Head XX', value: 'a' }]"
-                  ></v-select>
-                </v-col>
-
-                <v-col cols="4">
-                  <label>Part No</label>
-                  <v-text-field
-                    v-model="formInfo.cycle_time"
-                    readonly
-                    value="1001-5031"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Part Upper</label>
-                  <v-text-field readonly value="10001-00031"></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Part Lower</label>
-                  <v-text-field readonly value="10001-00231"></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Man Power</label>
-                  <v-text-field
-                    v-model="formInfo.cycle_time"
-                    value="1"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Planning ID</label>
-                  <v-text-field readonly value="P2504-0001"></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Status</label>
-                  <v-text-field readonly value="Finished"></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Update By</label>
-                  <v-text-field readonly value="Planner A"></v-text-field>
-                </v-col>
-                <v-col cols="4">
-                  <label>Update Date</label>
-                  <v-text-field
-                    readonly
-                    value="31/03/2025 13:45"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card-text>
-
-          <v-divider></v-divider>
-          <div class="d-flex justify-center py-3">
-            <n-btn-save
-              no-permission
-              @click="saveClick"
-              class="me-3"
-            ></n-btn-save>
-            <n-btn-cancel text @click="dialog = false"></n-btn-cancel>
-          </div>
-        </v-card>
-      </v-form>
-    </v-dialog>
   </div>
 </template>
 
@@ -462,7 +325,6 @@ onMounted(() => {
 
   // Start interval to fetch data every 5 seconds
   intervalId.value = setInterval(() => {
-    console.log("Fetching data every 5 seconds ", formSearch.value.line);
     if (formSearch.value.line) {
       loadPlanCurrent(formSearch.value.line);
     }
@@ -541,6 +403,16 @@ const onPlanCurrentEditClick = (item) => {
   });
 };
 
+const onEditPlan = (item) => {
+  console.log("onEdit", item);
+  router.push({
+    name: "planning-info",
+    params: {
+      id: item.id,
+    },
+  });
+};
+
 const onStopPlanClick = (item) => {
   console.log("onStopPlanClick", item);
   Alert.confirm("กรุณายืนยัน การหยุดแผนผลิต นี้").then(({ isConfirmed }) => {
@@ -564,6 +436,34 @@ const onStopPlanClick = (item) => {
         });
     }
   });
+};
+
+const onDelete = (id) => {
+  Alert.confirm("Are you sure you want to delete this line ?").then(
+    ({ isConfirmed }) => {
+      if (isConfirmed) {
+        isLoading.value = true;
+        api
+          .deletePlan(id)
+          .then((res) => {
+            isLoading.value = false;
+            if (res.status === 0) {
+              Alert.success("Delete successfully");
+              onSearch();
+            } else if (res.status === 1) {
+              Alert.warning(res.message);
+            } else {
+              Alert.error(res.message);
+            }
+          })
+          .catch((error) => {
+            isLoading.value = false;
+            console.error("Error fetching API:", error);
+            Alert.error(error.message);
+          });
+      }
+    }
+  );
 };
 </script>
 
