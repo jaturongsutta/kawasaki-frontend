@@ -174,6 +174,8 @@ onMounted(async () => {
   ddlApi.lineAll().then((data) => {
     lineList.value = data;
   });
+
+  onSearch();
 });
 
 const onSearch = () => {
