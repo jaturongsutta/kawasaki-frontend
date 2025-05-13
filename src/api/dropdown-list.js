@@ -70,6 +70,15 @@ export const line_ = async () => {
   }
 };
 
+export const lineAll = async () => {
+  try {
+    const { data } = await axios.get(`dropdown-list/lineAll`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const lineTank = async () => {
   try {
     const { data } = await axios.get(`dropdown-list/line-tank`);
@@ -130,8 +139,22 @@ export const lineModel = async (line) => {
 };
 
 export const shift = async () => {
-  const { data } = await axios.get(`dropdown-list/shift`);
-  return data;
+  try {
+    const { data } = await axios.get(`dropdown-list/shift`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const lineMachine = async (line, model) => {
+  try {
+    const { data } = await axios.get(`dropdown-list/line-machine/${line}/${model}`);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 /// private function ///
