@@ -21,7 +21,7 @@
             </v-col>
             <v-col :md="pageMode === 'edit' ? '3' : '6'">
                 <label>Status</label>
-                <v-select v-model="machineItem.isActive" :items="[{ title: 'All', value: null }, ...statusList]"
+                <v-select v-model="machineItem.isActive" :items="statusList"
                     :rules="[rules.required]"></v-select>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">

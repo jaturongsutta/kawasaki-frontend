@@ -154,6 +154,7 @@ const headersDetail = [
   { title: "Reason", key: "reason_name", sortable: false },
   { title: "Comment", key: "comment", sortable: false },
   { title: "Status", key: "status_name", sortable: false },
+  { title: "Type", key: "Type", sortable: false },
   { title: "Update By", key: "Updated_By", sortable: false },
   {
     title: "Update Date", key: "Updated_Date", sortable: false, value: (item) => {
