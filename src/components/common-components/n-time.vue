@@ -1,14 +1,6 @@
 <template>
-  <v-text-field
-    type="text"
-    v-model="timeInput"
-    @input="applyMask"
-    placeholder="HH:mm"
-    maxlength="5"
-    @change="onInputUpdated"
-    @keypress="onKeypress"
-    append-inner-icon="mdi-clock-time-eight-outline"
-  ></v-text-field>
+  <v-text-field type="text" v-model="timeInput" @input="applyMask" placeholder="HH:mm" maxlength="5"
+    @change="onInputUpdated" @keypress="onKeypress" append-inner-icon="mdi-clock-time-eight-outline"></v-text-field>
 </template>
 
 <script setup>
@@ -75,27 +67,33 @@ const applyMask = () => {
 const onInputUpdated = () => {
   let value = timeInput.value;
 
-  if (value.indexOf(":") !== -1) {
-    let [hours, minutes] = value.split(":");
-    hours = hours.padStart(2, "0");
-    minutes = minutes.padStart(2, "0");
-    value = hours + ":" + minutes;
+  if (!value || value.length === 0) {
+    timeInput.value = "";
+    return;
   }
 
-  if (value.indexOf(":") === -1 && value.length > 0) {
+  // Normalize format
+  if (!value.includes(":")) {
     value = value.padStart(2, "0") + ":00";
   }
 
-  let [hours, minutes] = value.split(":");
-  if (hours >= 24) {
-    hours = "24";
-    minutes = "00";
-  } else if (minutes && minutes.length === 1) {
-    minutes = "0" + minutes;
-  } else if (minutes && minutes >= 60) {
-    minutes = "59";
-  }
+  let [hours = "00", minutes = "00"] = value.split(":");
 
-  timeInput.value = [hours, minutes].filter(Boolean).join(":");
+  hours = hours.padStart(2, "0");
+  minutes = minutes.padStart(2, "0");
+
+  // Convert to numbers for logic
+  let h = parseInt(hours);
+  let m = parseInt(minutes);
+
+  // Special: if hours === 24, reset to 0
+  if (h === 24) h = 0;
+
+  //  Clamp max
+  if (h > 23) h = 0;
+  if (m > 59) m = 0;
+
+  // Return to formatted string
+  timeInput.value = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
 </script>
