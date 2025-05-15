@@ -190,7 +190,6 @@ const onReset = () => {
   };
   items.value = [];
   totalItems.value = 0;
-  lineModelList.value = [];
   onSearch();
 };
 
