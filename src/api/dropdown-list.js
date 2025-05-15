@@ -147,13 +147,20 @@ export const shift = async () => {
   }
 };
 
-export const lineMachine = async (line, model) => {
+export const lineMachine = async (line, model = null) => {
   try {
-    const { data } = await axios.get(
-      `dropdown-list/line-machine/${line}/${model}`
-    );
-
-    return data;
+    if (model === null) {
+      const { data } = await axios.get(
+        `dropdown-list/line-machine/${line}`
+      );
+      return data;
+    }
+    else {
+      const { data } = await axios.get(
+        `dropdown-list/line-machine/${line}/${model}`
+      );
+      return data;
+    }
   } catch (error) {
     throw error;
   }

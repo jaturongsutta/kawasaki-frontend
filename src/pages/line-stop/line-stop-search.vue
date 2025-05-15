@@ -263,9 +263,9 @@ const loadData = async (paginate) => {
 };
 
 const getProcessList = () => {
-  formSearch.value.machineNo = null;
-  api.getProcessDDL(formSearch.value.lineCd).then((v) => {
-    processList.value = v.data;
+  formSearch.value.processCd = null;
+  ddlApi.lineMachine(formSearch.value.lineCd).then((data) => {
+    processList.value = data;
   });
 }
 
