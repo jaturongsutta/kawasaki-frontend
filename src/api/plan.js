@@ -67,3 +67,10 @@ export const confirmList = async (data) => {
   const response = await axios.post(`/plan/confirm-list`, payload);
   return response.data;
 };
+
+export const getPlanAmtAS400 = async (pkCd, partNo, planDate) => {
+  const response = await axios.get(
+    `/plan/as400-plan-amt/${pkCd}/${partNo}/${planDate}`
+  );
+  return response.data;
+};

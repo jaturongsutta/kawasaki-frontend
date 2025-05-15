@@ -31,6 +31,7 @@
               v-model="form.planDate"
               :rules="[rules.required]"
               :readonly="status > '00'"
+              @update:model-value="onUpdateAS400PlanAmt"
             >
             </n-date>
           </v-col>
@@ -46,7 +47,7 @@
 
           <v-col md="2">
             <label>Plan Amt(AS400)</label>
-            <v-text-field v-model="form.planAmtAS400" readonly></v-text-field>
+            <v-text-field v-model="form.as400PlanAmt" readonly></v-text-field>
           </v-col>
 
           <v-col md="2">
@@ -221,7 +222,17 @@
         <v-col>
           <div v-if="status !== ''">
             <hr class="my-5" />
-            <plan-product-data v-model="route.params.id"></plan-product-data>
+            <plan-product-data
+              v-model="route.params.id"
+              :okAmt="form.okAmt"
+              :ngAmt="form.ngAmt"
+              :planFgAmt="form.planFgAmt"
+              :planTotalTime="form.planTotalTime"
+              :actualTotalTime="form.actualTotalTime"
+              :setupTime="form.setupTime"
+              :targetFg="form.targetFg"
+              :actualFg="form.actualFg"
+            ></plan-product-data>
           </div>
         </v-col>
       </v-row>
@@ -247,8 +258,11 @@ const planId = ref(null);
 
 const router = useRouter();
 const form = ref({
+  status: "",
   statusName: "Draft",
 });
+
+const isLoading = ref(false);
 
 const userList = ref([]);
 const lineList = ref([]);
@@ -265,43 +279,35 @@ const status = computed(() => {
   return form.value.status;
 });
 
-onMounted(() => {
+onMounted(async () => {
   console.log("onMounted");
-  ddlApi.user().then((data) => {
-    userList.value = data;
-  });
-  ddlApi.line_().then((data) => {
-    lineList.value = data;
-  });
-  ddlApi.shift().then((data) => {
-    shiftList.value = data;
-  });
-  ddlApi.getPredefine("Shift_Period").then((data) => {
-    shiftPeriodList.value = data;
-  });
 
-  api.getWorkingTimeAll().then((data) => {
-    workingTimes = data;
-  });
+  await doLoadInit();
+
   if (route.params.id) {
     // Edit mode
     mode = "EDIT";
     planId.value = route.params.id;
+
+    isLoading.value = true;
     api.getPlanById(route.params.id).then((data) => {
+      isLoading.value = false;
       form.value = data;
 
+      form.value.planStartTime = getDateFormat(data.planStartTime, "HH:mm:ss");
       form.value.updatedDate = getDateFormat(data.updatedDate);
 
-      cycleTimeVModel.value = convertCycleTime(data.cycleTime);
+      const _cycleTime = getDateFormat(data.cycleTime, "HH:mm:ss");
+      cycleTimeVModel.value = convertCycleTime(_cycleTime);
 
       api.getLineModel(form.value.lineCd).then((data) => {
         modelList.value = data;
-        if (data.length > 0) {
-          form.value.productCd = data[0].Product_CD;
-          form.value.partNo = data[0].Part_No;
-          form.value.partUpper = data[0].Part_Upper;
-          form.value.partLower = data[0].Part_Lower;
-        }
+        // if (data.length > 0) {
+        //   form.value.productCd = data[0].Product_CD;
+        //   form.value.partNo = data[0].Part_No;
+        //   form.value.partUpper = data[0].Part_Upper;
+        //   form.value.partLower = data[0].Part_Lower;
+        // }
       });
     });
   } else {
@@ -310,6 +316,20 @@ onMounted(() => {
     form.value.status = "";
   }
 });
+
+const doLoadInit = async () => {
+  console.log("doLoadInit");
+
+  try {
+    userList.value = await ddlApi.user();
+    lineList.value = await ddlApi.line_();
+    shiftList.value = await ddlApi.shift();
+    shiftPeriodList.value = await ddlApi.getPredefine("Shift_Period");
+    workingTimes = await api.getWorkingTimeAll();
+  } catch (error) {
+    console.error("Error loading initial data:", error);
+  }
+};
 
 // watch Target FG Amt = Total Time / Cycle Time --> Round 0  (เอาจำนวนเต็ม)
 watch(
@@ -326,15 +346,20 @@ watch(
 const onLineChange = (lineCd) => {
   const line = lineList.value.find((item) => item.lineCd === lineCd);
 
+  const oldPkCd = form.value.pkCd;
+
   form.value.lineName = line ? line.lineName : "";
   form.value.pkCd = line ? line.pkCd : "";
   modelList.value = [];
-  form.value.modelCd = "";
-  form.value.productCd = "";
-  form.value.partNo = "";
-  form.value.partUpper = "";
-  form.value.partLower = "";
-  cycleTimeVModel.value = "";
+  form.value.modelCd = null;
+  form.value.productCd = null;
+  form.value.partNo = null;
+  form.value.partUpper = null;
+  form.value.partLower = null;
+  cycleTimeVModel.value = null;
+  if (oldPkCd !== form.value.pkCd) {
+    onUpdateAS400PlanAmt();
+  }
   api.getLineModel(lineCd).then((data) => {
     modelList.value = data;
   });
@@ -342,6 +367,8 @@ const onLineChange = (lineCd) => {
 
 const onModelChange = (modelCd) => {
   const model = modelList.value.find((item) => item.Model_CD === modelCd);
+
+  const oldPartNo = form.value.partNo;
 
   if (!model) {
     form.value.productCd = "";
@@ -355,6 +382,10 @@ const onModelChange = (modelCd) => {
   form.value.partNo = model ? model.Part_No : "";
   form.value.partUpper = model ? model.Part_Upper : "";
   form.value.partLower = model ? model.Part_Lower : "";
+
+  if (oldPartNo !== form.value.partNo) {
+    onUpdateAS400PlanAmt();
+  }
 
   // convert Cycle_Time to minutes
   const cycleTime = model ? model.Cycle_Time : "";
@@ -471,7 +502,7 @@ const calculateTotalTime = () => {
 };
 
 const onshiftChange = (shiftCd) => {
-  const shift = shiftList.value.find((item) => item.value === shiftCd);
+  const shift = shiftList.value.find((item) => item.value == shiftCd);
 
   console.log("shift", shift);
   form.value.operator = shift ? shift.defaultOperator : "";
@@ -488,29 +519,50 @@ const onSave = async () => {
   const { valid } = await frmInfo.value.validate();
   if (!valid) return;
 
-  // convert cycleTime to string format "HH:mm:ss"
-  const cycleTime = cycleTimeVModel.value;
-  const hours = Math.floor(cycleTime / 60);
-  const minutes = cycleTime % 60;
-  const cycleTimeString = `${String(hours).padStart(2, "0")}:${String(
-    minutes
-  ).padStart(2, "0")}:00`;
-  form.value.cycleTime = cycleTimeString;
+  try {
+    // convert cycleTime to string format "HH:mm:ss"
+    const cycleTime = cycleTimeVModel.value;
+    const hours = Math.floor(cycleTime / 60);
+    const minutes = cycleTime % 60;
+    const cycleTimeString = `${String(hours).padStart(2, "0")}:${String(
+      minutes
+    ).padStart(2, "0")}:00`;
+    form.value.cycleTime = cycleTimeString;
+    isLoading.value = true;
+    let res = null;
+    if (mode === "EDIT") {
+      res = await api.updatePlan(route.params.id, form.value);
+    } else {
+      // New and Copy mode
+      res = await api.newPlan(form.value);
+    }
+    isLoading.value = false;
 
-  let res = null;
-  if (mode === "EDIT") {
-    res = await api.updatePlan(route.params.id, form.value);
-  } else {
-    // New and Copy mode
-    res = await api.newPlan(form.value);
+    if (res.status === 0) {
+      await Alert.success();
+      router.go(-1);
+    } else {
+      Alert.error(res.message);
+    }
+  } catch (error) {
+    isLoading.value = false;
+    console.error("Error saving plan:", error);
+  }
+};
+
+const onUpdateAS400PlanAmt = () => {
+  if (!form.value.pkCd || !form.value.partNo || !form.value.planDate) {
+    form.value.as400PlanAmt = null;
+    return;
   }
 
-  if (res.status === 0) {
-    await Alert.success();
-    router.go(-1);
-  } else {
-    Alert.error(res.message);
-  }
+  console.log("onUpdateAS400PlanAmt ");
+
+  api
+    .getPlanAmtAS400(form.value.pkCd, form.value.partNo, form.value.planDate)
+    .then((data) => {
+      form.value.as400PlanAmt = data.planAmt;
+    });
 };
 
 // Validation for Cycle Time !== 0

@@ -12,6 +12,7 @@
               v-model="formSearch.line"
               :items="lineList"
               @update:model-value="lineChange"
+              placeholder="Please Select"
             ></v-select>
           </v-sheet>
           <v-sheet width="160" class="mr-3">
@@ -164,7 +165,7 @@
               :items-per-page="pageSize"
             >
               <template v-slot:[`item.action`]="{ item }">
-                <n-gbtn-edit @click="onEditPlan(item)"></n-gbtn-edit>
+                <n-gbtn-edit @click="onEditPlan(item.id)"></n-gbtn-edit>
 
                 <n-gbtn-delete
                   v-if="item.status === '00'"
@@ -198,21 +199,8 @@ import moment from "moment";
 import router from "@/router";
 const Alert = inject("Alert");
 
-const dialog = ref(false);
+const formSearch = ref({});
 
-const formSearch = ref({
-  line: "CYH6",
-});
-const formInfo = ref({
-  line: "1",
-  plan_date: "2025-01-01",
-  plan_start_time: "08:00",
-  shift: "a",
-  model: "EX400",
-  shift_time: "a",
-  ot: "a",
-  partName: "a",
-});
 const isLoading = ref(false);
 
 const currentPlanTime = ref();
@@ -392,23 +380,20 @@ const lineChange = (value) => {
   loadPlanCurrent(value);
 };
 
-const onPlanCurrentEditClick = (item) => {
-  console.log("onPlanCurrentEditClick", item);
-
+const onPlanCurrentEditClick = (id) => {
   router.push({
     name: "planning-info",
     params: {
-      id: item.id,
+      id: id,
     },
   });
 };
 
-const onEditPlan = (item) => {
-  console.log("onEdit", item);
+const onEditPlan = (id) => {
   router.push({
     name: "planning-info",
     params: {
-      id: item.id,
+      id: id,
     },
   });
 };

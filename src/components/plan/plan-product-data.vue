@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>Product Data</h3>
-    <n-btn-confirm @click="confirmListClick"></n-btn-confirm>
+    <n-btn-confirm @click="confirmListClick" class="mt-3 mb-2"></n-btn-confirm>
 
     <v-row>
       <v-col cols="12" md="6">
@@ -39,6 +39,65 @@
             ></n-gbtn-edit>
           </template>
         </v-data-table>
+      </v-col>
+      <v-col cols="12" md="6">
+        <table
+          width="500px"
+          style="margin-left: auto; padding: 10px; border-spacing: 10px"
+        >
+          <tbody>
+            <tr>
+              <td>Plan Total Time</td>
+              <td>
+                <v-text-field
+                  v-model="props.planTotalTime"
+                  readonly
+                ></v-text-field>
+              </td>
+              <td>Actual Total Time</td>
+              <td>
+                <v-text-field
+                  v-model="props.actualTotalTime"
+                  readonly
+                ></v-text-field>
+              </td>
+            </tr>
+            <tr>
+              <td>Setup Time</td>
+              <td>
+                <v-text-field v-model="props.setupTime" readonly></v-text-field>
+              </td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Target FG</td>
+              <td>
+                <v-text-field v-model="props.targetFg" readonly></v-text-field>
+              </td>
+              <td>Actual FG</td>
+              <td>
+                <v-text-field v-model="props.actualFg" readonly></v-text-field>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>OK</td>
+              <td>
+                <v-text-field v-model="props.okAmt" readonly></v-text-field>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>NG</td>
+              <td>
+                <v-text-field v-model="props.ngAmt" readonly></v-text-field>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </v-col>
     </v-row>
   </div>
@@ -148,6 +207,34 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  okAmt: {
+    type: Number,
+    default: 0,
+  },
+  ngAmt: {
+    type: Number,
+    default: 0,
+  },
+  planTotalTime: {
+    type: Number,
+    default: 0,
+  },
+  actualTotalTime: {
+    type: Number,
+    default: 0,
+  },
+  setupTime: {
+    type: Number,
+    default: 0,
+  },
+  targetFg: {
+    type: Number,
+    default: 0,
+  },
+  actualFg: {
+    type: Number,
+    default: 0,
+  },
 });
 
 // Emit updates for v-model
@@ -165,6 +252,8 @@ const dialog = ref(false);
 const statusList = ref([]);
 const processList = ref([]);
 const ngReasonList = ref([]);
+
+const planTotalTime = ref(0);
 
 const headers = [
   { title: "", key: "action" },
@@ -208,6 +297,9 @@ onMounted(() => {
 });
 
 const doLoadData = () => {
+  if (props.modelValue === null || props.modelValue === "") {
+    return;
+  }
   api.getProductData(props.modelValue).then((data) => {
     console.log("Product Data response:", data);
 
@@ -262,7 +354,7 @@ const saveClick = async () => {
   const { valid } = await frmInfo.value.validate();
   if (!valid) return;
   console.log("Form data to save:", form.value);
-  if (form.value.status === "NG") {
+  if (form.value.status !== "NG") {
     form.value.ngProcess = null;
     form.value.ngReason = null;
     form.value.ngComment = null;
@@ -272,12 +364,13 @@ const saveClick = async () => {
 
   api
     .updateProductionData(form.value.prodDataId, form.value)
-    .then((res) => {
+    .then(async (res) => {
       console.log("Save response:", res);
 
       if (res.status === 0) {
-        Alert.success();
+        await Alert.success();
         dialog.value = false;
+        doLoadData();
       } else {
         Alert.error(res.message);
       }
@@ -294,7 +387,7 @@ const confirmClick = async () => {
   Alert.confirm("Are you sure you want to confirm?").then(({ isConfirmed }) => {
     if (isConfirmed) {
       console.log("Form data to save:", form.value);
-      if (form.value.status === "NG") {
+      if (form.value.status !== "NG") {
         form.value.ngProcess = null;
         form.value.ngReason = null;
         form.value.ngComment = null;
@@ -304,12 +397,13 @@ const confirmClick = async () => {
 
       api
         .updateProductionData(form.value.prodDataId, form.value)
-        .then((res) => {
+        .then(async (res) => {
           console.log("Save response:", res);
 
           if (res.status === 0) {
-            Alert.success();
+            await Alert.success();
             dialog.value = false;
+            doLoadData();
           } else {
             Alert.error(res.message);
           }
