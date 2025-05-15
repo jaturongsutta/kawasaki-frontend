@@ -152,12 +152,19 @@
 
           <v-col md="1">
             <label>Cycle Time(mins)</label>
-            <n-input-number
+            <!-- <n-input-number
               v-model="cycleTimeVModel"
               :rules="[rules.required, validateCycleTime]"
               :readonly="status > '00'"
             >
-            </n-input-number>
+            </n-input-number> -->
+
+            <n-time-mins
+              v-model="cycleTimeVModel"
+              :rules="[rules.required, validateCycleTime]"
+              :readonly="status > '00'"
+              @update:model-value="onCycleTimeChange"
+            ></n-time-mins>
           </v-col>
 
           <v-col md="1">
@@ -210,7 +217,10 @@
       <v-row>
         <v-col>
           <div class="d-flex justify-center">
-            <n-btn-save @click="onSave" />
+            <n-btn-save
+              @click="onSave"
+              :disabled="['30', '90'].includes(status)"
+            />
             <n-btn-cancel @click="router.go(-1)" class="ml-3" />
             <n-btn-copy v-if="status !== ''" @click="onCopy" class="ml-3" />
           </div>
@@ -241,14 +251,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject, watch, computed } from "vue";
+import { onMounted, ref, inject, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as api from "@/api/plan.js";
 import * as ddlApi from "@/api/dropdown-list.js";
-import { useAuthStore } from "@/stores/auth";
 import rules from "@/utils/rules";
 import { getDateFormat } from "@/utils/utils";
-const authStore = useAuthStore();
 const Alert = inject("Alert");
 const route = useRoute();
 
@@ -298,7 +306,7 @@ onMounted(async () => {
       form.value.updatedDate = getDateFormat(data.updatedDate);
 
       const _cycleTime = getDateFormat(data.cycleTime, "HH:mm:ss");
-      cycleTimeVModel.value = convertCycleTime(_cycleTime);
+      cycleTimeVModel.value = _cycleTime;
 
       api.getLineModel(form.value.lineCd).then((data) => {
         modelList.value = data;
@@ -330,18 +338,6 @@ const doLoadInit = async () => {
     console.error("Error loading initial data:", error);
   }
 };
-
-// watch Target FG Amt = Total Time / Cycle Time --> Round 0  (เอาจำนวนเต็ม)
-watch(
-  [() => form.value.planTotalTime, () => cycleTimeVModel.value],
-  ([p, c]) => {
-    if (p && c) {
-      form.value.planFgAmt = Math.floor(p / c);
-    } else {
-      form.value.planFgAmt = 0;
-    }
-  }
-);
 
 const onLineChange = (lineCd) => {
   const line = lineList.value.find((item) => item.lineCd === lineCd);
@@ -394,7 +390,14 @@ const onModelChange = (modelCd) => {
   //   parseInt(cycleTimeParts[0]) * 60 + parseInt(cycleTimeParts[1]);
   // cycleTimeVModel.value = cycleTimeInMinutes;
 
-  cycleTimeVModel.value = convertCycleTime(cycleTime);
+  // cycleTimeVModel.value = convertCycleTime(cycleTime);
+
+  if (!cycleTime) {
+    cycleTimeVModel.value = "";
+    return;
+  }
+
+  cycleTimeVModel.value = cycleTime;
 };
 
 const convertCycleTime = (cycleTime) => {
@@ -403,6 +406,10 @@ const convertCycleTime = (cycleTime) => {
   const cycleTimeInMinutes =
     parseInt(cycleTimeParts[0]) * 60 + parseInt(cycleTimeParts[1]);
   return cycleTimeInMinutes;
+};
+
+const onCycleTimeChange = (cycleTime) => {
+  calculatePlanFgAmt();
 };
 
 const onPlanStartTimeChange = (planStartTime) => {
@@ -499,6 +506,17 @@ const calculateTotalTime = () => {
     }
   }
   form.value.planTotalTime = totalTime;
+
+  calculatePlanFgAmt();
+};
+
+const calculatePlanFgAmt = () => {
+  if (form.value.planTotalTime && cycleTimeVModel.value) {
+    const cycleTimeMins = convertCycleTime(cycleTimeVModel.value);
+    form.value.planFgAmt = Math.floor(form.value.planTotalTime / cycleTimeMins);
+  } else {
+    form.value.planFgAmt = 0;
+  }
 };
 
 const onshiftChange = (shiftCd) => {
