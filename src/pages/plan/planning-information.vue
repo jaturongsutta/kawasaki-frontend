@@ -538,14 +538,14 @@ const onSave = async () => {
   if (!valid) return;
 
   try {
-    // convert cycleTime to string format "HH:mm:ss"
-    const cycleTime = cycleTimeVModel.value;
-    const hours = Math.floor(cycleTime / 60);
-    const minutes = cycleTime % 60;
-    const cycleTimeString = `${String(hours).padStart(2, "0")}:${String(
-      minutes
-    ).padStart(2, "0")}:00`;
-    form.value.cycleTime = cycleTimeString;
+    // // convert cycleTime to string format "HH:mm:ss"
+    // const cycleTime = cycleTimeVModel.value;
+    // const hours = Math.floor(cycleTime / 60);
+    // const minutes = cycleTime % 60;
+    // const cycleTimeString = `${String(hours).padStart(2, "0")}:${String(
+    //   minutes
+    // ).padStart(2, "0")}:00`;
+    form.value.cycleTime = cycleTimeVModel.value;
     isLoading.value = true;
     let res = null;
     if (mode === "EDIT") {
