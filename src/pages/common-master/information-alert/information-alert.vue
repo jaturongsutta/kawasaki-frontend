@@ -2,21 +2,21 @@
   <div>
     <v-card>
       <v-card-title>
-        <h4>Master - Machine</h4>
+        <h4>Master - Information Alert</h4>
       </v-card-title>
       <v-card-text>
         <v-row>
           <v-col>
-            <label>Machine No</label>
-            <v-text-field v-model="formSearch.machine_no"></v-text-field>
+            <label>Line</label>
+            <v-select v-model="formSearch.lineCd" :items="lineList"></v-select>
           </v-col>
           <v-col>
-            <label>Process Code</label>
-            <v-text-field v-model="formSearch.process_cd"></v-text-field>
+            <label>Date From</label>
+            <n-date v-model="formSearch.dateFrom"></n-date>
           </v-col>
           <v-col>
-            <label>Status</label>
-            <v-select v-model="formSearch.status" :items="[{ title: 'All', value: null }, ...statusList]"></v-select>
+            <label>Date To</label>
+            <n-date v-model="formSearch.dateTo" :min-date="formSearch.dateFrom"></n-date>
           </v-col>
         </v-row>
 
@@ -35,7 +35,7 @@
         <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
           :items="items" :items-length="totalItems" @update:options="loadData">
           <template v-slot:[`item.action`]="{ item }">
-            <n-gbtn-edit @click="onEdit(item.Process_CD)"></n-gbtn-edit>
+            <n-gbtn-edit @click="onEdit(item)"></n-gbtn-edit>
           </template>
           <template v-slot:bottom>
             <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
@@ -50,57 +50,57 @@
       <v-form ref="frmInfo">
         <v-card>
           <v-card-title>
-            <span class="headline">{{ mode }} Master - Model Information</span>
+            <span class="headline">{{ mode }} Master - Information Alert</span>
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col cols="6">
-                  <label class="require-field">Model </label>
-                  <v-text-field v-model="form.Model_CD" :rules="[rules.required]"
-                    :readonly="mode === 'Edit'"></v-text-field>
+                <v-col cols="6" v-if="mode === 'Edit'">
+                  <label class="require-field">Id </label>
+                  <v-text-field v-model="form.id" readonly></v-text-field>
+                </v-col>
+                <v-col :cols="mode === 'Edit' ? 6 : 12">
+                  <label class="require-field">Line </label>
+                  <v-select v-model="form.lineCd" :items="lineList" :rules="[rules.required]"></v-select>
+                </v-col>
+
+                <v-col cols="12">
+                  <label class="require-field">Information Alert </label>
+                  <v-textarea v-model="form.infoAlert" auto-grow rows="3" :rules="[rules.required]" />
                 </v-col>
                 <v-col cols="6">
-                  <label class="require-field">Product Code </label>
-                  <v-text-field v-model="form.Product_CD" :rules="[rules.required]"></v-text-field>
+                  <label class="require-field">Start Date </label>
+                  <n-date v-model="form.alertStartDate" :rules="[rules.required]"></n-date>
+                </v-col>
+                <v-col cols="6">
+                  <label class="require-field">Start Time </label>
+                  <n-time v-model="form.alertStartTime" :rules="[rules.required]" />
                 </v-col>
 
                 <v-col cols="6">
-                  <label class="require-field">Cycle Time (mins) </label>
-                  <v-text-field v-model="form.Cycle_Time_Min" :rules="[rules.required]" type="number"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <label>Part Name </label>
-                  <v-text-field v-model="form.predefineCd"></v-text-field>
+                  <label class="require-field">End Date</label>
+                  <n-date v-model="form.alertEndDate" :rules="[rules.required]"
+                    :min-date="form.alertStartDate"></n-date>
                 </v-col>
 
                 <v-col cols="6">
-                  <label class="require-field">Part No </label>
-                  <v-text-field v-model="form.Part_No" :rules="[rules.required]"></v-text-field>
+                  <label class="require-field">End Time </label>
+                  <n-time v-model="form.alertEndTime" :rules="[rules.required]" />
                 </v-col>
-                <v-col cols="6">
-                  <label class="require-field">Part Upper </label>
-                  <v-text-field v-model="form.Part_Upper" :rules="[rules.required]"></v-text-field>
-                </v-col>
-
-                <v-col cols="6">
-                  <label class="require-field">Part Lower </label>
-                  <v-text-field v-model="form.Part_Lower" :rules="[rules.required]"></v-text-field>
-                </v-col>
-                <v-col cols="6">
+                <v-col cols="12">
                   <label class="require-field">Status </label>
-                  <v-select v-model="form.Status" :rules="[rules.required]" :items="[...statusList]"></v-select>
+                  <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
                 </v-col>
                 <v-col cols="6" v-if="mode === 'Edit'">
                   <label class="require-field">Updated By </label>
-                  <v-text-field v-model="form.Updated_By" :rules="[rules.required]"
+                  <v-text-field v-model="form.updatedBy" :rules="[rules.required]"
                     :readonly="mode === 'Edit'"></v-text-field>
                 </v-col>
 
                 <v-col cols="6" v-if="mode === 'Edit'">
                   <label class="require-field">Updated Date </label>
-                  <v-text-field v-model="form.Updated_Date" :rules="[rules.required]" :readonly="mode === 'Edit'"
+                  <v-text-field v-model="form.updatedDate" :rules="[rules.required]" :readonly="mode === 'Edit'"
                     placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
                 </v-col>
 
@@ -122,14 +122,12 @@
 
 <script setup>
 import { onMounted, ref, inject } from "vue";
-import { useRouter } from "vue-router";
 import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
-import * as api from "@/api/machine.js";
+import * as api from "@/api/information-alert.js";
 import rules from "@/utils/rules";
 import { getDateFormat } from "@/utils/utils";
 
-const router = useRouter();
 const Alert = inject("Alert");
 const frmInfo = ref(null);
 const formSearch = ref({});
@@ -140,9 +138,28 @@ const statusList = ref([]);
 
 const headers = [
   { title: "", key: "action", sortable: false },
-  { title: "Machine No", key: "Machine_No", sortable: false },
-  { title: "Process Code", key: "Process_CD", sortable: false },
-  { title: "Map Code", key: "Map_CD", sortable: false },
+  { title: "Line", key: "Line_CD", sortable: false },
+  { title: "Information Alert", key: "Info_Alert", sortable: false },
+  {
+    title: "Start Date", key: "Alert_Start_Date", sortable: false, value: (item) => {
+      return getDateFormat(item.Alert_Start_Date, "dd/MM/yyyy");
+    }
+  },
+  {
+    title: "Start Time", key: "Alert_Start_Time", sortable: false, value: (item) => {
+      return getDateFormat(item.Alert_Start_Time, "HH:mm");
+    }
+  },
+  {
+    title: "End Date", key: "Alert_End_Date", sortable: false, value: (item) => {
+      return getDateFormat(item.Alert_End_Date, "dd/MM/yyyy");
+    }
+  },
+  {
+    title: "End Time", key: "Alert_End_Time", sortable: false, value: (item) => {
+      return getDateFormat(item.Alert_End_Time, "HH:mm");
+    }
+  },
   { title: "Status", key: "Status", sortable: false },
   { title: "Updated By", key: "Updated_By", sortable: false },
   {
@@ -156,6 +173,8 @@ const headers = [
 ];
 let items = ref([]);
 
+const lineList = ref([]);
+
 let isLoading = ref(false);
 let isDialogLoading = ref(false);
 let currentPage = ref(1);
@@ -163,6 +182,10 @@ let pageSize = ref(20);
 let totalItems = ref(0);
 
 onMounted(() => {
+  ddlApi.lineAll().then((data) => {
+    lineList.value = data;
+  });
+
   ddlApi.getPredefine({ group: "Is_Active", sortby: "text" }).then((data) => {
     statusList.value = data;
   });
@@ -207,11 +230,36 @@ const onReset = () => {
 };
 
 const onAdd = () => {
-  router.push({ name: "machine-info" });
+  mode.value = "Add";
+  console.log("Add");
+  form.value = {
+  };
+  dialog.value = true;
 };
 
-const onEdit = (id) => {
-  router.push({ name: `machine-info`, params: { id: id } });
+const onEdit = async (item) => {
+  mode.value = "Edit";
+  form.value = {
+  };
+  dialog.value = true;
+  isDialogLoading.value = true;
+  try {
+    const res = await api.getById(item.ID);
+    isDialogLoading.value = false;
+    if (res.status === 2) {
+      Alert.error("Error ", res.message);
+      return;
+    }
+    form.value = res.data;
+    form.value.alertStartDate = getDateFormat(form.value.alertStartDate, 'yyyy-MM-dd');
+    form.value.alertEndDate = getDateFormat(form.value.alertEndDate, 'yyyy-MM-dd');
+    form.value.updatedDate = getDateFormat(form.value.updatedDate);
+  }
+  catch (e) {
+    isDialogLoading.value = false;
+    console.log('Error: ', e);
+    Alert.error("Error ", e.message);
+  }
 };
 
 const saveClick = async () => {
@@ -220,12 +268,16 @@ const saveClick = async () => {
     if (!valid) return;
     isDialogLoading.value = true;
     let res = null;
+    let params = { ...form.value }
+    params.alertStartTime = `${params.alertStartTime}:00`;
+    params.alertEndTime = `${params.alertEndTime}:00`;
+
     if (mode.value === "Add") {
       console.log("Add");
-      res = await api.add(form.value);
+      res = await api.add(params);
     } else {
       console.log("Edit");
-      res = await api.update(form.value.Model_CD, form.value);
+      res = await api.update(params.id, params);
     }
     isDialogLoading.value = false;
     if (res.status === 0) {
@@ -240,4 +292,5 @@ const saveClick = async () => {
     Alert.error(error.message);
   }
 };
+
 </script>
