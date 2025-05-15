@@ -152,12 +152,11 @@ onMounted(() => {
     formInfo.value.Line_Stop_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
     getProcessDDL();
   }
-
 });
 
 const getProcessDDL = () => {
-  api.getProcessDDL(formInfo.value.Line_CD).then((v) => {
-    processList.value = v.data;
+  ddlApi.lineMachine(formInfo.value.Line_CD).then((data) => {
+    processList.value = data;
   });
 }
 
