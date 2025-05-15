@@ -8,12 +8,12 @@
         <v-row justify="justify-start">
           <v-col cols="2">
             <label>Line</label>
-            <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getMachineList"></v-select>
+            <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getProcessList"></v-select>
           </v-col>
           <v-col cols="2">
-            <label>Machine</label>
-            <v-select v-model="formSearch.machineNo"
-              :items="[{ title: 'All', value: null }, ...machineList]"></v-select>
+            <label>Process</label>
+            <v-select v-model="formSearch.processCd"
+              :items="[{ title: 'All', value: null }, ...processList]"></v-select>
           </v-col>
           <v-col cols="2">
             <label>Date From</label>
@@ -112,7 +112,7 @@ const formSearch = ref({
   lineCd: '',
   dateFrom: '',
   dateTo: '',
-  machineNo: null,
+  processCd: null,
   reasonCd: null,
   statusCd: null,
 });
@@ -121,7 +121,7 @@ const currentPage = ref(1);
 const pageSize = ref(20);
 const totalItems = ref(0);
 const lineList = ref([]);
-const machineList = ref([]);
+const processList = ref([]);
 const reasonList = ref([]);
 const statusList = ref([]);
 let items = ref([]);
@@ -135,7 +135,7 @@ const isPLC = ref(false);
 const headersDetail = [
   { title: "", key: "action", sortable: false, nowrap: true },
   { title: "Line", key: "Line_CD", sortable: false },
-  { title: "Machine", key: "Machine_No", sortable: false },
+  { title: "Process", key: "Process_CD", sortable: false },
   {
     title: "Date", key: "Line_Stop_Date", sortable: false, value: (item) => {
       return getDateFormat(item.Line_Stop_Date, "dd/MM/yyyy");
@@ -262,10 +262,10 @@ const loadData = async (paginate) => {
   isLoading.value = false;
 };
 
-const getMachineList = () => {
+const getProcessList = () => {
   formSearch.value.machineNo = null;
-  api.getMachineDDL(formSearch.value.lineCd).then((v) => {
-    machineList.value = v.data;
+  api.getProcessDDL(formSearch.value.lineCd).then((v) => {
+    processList.value = v.data;
   });
 }
 

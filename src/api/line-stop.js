@@ -26,9 +26,9 @@ export const getById = async (id) => {
   }
 };
 
-export const getMachineDDL = async (id) => {
+export const getProcessDDL = async (id) => {
   try {
-    const response = await axios.get(`/line-stop/machineDDL/${id}`);
+    const response = await axios.get(`/line-stop/processDDL/${id}`);
     return response.data;
   } catch (error) {
     throw error;
