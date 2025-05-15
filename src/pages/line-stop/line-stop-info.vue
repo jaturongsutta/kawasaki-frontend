@@ -13,8 +13,8 @@
               <v-text-field v-model="formInfo.Line_CD" readonly :rules="[rules.required]"></v-text-field>
             </v-col>
             <v-col cols="6">
-              <label class="require-field">Machine</label>
-              <v-select v-model="formInfo.Machine_No" :items="machineList" :rules="[rules.required]"
+              <label class="require-field">Process</label>
+              <v-select v-model="formInfo.Process_CD" :items="processList" :rules="[rules.required]"
                 :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
             <v-col cols="6">
@@ -89,7 +89,7 @@ const Alert = inject("Alert");
 const frmInfo = ref(null);
 const dialog = ref(false);
 const reasonList = ref([]);
-const machineList = ref([]);
+const processList = ref([]);
 
 let formInfo = ref({
   "B1": "",
@@ -124,7 +124,6 @@ let formInfo = ref({
   "Quantity": "",
   "Reason_CD": "",
   "Comment": "",
-  "Machine_No": ''
 });
 
 let isLoading = ref(false);
@@ -151,14 +150,14 @@ onMounted(() => {
 
     formInfo.value.Line_Stop_Date = getCurrrentDate();
     formInfo.value.Line_Stop_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
-    getMachineDDL();
+    getProcessDDL();
   }
 
 });
 
-const getMachineDDL = () => {
-  api.getMachineDDL(formInfo.value.Line_CD).then((v) => {
-    machineList.value = v.data;
+const getProcessDDL = () => {
+  api.getProcessDDL(formInfo.value.Line_CD).then((v) => {
+    processList.value = v.data;
   });
 }
 
@@ -178,7 +177,7 @@ const loadData = async () => {
     formInfo.value.Updated_Date = getDateFormat(formInfo.value.Updated_Date);
     formInfo.value.Loss_Time = secondsToMMSS(formInfo.value.Loss_Time);
 
-    getMachineDDL();
+    getProcessDDL();
   } catch (error) {
     console.error("Error fetching API:", error);
     formInfo.value = {}
@@ -198,7 +197,6 @@ const saveClick = async (mode) => {
     let info = {
       processCd: v.Process_CD,
       lineCd: v.Line_CD,
-      machineNo: v.Machine_No,
       lineStopDate: v.Line_Stop_Date,
       lineStopTime: `${v.Line_Stop_Time}:00`,
       lossTime: v.Loss_Time,

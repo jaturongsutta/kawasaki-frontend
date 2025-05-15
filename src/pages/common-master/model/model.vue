@@ -71,11 +71,6 @@
                   <n-time-mins v-model="form.cycleTime" :rules="[rules.required]" reverse />
                 </v-col>
                 <v-col cols="6">
-                  <label>Part Name </label>
-                  <v-text-field v-model="form.partName"></v-text-field>
-                </v-col>
-
-                <v-col cols="6">
                   <label class="require-field">Part No </label>
                   <v-text-field v-model="form.partNo" :rules="[rules.required]"></v-text-field>
                 </v-col>
@@ -88,7 +83,7 @@
                   <label>Part Lower </label>
                   <v-text-field v-model="form.partLower"></v-text-field>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="12">
                   <label class="require-field">Status </label>
                   <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
                 </v-col>
