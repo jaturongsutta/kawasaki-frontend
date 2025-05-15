@@ -185,6 +185,19 @@ const routes = [
     ],
   },
   {
+    path: "/common-master/information-alert",
+    meta: {
+      menuNo: "M1008",
+    },
+    children: [
+      {
+        path: "",
+        name: "information-alert",
+        component: () => import("@/pages/common-master/information-alert/information-alert.vue"),
+      },
+    ],
+  },
+  {
     path: "/line",
     meta: {
       menuNo: "M2001",

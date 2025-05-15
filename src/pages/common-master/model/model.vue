@@ -2,7 +2,7 @@
   <div>
     <v-card>
       <v-card-title>
-        <h4>Model</h4>
+        <h4>Master - Model</h4>
       </v-card-title>
       <v-card-text>
         <v-row>
