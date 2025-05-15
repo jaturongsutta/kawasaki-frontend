@@ -513,6 +513,10 @@ const calculateTotalTime = () => {
 const calculatePlanFgAmt = () => {
   if (form.value.planTotalTime && cycleTimeVModel.value) {
     const cycleTimeMins = convertCycleTime(cycleTimeVModel.value);
+    if (cycleTimeMins === 0) {
+      form.value.planFgAmt = 0;
+      return;
+    }
     form.value.planFgAmt = Math.floor(form.value.planTotalTime / cycleTimeMins);
   } else {
     form.value.planFgAmt = 0;
