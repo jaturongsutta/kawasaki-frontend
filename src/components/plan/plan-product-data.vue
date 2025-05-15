@@ -423,12 +423,15 @@ const confirmListClick = () => {
   Alert.confirm("Are you sure you want to confirm the selected records?").then(
     ({ isConfirmed }) => {
       if (isConfirmed) {
-        const selectedIds = selectedProductData.value.map(
-          (item) => item.prod_data_id
-        );
-        console.log("Selected IDs for confirmation:", selectedIds);
-
-        api.confirmList(selectedIds).then((res) => {
+        // console.log(
+        //   "Selected records for confirmation:",
+        //   selectedProductData.value
+        // );
+        // const selectedIds = selectedProductData.value.map(
+        //   (item) => item.prod_data_id
+        // );
+        // console.log("Selected IDs for confirmation:", selectedIds);
+        api.confirmList(selectedProductData.value).then((res) => {
           if (res.status === 0) {
             Alert.success("Confirmation successful");
             doLoadData();
