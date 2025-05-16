@@ -198,6 +198,19 @@ const routes = [
     ],
   },
   {
+    path: "/common-master/team",
+    meta: {
+      menuNo: "M1009",
+    },
+    children: [
+      {
+        path: "",
+        name: "team",
+        component: () => import("@/pages/common-master/team/team.vue"),
+      },
+    ],
+  },
+  {
     path: "/line",
     meta: {
       menuNo: "M2001",
