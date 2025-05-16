@@ -21,7 +21,7 @@
           </v-col>
           <v-col cols="2">
             <label>Date To</label>
-            <n-date v-model="formSearch.dateTo"></n-date>
+            <n-date v-model="formSearch.dateTo" :min-date="formSearch.dateFrom"></n-date>
           </v-col>
           <v-col cols="2">
             <label>Reason</label>
