@@ -29,7 +29,11 @@
             <label>Plan Date</label>
             <n-date
               v-model="form.planDate"
-              :rules="[rules.required]"
+              :rules="[
+                rules.required,
+                (v) =>
+                  validatePlanDateBackDate(form.planDate, form.planStartTime),
+              ]"
               :readonly="status > '00'"
               @update:model-value="onUpdateAS400PlanAmt"
             >
@@ -46,8 +50,13 @@
           </v-col>
 
           <v-col md="2">
-            <label>Plan Amt(AS400)</label>
-            <v-text-field v-model="form.as400PlanAmt" readonly></v-text-field>
+            <label>Plan Stop Time</label>
+            <n-time
+              v-model="form.planStopTime"
+              :rules="[rules.required]"
+              :readonly="status > '00'"
+              @update:model-value="onPlanStopTimeChange"
+            ></n-time>
           </v-col>
 
           <v-col md="2">
@@ -112,9 +121,14 @@
             ></v-checkbox>
           </v-col>
 
-          <v-col md="2">
+          <v-col md="1">
             <label>Total Time(mins)</label>
             <v-text-field v-model="form.planTotalTime" readonly></v-text-field>
+          </v-col>
+
+          <v-col md="1">
+            <label>Plan Amt(AS400)</label>
+            <v-text-field v-model="form.as400PlanAmt" readonly></v-text-field>
           </v-col>
 
           <v-col md="2">
@@ -257,6 +271,7 @@ import * as api from "@/api/plan.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import rules from "@/utils/rules";
 import { getDateFormat } from "@/utils/utils";
+import { DateTime } from "luxon";
 const Alert = inject("Alert");
 const route = useRoute();
 
@@ -302,7 +317,8 @@ onMounted(async () => {
       isLoading.value = false;
       form.value = data;
 
-      form.value.planStartTime = getDateFormat(data.planStartTime, "HH:mm:ss");
+      form.value.planStartTime = getDateFormat(data.planStartTime, "HH:mm");
+      form.value.planStopTime = getDateFormat(data.planStopTime, "HH:mm");
       form.value.updatedDate = getDateFormat(data.updatedDate);
 
       const _cycleTime = getDateFormat(data.cycleTime, "HH:mm:ss");
@@ -432,11 +448,21 @@ const onPlanStartTimeChange = (planStartTime) => {
   });
   if (filteredWorkingTime.length > 0) {
     form.value.shiftPeriod = filteredWorkingTime[0].dN;
+    if (!form.value.planStopTime) {
+      form.value.planStopTime = getDateFormat(
+        filteredWorkingTime[0].timeEnd,
+        "HH:mm"
+      );
+    }
   } else {
     form.value.shiftPeriod = null;
   }
 
   sumWorkingTime(form.value.shiftPeriod);
+  calculateTotalTime();
+};
+
+const onPlanStopTimeChange = () => {
   calculateTotalTime();
 };
 
@@ -456,56 +482,78 @@ const sumWorkingTime = (dN) => {
   }
 
   totalWorkingTime = total;
-  console.log("sumWorkingTime", totalWorkingTime);
 };
 
-const calculateTotalTime = () => {
-  if (!form.value.shiftPeriod) {
-    form.value.planTotalTime = 0;
+const calculateTotalTime = async () => {
+  //validate parameter !== null
+  if (
+    !form.value.lineCd ||
+    !form.value.planDate ||
+    !form.value.planStartTime ||
+    !form.value.planStopTime
+  ) {
+    form.value.planTotalTime = null;
     return;
   }
-  let totalTime = totalWorkingTime;
-  if (form.value.b1 === "Y") {
-    const b1 = workingTimes.find(
-      (item) => item.dN === form.value.shiftPeriod && item.workType === "B1"
-    );
-    if (b1) {
-      totalTime += b1.timeMins;
-    }
-  }
-  if (form.value.b2 === "Y") {
-    const b2 = workingTimes.find(
-      (item) => item.dN === form.value.shiftPeriod && item.workType === "B2"
-    );
-    if (b2) {
-      totalTime += b2.timeMins;
-    }
-  }
-  if (form.value.b3 === "Y") {
-    const b3 = workingTimes.find(
-      (item) => item.dN === form.value.shiftPeriod && item.workType === "B3"
-    );
-    if (b3) {
-      totalTime += b3.timeMins;
-    }
-  }
-  if (form.value.b4 === "Y") {
-    const b4 = workingTimes.find(
-      (item) => item.dN === form.value.shiftPeriod && item.workType === "B4"
-    );
-    if (b4) {
-      totalTime += b4.timeMins;
-    }
-  }
-  if (form.value.ot === "Y") {
-    const ot = workingTimes.find(
-      (item) => item.dN === form.value.shiftPeriod && item.workType === "OT"
-    );
-    if (ot) {
-      totalTime += ot.timeMins;
-    }
-  }
-  form.value.planTotalTime = totalTime;
+
+  const { lineCd, planDate, planStartTime, planStopTime, b1, b2, b3, b4, ot } =
+    form.value;
+
+  const data = await api.getPlanTotalTime(
+    lineCd,
+    planDate,
+    planStartTime,
+    planStopTime,
+    b1,
+    b2,
+    b3,
+    b4,
+    ot
+  );
+  form.value.planTotalTime = data.planTotalTime;
+
+  // let totalTime = totalWorkingTime;
+  // if (form.value.b1 === "Y") {
+  //   const b1 = workingTimes.find(
+  //     (item) => item.dN === form.value.shiftPeriod && item.workType === "B1"
+  //   );
+  //   if (b1) {
+  //     totalTime += b1.timeMins;
+  //   }
+  // }
+  // if (form.value.b2 === "Y") {
+  //   const b2 = workingTimes.find(
+  //     (item) => item.dN === form.value.shiftPeriod && item.workType === "B2"
+  //   );
+  //   if (b2) {
+  //     totalTime += b2.timeMins;
+  //   }
+  // }
+  // if (form.value.b3 === "Y") {
+  //   const b3 = workingTimes.find(
+  //     (item) => item.dN === form.value.shiftPeriod && item.workType === "B3"
+  //   );
+  //   if (b3) {
+  //     totalTime += b3.timeMins;
+  //   }
+  // }
+  // if (form.value.b4 === "Y") {
+  //   const b4 = workingTimes.find(
+  //     (item) => item.dN === form.value.shiftPeriod && item.workType === "B4"
+  //   );
+  //   if (b4) {
+  //     totalTime += b4.timeMins;
+  //   }
+  // }
+  // if (form.value.ot === "Y") {
+  //   const ot = workingTimes.find(
+  //     (item) => item.dN === form.value.shiftPeriod && item.workType === "OT"
+  //   );
+  //   if (ot) {
+  //     totalTime += ot.timeMins;
+  //   }
+  // }
+  // form.value.planTotalTime = totalTime;
 
   calculatePlanFgAmt();
 };
@@ -551,6 +599,23 @@ const onSave = async () => {
     // ).padStart(2, "0")}:00`;
     form.value.cycleTime = cycleTimeVModel.value;
     isLoading.value = true;
+
+    //validate validatePlanTimeOverlap
+
+    const { valid, message } = await api.validatePlanTimeOverlap(
+      form.value.lineCd,
+      form.value.planDate,
+      form.value.planStartTime,
+      form.value.planStopTime,
+      form.value.id
+    );
+
+    if (!valid) {
+      Alert.warning(message);
+      isLoading.value = false;
+      return;
+    }
+
     let res = null;
     if (mode === "EDIT") {
       res = await api.updatePlan(route.params.id, form.value);
@@ -591,6 +656,35 @@ const onUpdateAS400PlanAmt = () => {
 const validateCycleTime = (value) => {
   if (value == 0) {
     return "Cycle Time must be greater than 0";
+  }
+  return true;
+};
+
+const validatePlanDateBackDate = (planDate, planStartTime) => {
+  // planDate: string (format 'yyyy-MM-dd')
+  // planStartTime: string (format 'HH:mm:ss')
+
+  // ถ้าเวลา >= 08:00:00 ใช้ planDate เดิม, ถ้าน้อยกว่าใช้วันถัดไป
+  let tmpDate = planDate;
+  if (planStartTime !== null && planStartTime.length === 5) {
+    planStartTime = `${planStartTime}:00`; // เพิ่มวินาที ให้ครบ 8 หลัก
+  }
+
+  if (planStartTime < "08:00:00") {
+    console.log('planStartTime < "08:00:00"');
+    tmpDate = DateTime.fromISO(planDate).plus({ days: 1 }).toISODate();
+  }
+
+  // รวมวันที่และเวลา
+  const dt = DateTime.fromISO(`${tmpDate}T${planStartTime}`);
+
+  // เวลาปัจจุบัน
+  const now = DateTime.now();
+
+  // console.log("now " + now.toISO());
+
+  if (dt <= now) {
+    return "ไม่สามารถสร้าง Plan ย้อนหลังได้";
   }
   return true;
 };

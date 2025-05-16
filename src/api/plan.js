@@ -74,3 +74,52 @@ export const getPlanAmtAS400 = async (pkCd, partNo, planDate) => {
   );
   return response.data;
 };
+
+// api post data
+export const getPlanTotalTime = async (
+  line,
+  planDate,
+  planStartTime,
+  planStopTime,
+  b1,
+  b2,
+  b3,
+  b4,
+  ot
+) => {
+  // Convert boolean values to 'Y' or 'N'
+  b1 = b1 ? "Y" : "N";
+  b2 = b2 ? "Y" : "N";
+  b3 = b3 ? "Y" : "N";
+  b4 = b4 ? "Y" : "N";
+  ot = ot ? "Y" : "N";
+  const response = await axios.post(`/plan/get-plan-total-time`, {
+    line,
+    planDate,
+    planStartTime,
+    planStopTime,
+    b1,
+    b2,
+    b3,
+    b4,
+    ot,
+  });
+  return response.data;
+};
+
+export const validatePlanTimeOverlap = async (
+  lineCd,
+  planDate,
+  planStartTime,
+  planStopTime,
+  id
+) => {
+  const response = await axios.post(`/plan/validate-plan-time-overlap`, {
+    lineCd,
+    planDate,
+    planStartTime,
+    planStopTime,
+    id,
+  });
+  return response.data;
+};

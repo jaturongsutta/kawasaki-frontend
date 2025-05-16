@@ -35,7 +35,7 @@ export function getDateFormat(date, format) {
     }
     return DateTime.fromISO(date, { zone: "utc" }).toFormat(format);
   }
-  return "-";
+  return null;
 }
 
 export function getCurrrentDate() {
@@ -66,27 +66,27 @@ export function convertCommaToPureNumber(v) {
 }
 
 export const getCheckBreak = (v) => {
-  if (v === null || v === 'N') {
-    return 'N';
+  if (v === null || v === "N") {
+    return "N";
   }
-  return 'Y';
-}
+  return "Y";
+};
 
 export const secondsToHHMMSS = (totalSeconds) => {
-  const hours = Math.floor(totalSeconds / 3600)
-  const minutes = Math.floor((totalSeconds % 3600) / 60)
-  const seconds = totalSeconds % 60
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
 
-  const pad = (n) => String(n).padStart(2, '0')
+  const pad = (n) => String(n).padStart(2, "0");
 
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
-}
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+};
 
 export const secondsToMMSS = (totalSeconds) => {
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
 
-  const pad = (n) => String(n).padStart(2, '0')
+  const pad = (n) => String(n).padStart(2, "0");
 
-  return `${pad(minutes)}:${pad(seconds)}`
-}
+  return `${pad(minutes)}:${pad(seconds)}`;
+};
