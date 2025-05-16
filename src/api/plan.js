@@ -88,11 +88,11 @@ export const getPlanTotalTime = async (
   ot
 ) => {
   // Convert boolean values to 'Y' or 'N'
-  b1 = b1 ? "Y" : "N";
-  b2 = b2 ? "Y" : "N";
-  b3 = b3 ? "Y" : "N";
-  b4 = b4 ? "Y" : "N";
-  ot = ot ? "Y" : "N";
+  b1 = b1 === "Y" ? "Y" : "N";
+  b2 = b2 === "Y" ? "Y" : "N";
+  b3 = b3 === "Y" ? "Y" : "N";
+  b4 = b4 === "Y" ? "Y" : "N";
+  ot = ot === "Y" ? "Y" : "N";
   const response = await axios.post(`/plan/get-plan-total-time`, {
     line,
     planDate,

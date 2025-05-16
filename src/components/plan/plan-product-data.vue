@@ -158,7 +158,10 @@
             <v-row v-if="form.status === 'NG'">
               <v-col cols="4">
                 <label>Process</label>
-                <v-select v-model="form.ngProcess" items:processList></v-select>
+                <v-select
+                  v-model="form.ngProcess"
+                  :items="processList"
+                ></v-select>
               </v-col>
               <v-col cols="8">
                 <label>Reason</label>
@@ -342,7 +345,7 @@ const onEditClick = (id) => {
     form.value.planStartTime = getDateFormat(res.planStartTime, "HH:mm");
     form.value.productionDate = getDateFormat(res.productionDate);
 
-    ddlApi.lineMachine(form.value.Line_CD, form.value.Model_CD).then((data) => {
+    ddlApi.lineMachine(form.value.lineCd, form.value.modelCd).then((data) => {
       processList.value = data;
     });
   });

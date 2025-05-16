@@ -265,7 +265,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject, computed } from "vue";
+import { onMounted, ref, inject, computed, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as api from "@/api/plan.js";
 import * as ddlApi from "@/api/dropdown-list.js";
@@ -286,6 +286,8 @@ const form = ref({
 });
 
 const isLoading = ref(false);
+
+let isDoLoadData = false;
 
 const userList = ref([]);
 const lineList = ref([]);
@@ -313,8 +315,10 @@ onMounted(async () => {
     planId.value = route.params.id;
 
     isLoading.value = true;
+    console.log("isloading.value brfore load", isLoading.value);
+
+    isDoLoadData = true;
     api.getPlanById(route.params.id).then((data) => {
-      isLoading.value = false;
       form.value = data;
 
       form.value.planStartTime = getDateFormat(data.planStartTime, "HH:mm");
@@ -333,6 +337,14 @@ onMounted(async () => {
         //   form.value.partLower = data[0].Part_Lower;
         // }
       });
+
+      console.log("isloading.value loaded", isLoading.value);
+
+      nextTick(() => {
+        isDoLoadData = false;
+      });
+
+      isLoading.value = false;
     });
   } else {
     // New mode
@@ -429,6 +441,7 @@ const onCycleTimeChange = (cycleTime) => {
 };
 
 const onPlanStartTimeChange = (planStartTime) => {
+  if (isDoLoadData) return; // prevent multiple calls
   // filter working time from "workingTimes" #planStartTime between timeStart and timeEnd
   const filteredWorkingTime = workingTimes.filter((item) => {
     const timeStart = item.timeStart.split(":");
@@ -459,11 +472,12 @@ const onPlanStartTimeChange = (planStartTime) => {
   }
 
   sumWorkingTime(form.value.shiftPeriod);
-  calculateTotalTime();
+  calculateTotalTime("onPlanStartTimeChange");
 };
 
 const onPlanStopTimeChange = () => {
-  calculateTotalTime();
+  if (isDoLoadData) return; // prevent multiple calls
+  calculateTotalTime("onPlanStopTimeChange");
 };
 
 const sumWorkingTime = (dN) => {
@@ -484,8 +498,12 @@ const sumWorkingTime = (dN) => {
   totalWorkingTime = total;
 };
 
-const calculateTotalTime = async () => {
+const calculateTotalTime = async (v) => {
   //validate parameter !== null
+
+  if (isDoLoadData) return; // prevent multiple calls
+
+  // console.log("calculateTotalTime ", v);
   if (
     !form.value.lineCd ||
     !form.value.planDate ||
@@ -569,6 +587,8 @@ const calculatePlanFgAmt = () => {
   } else {
     form.value.planFgAmt = 0;
   }
+
+  console.log("calculatePlanFgAmt", form.value.planFgAmt);
 };
 
 const onshiftChange = (shiftCd) => {
