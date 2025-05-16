@@ -73,11 +73,14 @@
             <tr>
               <td>Target FG</td>
               <td>
-                <v-text-field v-model="props.targetFg" readonly></v-text-field>
+                <v-text-field v-model="props.planFgAmt" readonly></v-text-field>
               </td>
               <td>Actual FG</td>
               <td>
-                <v-text-field v-model="props.actualFg" readonly></v-text-field>
+                <v-text-field
+                  v-model="props.actualFgAmt"
+                  readonly
+                ></v-text-field>
               </td>
             </tr>
             <tr>
@@ -230,11 +233,12 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-  targetFg: {
+  planFgAmt: {
+    // targetFgAmt
     type: Number,
     default: 0,
   },
-  actualFg: {
+  actualFgAmt: {
     type: Number,
     default: 0,
   },

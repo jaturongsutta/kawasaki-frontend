@@ -254,8 +254,7 @@
               :planTotalTime="form.planTotalTime"
               :actualTotalTime="form.actualTotalTime"
               :setupTime="form.setupTime"
-              :targetFg="form.targetFg"
-              :actualFg="form.actualFg"
+              :actualFgAmt="form.actualFgAmt"
             ></plan-product-data>
           </div>
         </v-col>
