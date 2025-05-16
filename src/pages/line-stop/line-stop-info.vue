@@ -14,8 +14,7 @@
             </v-col>
             <v-col cols="6">
               <label>Process</label>
-              <v-select v-model="formInfo.Process_CD"
-                :items="[{ title: 'No Process Selected', value: null }, ...processList]"
+              <v-select v-model="formInfo.Process_CD" placeholder="No Process Selected" :items="processList"
                 :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
             <v-col cols="6">
@@ -24,13 +23,13 @@
             </v-col>
             <v-col cols="3">
               <label class="require-field">Stop Time</label>
-              <n-time v-model="formInfo.Line_Stop_Time" :rules="[rules.required]"
+              <n-time v-model="formInfo.Line_Stop_Time" :rules="[rules.required, validateTimeRange]"
                 :readonly="formInfo.Status === '90'" />
             </v-col>
 
             <v-col cols="3">
               <label class="require-field">Lost Time (mins)</label>
-              <n-input-number v-model="formInfo.Loss_Time" :rules="[rules.required]"
+              <n-input-number v-model="formInfo.Loss_Time" :rules="[rules.required, validateLossTimeWithStartTime]"
                 :readonly="formInfo.Status === '90'" v-maska="'###'" />
             </v-col>
             <v-col cols="12">
@@ -105,6 +104,7 @@ let formInfo = ref({
   "Part_Upper": "",
   "Plan_Date": "",
   "Plan_Start_Time": "",
+  "Plan_Stop_Time": "",
   "Shift_Period_Name": "",
   "Team_Name": "",
   "actual_fg_amt": "",
@@ -150,7 +150,7 @@ onMounted(() => {
     }
 
     formInfo.value.Line_Stop_Date = getCurrrentDate();
-    formInfo.value.Line_Stop_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
+    formInfo.value.Line_Stop_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
     getProcessDDL();
   }
 });
@@ -234,4 +234,54 @@ const saveClick = async (mode) => {
     Alert.error(error.message);
   }
 };
+
+function validateTimeRange(value) {
+  if (!value) return true;
+  console.log("validateTimeRange called")
+  const [hh, mm, ss] = value.split(":").map(Number);
+  const totalSeconds = hh * 3600 + mm * 60 + (ss || 0);
+
+  const start = new Date(formInfo.value.Plan_Start_Time);
+  const stop = new Date(formInfo.value.Plan_Stop_Time);
+
+  const startSeconds = start.getUTCHours() * 3600 + start.getUTCMinutes()
+  const stopSeconds = stop.getUTCHours() * 3600 + stop.getUTCMinutes()
+  validateLossTimeWithStartTime();
+  if (totalSeconds < startSeconds || totalSeconds > stopSeconds) {
+    Alert.warning(`Stop Time must be between\n
+     "${getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm:00")} and ${getDateFormat(formInfo.value.Plan_Stop_Time, "HH:mm:00")} "`);
+    formInfo.value.Line_Stop_Time = null;
+    return false;
+  }
+  return true;
+}
+
+function validateLossTimeWithStartTime(v = null) {
+  let lossMinutes = formInfo.value.Loss_Time;
+  if (v !== null) {
+    lossMinutes = v;
+  }
+  if (!lossMinutes) return true;
+  console.log("validateLossTimeWithStartTime");
+  const start = formInfo.value.Line_Stop_Time;
+  const planStopISO = formInfo.value.Plan_Stop_Time;
+
+  if (!start || !planStopISO) return true;
+
+  const [hh, mm, ss] = start.split(":").map(Number);
+  const startSeconds = hh * 3600 + mm * 60 + (ss || 0);
+  const lossSeconds = Number(lossMinutes) * 60;
+
+  const stopDate = new Date(planStopISO);
+  const stopSeconds = stopDate.getUTCHours() * 3600 + stopDate.getUTCMinutes()
+  const totalUsedSeconds = startSeconds + lossSeconds;
+
+  if (totalUsedSeconds > stopSeconds) {
+    Alert.warning("Lost time is more than planned time");
+    formInfo.value.Loss_Time = 0;
+    return false;
+  }
+
+  return true;
+}
 </script>

@@ -26,28 +26,9 @@ export const getById = async (id) => {
   }
 };
 
-export const getProcessDDL = async (id) => {
-  try {
-    const response = await axios.get(`/line-stop/processDDL/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-
 export const add = async (data) => {
   try {
     const response = await axios.post(`/line-stop/add`, data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const addFromPLC = async (data) => {
-  try {
-    const response = await axios.post(`/line-stop/add-plc`, data);
     return response.data;
   } catch (error) {
     throw error;
