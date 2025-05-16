@@ -147,9 +147,7 @@ const headersDetail = [
     }
   },
   {
-    title: "Line Stop mins", key: "Loss_Time", sortable: false, value: (item) => {
-      return secondsToMMSS(item.Loss_Time);
-    }
+    title: "Line Stop mins", key: "Loss_Time", sortable: false
   },
   { title: "Reason", key: "reason_name", sortable: false },
   { title: "Comment", key: "comment", sortable: false },

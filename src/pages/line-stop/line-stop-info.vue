@@ -13,8 +13,9 @@
               <v-text-field v-model="formInfo.Line_CD" readonly :rules="[rules.required]"></v-text-field>
             </v-col>
             <v-col cols="6">
-              <label class="require-field">Process</label>
-              <v-select v-model="formInfo.Process_CD" :items="processList" :rules="[rules.required]"
+              <label>Process</label>
+              <v-select v-model="formInfo.Process_CD"
+                :items="[{ title: 'No Process Selected', value: null }, ...processList]"
                 :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
             <v-col cols="6">
@@ -29,8 +30,8 @@
 
             <v-col cols="3">
               <label class="require-field">Lost Time (mins)</label>
-              <n-time-mins v-model="formInfo.Loss_Time" :rules="[rules.required]"
-                :readonly="formInfo.Status === '90'" />
+              <n-input-number v-model="formInfo.Loss_Time" :rules="[rules.required]"
+                :readonly="formInfo.Status === '90'" v-maska="'###'" />
             </v-col>
             <v-col cols="12">
               <label class="require-field">Reason</label>
@@ -174,7 +175,6 @@ const loadData = async () => {
     formInfo.value.Line_Stop_Date = getDateFormat(formInfo.value.Line_Stop_Date, "yyyy-MM-dd");
     formInfo.value.Line_Stop_Time = getDateFormat(formInfo.value.Line_Stop_Time, "HH:mm");
     formInfo.value.Updated_Date = getDateFormat(formInfo.value.Updated_Date);
-    formInfo.value.Loss_Time = secondsToMMSS(formInfo.value.Loss_Time);
 
     getProcessDDL();
   } catch (error) {
