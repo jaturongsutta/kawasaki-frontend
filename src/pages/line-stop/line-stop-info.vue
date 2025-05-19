@@ -80,8 +80,7 @@ import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/line-stop.js";
 import rules from "@/utils/rules";
-import { getCurrrentDate, getDateFormat, secondsToMMSS } from "@/utils/utils";
-import { DateTime } from 'luxon'
+import { getCurrrentDate, getDateFormat } from "@/utils/utils";
 
 const route = useRoute();
 const router = useRouter();
@@ -127,9 +126,10 @@ let formInfo = ref({
   "Comment": "",
 });
 
-let isLoading = ref(false);
-let isDialogLoading = ref(false);
-let pageMode = ref("add");
+const isLoading = ref(false);
+const isDialogLoading = ref(false);
+const pageMode = ref("add");
+const planId = ref(null);
 
 onMounted(() => {
   ddlApi.getPredefine("Stop_Reason").then((data) => {
@@ -148,7 +148,7 @@ onMounted(() => {
       const d = JSON.parse(v);
       formInfo.value = d;
     }
-
+    planId.value = `${v.id}`;
     formInfo.value.Line_Stop_Date = getCurrrentDate();
     formInfo.value.Line_Stop_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
     getProcessDDL();
@@ -175,7 +175,7 @@ const loadData = async () => {
     formInfo.value.Line_Stop_Date = getDateFormat(formInfo.value.Line_Stop_Date, "yyyy-MM-dd");
     formInfo.value.Line_Stop_Time = getDateFormat(formInfo.value.Line_Stop_Time, "HH:mm");
     formInfo.value.Updated_Date = getDateFormat(formInfo.value.Updated_Date);
-
+    planId.value = formInfo.value.Plan_ID;
     getProcessDDL();
   } catch (error) {
     console.error("Error fetching API:", error);
@@ -236,6 +236,7 @@ const saveClick = async (mode) => {
 };
 
 function validateTimeRange(value) {
+  if (planId.value === null) return true;
   if (!value) return true;
   console.log("validateTimeRange called")
   const [hh, mm, ss] = value.split(":").map(Number);
@@ -257,6 +258,7 @@ function validateTimeRange(value) {
 }
 
 function validateLossTimeWithStartTime(v = null) {
+  if (planId.value === null) return true;
   let lossMinutes = formInfo.value.Loss_Time;
   if (v !== null) {
     lossMinutes = v;
