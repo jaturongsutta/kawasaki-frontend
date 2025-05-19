@@ -19,14 +19,14 @@
             </v-col>
             <v-col cols="6">
               <label class="require-field">Stop Date</label>
-              <n-date v-model="formInfo.Line_Stop_Date" :readonly="formInfo.Status === '90'" />
+              <n-date v-model="formInfo.Line_Stop_Date" :readonly="formInfo.Status === '90'"
+                :min-date="formInfo.Plan_Date" :max-date="formInfo.Plan_Date_Stop" />
             </v-col>
             <v-col cols="3">
               <label class="require-field">Stop Time</label>
               <n-time v-model="formInfo.Line_Stop_Time" :rules="[rules.required, validateTimeRange]"
                 :readonly="formInfo.Status === '90'" />
             </v-col>
-
             <v-col cols="3">
               <label class="require-field">Lost Time (mins)</label>
               <n-input-number v-model="formInfo.Loss_Time" :rules="[rules.required, validateLossTimeWithStartTime]"
@@ -149,7 +149,7 @@ onMounted(() => {
       formInfo.value = d;
     }
     planId.value = `${v.id}`;
-    formInfo.value.Line_Stop_Date = getCurrrentDate();
+    formInfo.value.Line_Stop_Date = getDateFormat(formInfo.value.Plan_Date, "yyyy-MM-dd");
     formInfo.value.Line_Stop_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
     getProcessDDL();
   }
@@ -241,6 +241,7 @@ function validateTimeRange(value) {
   console.log("validateTimeRange called")
   const [hh, mm, ss] = value.split(":").map(Number);
   const totalSeconds = hh * 3600 + mm * 60 + (ss || 0);
+  if (!totalSeconds) return true;
 
   const start = new Date(formInfo.value.Plan_Start_Time);
   const stop = new Date(formInfo.value.Plan_Stop_Time);
@@ -248,9 +249,16 @@ function validateTimeRange(value) {
   const startSeconds = start.getUTCHours() * 3600 + start.getUTCMinutes()
   const stopSeconds = stop.getUTCHours() * 3600 + stop.getUTCMinutes()
   validateLossTimeWithStartTime();
-  if (totalSeconds < startSeconds || totalSeconds > stopSeconds) {
+  let valid = true;
+  if (startSeconds < stopSeconds) {
+    valid = totalSeconds >= startSeconds && totalSeconds <= stopSeconds;
+  }
+  else {
+    valid = totalSeconds >= startSeconds || totalSeconds <= stopSeconds;
+  }
+  if (!valid) {
     Alert.warning(`Stop Time must be between\n
-     "${getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm:00")} and ${getDateFormat(formInfo.value.Plan_Stop_Time, "HH:mm:00")} "`);
+     "${getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm:00")} and ${getDateFormat(formInfo.value.Plan_Stop_Time, "HH:mm:00")}"`);
     formInfo.value.Line_Stop_Time = null;
     return false;
   }
@@ -269,16 +277,10 @@ function validateLossTimeWithStartTime(v = null) {
   const planStopISO = formInfo.value.Plan_Stop_Time;
 
   if (!start || !planStopISO) return true;
-
-  const [hh, mm, ss] = start.split(":").map(Number);
-  const startSeconds = hh * 3600 + mm * 60 + (ss || 0);
   const lossSeconds = Number(lossMinutes) * 60;
+  const totalLastSeconds = calculateTimeDiffInSeconds(formInfo.value.Line_Stop_Time, getDateFormat(formInfo.value.Plan_Stop_Time, "HH:mm:00"))
 
-  const stopDate = new Date(planStopISO);
-  const stopSeconds = stopDate.getUTCHours() * 3600 + stopDate.getUTCMinutes()
-  const totalUsedSeconds = startSeconds + lossSeconds;
-
-  if (totalUsedSeconds > stopSeconds) {
+  if (lossSeconds > totalLastSeconds) {
     Alert.warning("Lost time is more than planned time");
     formInfo.value.Loss_Time = 0;
     return false;
@@ -286,4 +288,26 @@ function validateLossTimeWithStartTime(v = null) {
 
   return true;
 }
+
+
+function calculateTimeDiffInSeconds(startTimeStr, endTimeStr) {
+  const [startH, startM] = startTimeStr.split(':').map(Number);
+  const [endH, endM] = endTimeStr.split(':').map(Number);
+
+  const baseDate = new Date('1970-01-01T00:00:00Z');
+
+  const start = new Date(baseDate);
+  start.setUTCHours(startH, startM, 0, 0);
+
+  const end = new Date(baseDate);
+  end.setUTCHours(endH, endM, 0, 0);
+
+  /*ถ้าสิ้นสุดก่อนเริ่มต้น แสดงว่าข้ามวันบวก 1 วัน */
+  if (end <= start) {
+    end.setUTCDate(end.getUTCDate() + 1);
+  }
+  const diffInSeconds = Math.floor((end - start) / 1000);
+  return diffInSeconds;
+}
+
 </script>

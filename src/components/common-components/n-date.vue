@@ -30,6 +30,7 @@
         model-type="yyyy-MM-dd"
         :format="format"
         :min-date="mainProps.minDate"
+        :max-date="mainProps.maxDate"
         @invalid-select="handleInvalidSelect"
       />
     </v-menu>
@@ -50,6 +51,7 @@ const mainProps = defineProps({
   hideDetails: Boolean,
   rules: Array,
   minDate: String | Date,
+  maxDate: String | Date,
 });
 const emit = defineEmits(["update:modelValue"]);
 

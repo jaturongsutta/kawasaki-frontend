@@ -58,6 +58,7 @@ const applyMask = () => {
   // let value = timeInput.value.replace(/\D/g, ""); // Remove non-numeric characters
   let value = timeInput.value;
   // Auto-insert colon after 2 digits (HH:mm format)
+  if(!value) return;
   if (value.length >= 3) {
     if (value.indexOf(":") === -1) {
       value = value.slice(0, 2) + ":" + value.slice(2, 4);
