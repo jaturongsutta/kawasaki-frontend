@@ -20,7 +20,8 @@
             <v-col cols="6">
               <label class="require-field">Stop Date</label>
               <n-date v-model="formInfo.Line_Stop_Date" :readonly="formInfo.Status === '90'"
-                :min-date="formInfo.Plan_Date" :max-date="formInfo.Plan_Date_Stop" />
+                :min-date="formInfo.Plan_Date" :max-date="formInfo.Plan_Date_Stop"
+                @update:model-value="validateTimeRange(formInfo.Line_Stop_Time)" />
             </v-col>
             <v-col cols="3">
               <label class="require-field">Stop Time</label>
@@ -81,6 +82,7 @@ import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/line-stop.js";
 import rules from "@/utils/rules";
 import { getCurrrentDate, getDateFormat } from "@/utils/utils";
+import { DateTime } from "luxon";
 
 const route = useRoute();
 const router = useRouter();
@@ -241,13 +243,12 @@ function validateTimeRange(value) {
   console.log("validateTimeRange called")
   const [hh, mm, ss] = value.split(":").map(Number);
   const totalSeconds = hh * 3600 + mm * 60 + (ss || 0);
-  if (!totalSeconds) return true;
 
-  const start = new Date(formInfo.value.Plan_Start_Time);
-  const stop = new Date(formInfo.value.Plan_Stop_Time);
+  if (isNaN(totalSeconds)) return true;
 
-  const startSeconds = start.getUTCHours() * 3600 + start.getUTCMinutes()
-  const stopSeconds = stop.getUTCHours() * 3600 + stop.getUTCMinutes()
+  const time = getStartStopTime();
+  const startSeconds = time.startTime.hour * 3600 + time.startTime.minute * 60;
+  const stopSeconds = time.stopTime.hour * 3600 + time.stopTime.minute * 60;
   validateLossTimeWithStartTime();
   let valid = true;
   if (startSeconds < stopSeconds) {
@@ -258,7 +259,7 @@ function validateTimeRange(value) {
   }
   if (!valid) {
     Alert.warning(`Stop Time must be between\n
-     "${getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm:00")} and ${getDateFormat(formInfo.value.Plan_Stop_Time, "HH:mm:00")}"`);
+     "${getDateFormat(time.startTime, "HH:mm:00")} and ${getDateFormat(time.stopTime, "HH:mm:00")}"`);
     formInfo.value.Line_Stop_Time = null;
     return false;
   }
@@ -273,12 +274,13 @@ function validateLossTimeWithStartTime(v = null) {
   }
   if (!lossMinutes) return true;
   console.log("validateLossTimeWithStartTime");
+  const time = getStartStopTime();
   const start = formInfo.value.Line_Stop_Time;
-  const planStopISO = formInfo.value.Plan_Stop_Time;
+  const planStopISO = time.stopTime;
 
   if (!start || !planStopISO) return true;
   const lossSeconds = Number(lossMinutes) * 60;
-  const totalLastSeconds = calculateTimeDiffInSeconds(formInfo.value.Line_Stop_Time, getDateFormat(formInfo.value.Plan_Stop_Time, "HH:mm:00"))
+  const totalLastSeconds = calculateTimeDiffInSeconds(formInfo.value.Line_Stop_Time, getDateFormat(time.stopTime, "HH:mm:00"))
 
   if (lossSeconds > totalLastSeconds) {
     Alert.warning("Lost time is more than planned time");
@@ -303,11 +305,37 @@ function calculateTimeDiffInSeconds(startTimeStr, endTimeStr) {
   end.setUTCHours(endH, endM, 0, 0);
 
   /*ถ้าสิ้นสุดก่อนเริ่มต้น แสดงว่าข้ามวันบวก 1 วัน */
-  if (end <= start) {
+  if (end < start) {
     end.setUTCDate(end.getUTCDate() + 1);
   }
   const diffInSeconds = Math.floor((end - start) / 1000);
   return diffInSeconds;
+}
+
+
+function getStartStopTime() {
+  const item = formInfo.value;
+  const d1 = DateTime.fromISO(item.Plan_Date, { zone: "utc" });
+  const d2 = DateTime.fromISO(item.Plan_Date_Stop, { zone: "utc" });
+
+  const isSame = d1.hasSame(d2, 'day');
+  let startTime = DateTime.fromISO(item.Plan_Start_Time, { zone: 'utc' });
+  let stopTime = DateTime.fromISO(item.Plan_Stop_Time, { zone: 'utc' });
+
+  if (!isSame) {
+    const d3 = DateTime.fromISO(item.Line_Stop_Date, { zone: "utc" });
+    const isSelectD1 = d1.hasSame(d3, 'day');
+    if (isSelectD1) { /* Select first day */
+      stopTime = DateTime.fromObject({ hour: 23, minute: 59 }, { zone: "utc" });
+    }
+    else { /* Select last day */
+      startTime = DateTime.fromObject({ hour: 0, minute: 0 }, { zone: "utc" });
+    }
+  }
+  return {
+    startTime,
+    stopTime
+  }
 }
 
 </script>
