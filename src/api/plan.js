@@ -152,18 +152,24 @@ export function getPlanDateTimeWithOvernight(
   const baseDate = planDate.substring(0, 10);
 
   let startDate = baseDate;
-  if (planStartTime < "08:00:00") {
-    startDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
-  }
-  const start_dt = `${startDate} ${planStartTime}`;
 
   let stopDate = baseDate;
-  if (planStopTime < "08:00:00") {
-    stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
+  if (planStartTime < "08:00:00") {
+    startDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+    if (planStopTime < "08:00:00") {
+      stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
+    }
   } else {
-    stopDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+    if (planStopTime < "08:00:00") {
+      stopDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+    }
   }
+
+  const start_dt = `${startDate} ${planStartTime}`;
   const stop_dt = `${stopDate} ${planStopTime}`;
+
+  console.log("start_dt", start_dt);
+  console.log("stop_dt", stop_dt);
 
   return { start_dt, stop_dt };
 }
