@@ -30,7 +30,7 @@
             <v-col cols="3">
               <label class="require-field">Lost Time (mins)</label>
               <n-input-number v-model="formInfo.Loss_Time" :rules="[rules.required, validateLossTimeWithStartTime]"
-                :readonly="formInfo.Status === '90'" v-maska="'###'" />
+                :readonly="formInfo.Status === '90'" v-maska="'####'" />
             </v-col>
             <v-col cols="12">
               <label class="require-field">Reason</label>
