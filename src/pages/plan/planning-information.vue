@@ -455,7 +455,7 @@ const onPlanStartTimeChange = (planStartTime) => {
 
     return (
       planStartTimeInMinutes >= startTimeInMinutes &&
-      planStartTimeInMinutes <= endTimeInMinutes
+      planStartTimeInMinutes < endTimeInMinutes
     );
   });
   if (filteredWorkingTime.length > 0) {
@@ -620,7 +620,6 @@ const onSave = async () => {
     isLoading.value = true;
 
     //validate validatePlanTimeOverlap
-
     const { valid, message } = await api.validatePlanTimeOverlap(
       form.value.lineCd,
       form.value.planDate,

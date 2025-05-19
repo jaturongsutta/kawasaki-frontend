@@ -1,4 +1,5 @@
 import axios from "@/utils/axios";
+import { DateTime } from "luxon";
 
 export const getPalnListCurrent = async (line) => {
   const response = await axios.get(`/plan/plan-list-current/${line}`);
@@ -114,12 +115,55 @@ export const validatePlanTimeOverlap = async (
   planStopTime,
   id
 ) => {
-  const response = await axios.post(`/plan/validate-plan-time-overlap`, {
-    lineCd,
+  // startTime: "YYYY-MM-dd HH:mm:ss"
+  // stopTime: "YYYY-MM-dd HH:mm:ss"
+
+  const { start_dt, stop_dt } = getPlanDateTimeWithOvernight(
     planDate,
     planStartTime,
-    planStopTime,
+    planStopTime
+  );
+
+  console.log("start_dt", start_dt);
+  console.log("stop_dt", stop_dt);
+
+  const response = await axios.post(`/plan/validate-plan-time-overlap`, {
+    lineCd,
+    planStartTime: start_dt,
+    planStopTime: stop_dt,
     id,
   });
   return response.data;
 };
+
+/**
+ * Calculate start_dt and stop_dt for plan, handling overnight shift logic.
+ * @param {string} planDate - format 'YYYY-MM-DD'
+ * @param {string} planStartTime - format 'HH:mm:ss'
+ * @param {string} planStopTime - format 'HH:mm:ss'
+ * @returns {{ start_dt: string, stop_dt: string }}
+ */
+export function getPlanDateTimeWithOvernight(
+  planDate,
+  planStartTime,
+  planStopTime
+) {
+  // ตัดให้เหลือแค่ yyyy-MM-dd
+  const baseDate = planDate.substring(0, 10);
+
+  let startDate = baseDate;
+  if (planStartTime < "08:00:00") {
+    startDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+  }
+  const start_dt = `${startDate} ${planStartTime}`;
+
+  let stopDate = baseDate;
+  if (planStopTime < "08:00:00") {
+    stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
+  } else {
+    stopDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+  }
+  const stop_dt = `${stopDate} ${planStopTime}`;
+
+  return { start_dt, stop_dt };
+}

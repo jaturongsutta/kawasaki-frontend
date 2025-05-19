@@ -32,13 +32,13 @@
               "
             ></v-checkbox-btn>
           </template>
+
           <template v-slot:[`item.action`]="{ item }">
             <n-gbtn-edit
-              v-if="
-                item.prod_data_id !== null &&
-                internalItem.value.Confirmed_Status !== '90'
-              "
               @click="onEditClick(item.prod_data_id)"
+              v-if="
+                item.prod_data_id !== null && item.Confirmed_Status !== '90'
+              "
             ></n-gbtn-edit>
           </template>
         </v-data-table>
