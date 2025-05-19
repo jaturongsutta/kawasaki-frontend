@@ -34,7 +34,10 @@
           </template>
           <template v-slot:[`item.action`]="{ item }">
             <n-gbtn-edit
-              v-if="item.prod_data_id !== null"
+              v-if="
+                item.prod_data_id !== null &&
+                internalItem.value.Confirmed_Status !== '90'
+              "
               @click="onEditClick(item.prod_data_id)"
             ></n-gbtn-edit>
           </template>

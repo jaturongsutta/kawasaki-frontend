@@ -193,7 +193,10 @@ const routes = [
       {
         path: "",
         name: "information-alert",
-        component: () => import("@/pages/common-master/information-alert/information-alert.vue"),
+        component: () =>
+          import(
+            "@/pages/common-master/information-alert/information-alert.vue"
+          ),
       },
     ],
   },

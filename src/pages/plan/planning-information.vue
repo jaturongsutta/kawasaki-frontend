@@ -235,7 +235,7 @@
               @click="onSave"
               :disabled="['30', '90'].includes(status)"
             />
-            <n-btn-cancel @click="router.go(-1)" class="ml-3" />
+            <n-btn-cancel @click="router.back()" class="ml-3" />
             <n-btn-copy v-if="status !== ''" @click="onCopy" class="ml-3" />
           </div>
         </v-col>

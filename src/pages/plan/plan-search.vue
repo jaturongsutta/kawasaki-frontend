@@ -17,23 +17,23 @@
           </v-sheet>
           <v-sheet width="160" class="mr-3">
             <label>Plan Date From</label>
-            <n-date v-model="date1"></n-date>
+            <n-date v-model="formSearch.dateFrom"></n-date>
           </v-sheet>
           <v-sheet width="160" class="mr-3">
             <label>Plan Date To</label>
-            <n-date v-model="date2"></n-date>
+            <n-date v-model="formSearch.dateTo"></n-date>
           </v-sheet>
           <v-sheet width="200" class="mr-3">
             <label>Model</label>
             <v-select
-              v-model="formSearch.model"
+              v-model="formSearch.lineModel"
               :items="[{ title: 'All', value: null }, ...lineModelList]"
             ></v-select>
           </v-sheet>
           <v-sheet width="160" class="mr-3">
             <label>Status</label>
             <v-select
-              v-model="formSearch.isActive"
+              v-model="formSearch.status"
               :items="[{ title: 'All', value: null }, ...statusList]"
             ></v-select>
           </v-sheet>
