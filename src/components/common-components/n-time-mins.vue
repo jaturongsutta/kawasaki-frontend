@@ -7,6 +7,7 @@
     maxlength="5"
     @change="onInputUpdated"
     @keypress="onKeypress"
+    autocomplete="off"
   ></v-text-field>
 </template>
 <!-- append-inner-icon="mdi-clock-time-eight-outline" -->

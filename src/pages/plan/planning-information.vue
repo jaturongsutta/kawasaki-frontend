@@ -620,12 +620,15 @@ const onSave = async () => {
     isLoading.value = true;
 
     //validate validatePlanTimeOverlap
+
+    const _id = route.params.id ? route.params.id : "";
+
     const { valid, message } = await api.validatePlanTimeOverlap(
       form.value.lineCd,
       form.value.planDate,
       form.value.planStartTime,
       form.value.planStopTime,
-      form.value.id
+      _id
     );
 
     if (!valid) {
@@ -684,7 +687,7 @@ const validatePlanDateBackDate = (planDate, planStartTime) => {
 
   // ถ้าเวลา >= 08:00:00 ใช้ planDate เดิม, ถ้าน้อยกว่าใช้วันถัดไป
   let tmpDate = planDate;
-  if (planStartTime !== null && planStartTime.length === 5) {
+  if (planStartTime && planStartTime.length === 5) {
     planStartTime = `${planStartTime}:00`; // เพิ่มวินาที ให้ครบ 8 หลัก
   }
 

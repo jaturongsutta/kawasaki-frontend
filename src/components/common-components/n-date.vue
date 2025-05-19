@@ -13,6 +13,7 @@
           v-bind="mainProps.readonly || mainProps.disabled ? null : props"
           :hide-details="mainProps.hideDetails"
           :rules="mainProps.rules"
+          autocomplete="off"
         >
           <template v-slot:append-inner>
             <v-icon icon="mdi mdi-calendar" class="cursor-pointer"></v-icon>

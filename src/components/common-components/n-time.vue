@@ -1,6 +1,15 @@
 <template>
-  <v-text-field type="text" v-model="timeInput" @input="applyMask" placeholder="HH:mm" maxlength="5"
-    @change="onInputUpdated" @keypress="onKeypress" append-inner-icon="mdi-clock-time-eight-outline"></v-text-field>
+  <v-text-field
+    type="text"
+    v-model="timeInput"
+    @input="applyMask"
+    placeholder="HH:mm"
+    maxlength="5"
+    autocomplete="off"
+    @change="onInputUpdated"
+    @keypress="onKeypress"
+    append-inner-icon="mdi-clock-time-eight-outline"
+  ></v-text-field>
 </template>
 
 <script setup>
@@ -94,6 +103,9 @@ const onInputUpdated = () => {
   if (m > 59) m = 0;
 
   // Return to formatted string
-  timeInput.value = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  timeInput.value = `${String(h).padStart(2, "0")}:${String(m).padStart(
+    2,
+    "0"
+  )}`;
 };
 </script>
