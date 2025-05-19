@@ -78,9 +78,15 @@ const headersDetail = [
   },
   {
     title: "Plan Start Time", key: "Plan_Start_Time", sortable: false, value: (item) => {
-      return getDateFormat(item.Plan_Start_Time, "HH:mm");
+      return getDateFormat(item.Plan_Start_Time, "HH:mm:ss");
     }
   },
+  {
+    title: "Plan Stop Time", key: "Plan_Stop_Time", sortable: false, value: (item) => {
+      return getDateFormat(item.Plan_Stop_Time, "HH:mm:ss");
+    }
+  }
+  ,
   {
     title: "Shift", key: "Team_Name", sortable: false
   },

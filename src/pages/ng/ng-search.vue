@@ -16,7 +16,7 @@
           </v-col>
           <v-col cols="2">
             <label>Date To</label>
-            <n-date v-model="formSearch.dateTo"></n-date>
+            <n-date v-model="formSearch.dateTo" :min-date="formSearch.dateFrom"></n-date>
           </v-col>
 
           <v-col cols="2">
@@ -258,8 +258,10 @@ const loadData = async (paginate) => {
 
     const hours = Math.floor(totalSeconds / 3600)
     const minutes = Math.floor((totalSeconds % 3600) / 60)
-    rejectionLoss.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    const seconds = totalSeconds % 60;
 
+    const pad = n => String(n).padStart(2, '0');
+    rejectionLoss.value = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   } catch (error) {
     console.error("Error fetching API:", error);
     items.value = [];

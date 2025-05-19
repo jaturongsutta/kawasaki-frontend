@@ -6,28 +6,33 @@
       </v-card-title>
       <v-card-text class="mt-3">
         <v-row justify="justify-start">
-          <v-col cols="2">
+          <v-col cols="6">
             <label>Line</label>
             <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getProcessList"></v-select>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3">
             <label>Process</label>
             <v-select v-model="formSearch.processCd"
               :items="[{ title: 'All', value: null }, ...processList]"></v-select>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3">
+            <label>Type</label>
+            <v-select v-model="formSearch.typeCd" :items="[{ title: 'All', value: null }, ...typeList]"></v-select>
+          </v-col>
+          <v-col cols="3">
             <label>Date From</label>
             <n-date v-model="formSearch.dateFrom"></n-date>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3">
             <label>Date To</label>
-            <n-date v-model="formSearch.dateTo"></n-date>
+            <n-date v-model="formSearch.dateTo" :min-date="formSearch.dateFrom"></n-date>
           </v-col>
-          <v-col cols="2">
+          
+          <v-col cols="3">
             <label>Reason</label>
             <v-select v-model="formSearch.reasonCd" :items="[{ title: 'All', value: null }, ...reasonList]"></v-select>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3">
             <label>Status</label>
             <v-select v-model="formSearch.statusCd" :items="[{ title: 'All', value: null }, ...statusList]"></v-select>
           </v-col>
@@ -46,7 +51,6 @@
         <v-row>
           <div class="d-flex justify-center ma-5">
             <n-btn-add no-permission label="New Line Stop" @click="newClick(false)"></n-btn-add>
-            <n-btn-add no-permission label="New Line Stop from PLC" class="ml-3" @click="newClick(true)"></n-btn-add>
           </div>
         </v-row>
         <v-row>
@@ -124,6 +128,7 @@ const lineList = ref([]);
 const processList = ref([]);
 const reasonList = ref([]);
 const statusList = ref([]);
+const typeList = ref([]);
 let items = ref([]);
 let isLoading = ref(false);
 
@@ -147,9 +152,7 @@ const headersDetail = [
     }
   },
   {
-    title: "Line Stop mins", key: "Loss_Time", sortable: false, value: (item) => {
-      return secondsToMMSS(item.Loss_Time);
-    }
+    title: "Line Stop mins", key: "Loss_Time", sortable: false
   },
   { title: "Reason", key: "reason_name", sortable: false },
   { title: "Comment", key: "comment", sortable: false },
@@ -172,6 +175,10 @@ onMounted(async () => {
     reasonList.value = data;
   });
 
+  ddlApi.getPredefine("Stop_Type").then((data) => {
+    typeList.value = data;
+  });
+  
   ddlApi.lineAll().then((data) => {
     lineList.value = data;
   });

@@ -252,6 +252,7 @@ const saveClick = async (mode) => {
 
     const v = { ...formInfo.value };
     let info = {
+      planId: v.Plan_ID,
       processCd: v.Process_CD,
       lineCd: v.Line_CD,
       modelCd: v.Model_CD,
@@ -268,6 +269,7 @@ const saveClick = async (mode) => {
       info = {
         ...info,
         planId: `${v.id}`,
+        idRef: null
       }
       res = await api.add(info);
     } else {
