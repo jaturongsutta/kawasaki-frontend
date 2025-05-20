@@ -153,6 +153,15 @@ export function getPlanDateTimeWithOvernight(
 
   let startDate = baseDate;
 
+  // if planStartTime format i s"08:00" then 08:00:00
+  // if planStopTime format is "08:00" then 08:00:00
+  if (planStartTime.length === 5) {
+    planStartTime = `${planStartTime}:00`;
+  }
+  if (planStopTime.length === 5) {
+    planStopTime = `${planStopTime}:00`;
+  }
+
   let stopDate = baseDate;
   if (planStartTime < "08:00:00") {
     startDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
