@@ -22,7 +22,7 @@
           </v-col>
           <v-col cols="3">
             <label>Date From</label>
-            <n-date v-model="formSearch.dateFrom"></n-date>
+            <n-date v-model="formSearch.dateFrom" @update:modelValue="formSearch.dateTo = null"></n-date>
           </v-col>
           <v-col cols="3">
             <label>Date To</label>
@@ -107,7 +107,7 @@ import * as api from "@/api/line-stop.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import { getDateFormat, getPaging, secondsToHHMMSS } from "@/utils/utils.js";
 import { useRouter } from "vue-router";
-import { usePageState } from '@/api/line-stop'
+import { usePageState } from '@/stores/search/line-stop'
 const pageState = usePageState()
 
 const formSearch = ref({
@@ -192,16 +192,6 @@ onMounted(async () => {
   onSearch();
 });
 
-onUnmounted(() => {
-  pageState.line = formSearch.value.lineCd;
-  pageState.dateFrom = formSearch.value.dateFrom;
-  pageState.dateTo = formSearch.value.dateTo;
-  pageState.process = formSearch.value.processCd;
-  pageState.reason = formSearch.value.reasonCd;
-  pageState.type = formSearch.value.typeCd;
-  pageState.status = formSearch.value.statusCd;
-});
-
 const onSearch = () => {
   console.log("onsearch ")
   currentPage.value = 1;
@@ -266,6 +256,7 @@ const loadData = async (paginate) => {
       searchOptions,
     };
 
+    pageState.setSearchData(data);
     const response = await api.search(data);
 
     items.value = response.data;

@@ -12,7 +12,8 @@
           </v-col>
           <v-col>
             <label>Date From</label>
-            <n-date v-model="formSearch.dateFrom"></n-date>
+            <n-date v-model="formSearch.dateFrom"
+              @update:modelValue="formSearch.dateTo = null"></n-date>
           </v-col>
           <v-col>
             <label>Date To</label>
@@ -71,7 +72,8 @@
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Start Date </label>
-                  <n-date v-model="form.alertStartDate" :rules="[rules.required]"></n-date>
+                  <n-date v-model="form.alertStartDate" :rules="[rules.required]"
+                    @update:modelValue="form.alertEndDate = null;"></n-date>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Start Time </label>
@@ -292,5 +294,4 @@ const saveClick = async () => {
     Alert.error(error.message);
   }
 };
-
 </script>

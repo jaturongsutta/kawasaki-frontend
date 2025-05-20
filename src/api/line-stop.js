@@ -1,17 +1,4 @@
 import axios from "@/utils/axios";
-import { defineStore } from 'pinia'
-
-export const usePageState = defineStore('line-stop', {
-  state: () => ({
-    line: null,
-    process: null,
-    type: null,
-    dateFrom: null,
-    dateTo: null,
-    reason: null,
-    status: null,
-  }),
-})
 
 export const search = async (data) => {
   try {

@@ -12,7 +12,7 @@
           </v-col>
           <v-col cols="2">
             <label>Date From</label>
-            <n-date v-model="formSearch.dateFrom"></n-date>
+            <n-date v-model="formSearch.dateFrom" @update:modelValue="formSearch.dateTo = null"></n-date>
           </v-col>
           <v-col cols="2">
             <label>Date To</label>
