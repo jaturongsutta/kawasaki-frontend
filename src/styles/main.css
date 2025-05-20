@@ -120,3 +120,6 @@
   color: red;
   margin-left: 2px; /* Adjust spacing as needed */
 }
+body {
+  font-family: 'Inter', sans-serif;
+}
