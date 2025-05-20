@@ -30,7 +30,12 @@
           <v-text-field v-model="form.lastName"></v-text-field>
         </v-col>
 
-        <v-col md="4">
+        <v-col md="2">
+          <label>Position Name</label>
+          <v-text-field v-model="form.positionName"></v-text-field>
+        </v-col>
+
+        <v-col md="2">
           <label>Status</label>
           <v-select v-model="form.isActive" :items="statusList"></v-select>
         </v-col>
