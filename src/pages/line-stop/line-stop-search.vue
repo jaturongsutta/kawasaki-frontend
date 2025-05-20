@@ -55,7 +55,8 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-data-table v-model:page="currentPage" :headers="headersDetail" :items="items" :items-per-page="pageSize">
+            <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headersDetail"
+              :items="items" :items-length="totalItems" @update:options="loadData">
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit :permission="false" @click="onEdit(item.id)"></n-gbtn-edit>
 
@@ -67,7 +68,7 @@
                 <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
                   v-model:totalItems="totalItems"></n-pagination>
               </template>
-            </v-data-table>
+            </v-data-table-server>
           </v-col>
         </v-row>
         <v-divider class="mb-8"></v-divider>
@@ -109,10 +110,6 @@ import { useRouter } from "vue-router";
 import { usePageState } from '@/api/line-stop'
 const pageState = usePageState()
 
-const router = useRouter();
-const dialog = ref(false);
-const Alert = inject("Alert");
-
 const formSearch = ref({
   lineCd: pageState.line,
   dateFrom: pageState.dateFrom,
@@ -123,6 +120,9 @@ const formSearch = ref({
   statusCd: pageState.status,
 });
 
+const Alert = inject("Alert");
+const router = useRouter();
+const dialog = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(20);
 const totalItems = ref(0);
@@ -203,6 +203,7 @@ onUnmounted(() => {
 });
 
 const onSearch = () => {
+  console.log("onsearch ")
   currentPage.value = 1;
   loadData({ page: currentPage.value, itemsPerPage: pageSize.value });
 }
@@ -251,6 +252,7 @@ const onDelete = (id) => {
 };
 
 const loadData = async (paginate) => {
+  console.log("loaddata")
   const { page, itemsPerPage } = paginate;
 
   const searchOptions = getPaging({
