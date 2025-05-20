@@ -22,7 +22,7 @@
           </v-col>
           <v-col cols="3">
             <label>Date From</label>
-            <n-date v-model="formSearch.dateFrom"></n-date>
+            <n-date v-model="formSearch.dateFrom" @update:modelValue="formSearch.dateTo = null"></n-date>
           </v-col>
           <v-col cols="3">
             <label>Date To</label>
@@ -55,7 +55,8 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-data-table v-model:page="currentPage" :headers="headersDetail" :items="items" :items-per-page="pageSize">
+            <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headersDetail"
+              :items="items" :items-length="totalItems" @update:options="loadData">
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit :permission="false" @click="onEdit(item.id)"></n-gbtn-edit>
 
@@ -67,7 +68,7 @@
                 <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
                   v-model:totalItems="totalItems"></n-pagination>
               </template>
-            </v-data-table>
+            </v-data-table-server>
           </v-col>
         </v-row>
         <v-divider class="mb-8"></v-divider>
@@ -106,12 +107,8 @@ import * as api from "@/api/line-stop.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import { getDateFormat, getPaging, secondsToHHMMSS } from "@/utils/utils.js";
 import { useRouter } from "vue-router";
-import { usePageState } from '@/api/line-stop'
+import { usePageState } from '@/stores/search/line-stop'
 const pageState = usePageState()
-
-const router = useRouter();
-const dialog = ref(false);
-const Alert = inject("Alert");
 
 const formSearch = ref({
   lineCd: pageState.line,
@@ -123,6 +120,9 @@ const formSearch = ref({
   statusCd: pageState.status,
 });
 
+const Alert = inject("Alert");
+const router = useRouter();
+const dialog = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(20);
 const totalItems = ref(0);
@@ -192,17 +192,8 @@ onMounted(async () => {
   onSearch();
 });
 
-onUnmounted(() => {
-  pageState.line = formSearch.value.lineCd;
-  pageState.dateFrom = formSearch.value.dateFrom;
-  pageState.dateTo = formSearch.value.dateTo;
-  pageState.process = formSearch.value.processCd;
-  pageState.reason = formSearch.value.reasonCd;
-  pageState.type = formSearch.value.typeCd;
-  pageState.status = formSearch.value.statusCd;
-});
-
 const onSearch = () => {
+  console.log("onsearch ")
   currentPage.value = 1;
   loadData({ page: currentPage.value, itemsPerPage: pageSize.value });
 }
@@ -251,6 +242,7 @@ const onDelete = (id) => {
 };
 
 const loadData = async (paginate) => {
+  console.log("loaddata")
   const { page, itemsPerPage } = paginate;
 
   const searchOptions = getPaging({
@@ -264,6 +256,7 @@ const loadData = async (paginate) => {
       searchOptions,
     };
 
+    pageState.setSearchData(data);
     const response = await api.search(data);
 
     items.value = response.data;

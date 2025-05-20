@@ -30,7 +30,8 @@
             </v-col>
             <v-col cols="3">
               <label class="require-field">Lost Time (mins)</label>
-              <n-input-number v-model="formInfo.Loss_Time" :rules="[rules.required, validateLossTimeWithStartTime]"
+              <n-input-number v-model="formInfo.Loss_Time"
+                :rules="[rules.required, validateZero, validateLossTimeWithStartTime]"
                 :readonly="formInfo.Status === '90'" v-maska="'####'" />
             </v-col>
             <v-col cols="12">
@@ -288,6 +289,13 @@ function validateLossTimeWithStartTime(v = null) {
   }
 
   return true;
+}
+
+const validateZero = value => {
+  if (value == null || value === '' || Number(value) === 0) {
+    return 'This field is required'
+  }
+  return true
 }
 
 

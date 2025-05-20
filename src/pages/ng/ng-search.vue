@@ -12,7 +12,7 @@
           </v-col>
           <v-col cols="2">
             <label>Date From</label>
-            <n-date v-model="formSearch.dateFrom"></n-date>
+            <n-date v-model="formSearch.dateFrom" @update:modelValue="formSearch.dateTo = null"></n-date>
           </v-col>
           <v-col cols="2">
             <label>Date To</label>
@@ -50,7 +50,8 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-data-table v-model:page="currentPage" :headers="headersDetail" :items="items" :items-per-page="pageSize">
+            <v-data-table-server v-model:page="currentPage" :headers="headersDetail" :items="items"
+              :items-per-page="pageSize">
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit :permission="false" @click="onEdit(item.id)"></n-gbtn-edit>
 
@@ -62,7 +63,7 @@
                 <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
                   v-model:totalItems="totalItems"></n-pagination>
               </template>
-            </v-data-table>
+            </v-data-table-server>
           </v-col>
         </v-row>
         <v-divider class="mb-8"></v-divider>
