@@ -274,13 +274,12 @@ function validateLossTimeWithStartTime(v = null) {
   }
   if (!lossMinutes) return true;
   console.log("validateLossTimeWithStartTime");
-  const time = getStartStopTime();
   const start = formInfo.value.Line_Stop_Time;
-  const planStopISO = time.stopTime;
+  const planStopISO = formInfo.value.Plan_Stop_Time;
 
   if (!start || !planStopISO) return true;
   const lossSeconds = Number(lossMinutes) * 60;
-  const totalLastSeconds = calculateTimeDiffInSeconds(formInfo.value.Line_Stop_Time, getDateFormat(time.stopTime, "HH:mm:00"))
+  const totalLastSeconds = calculateTimeDiffInSeconds(start, getDateFormat(planStopISO, "HH:mm:00"))
 
   if (lossSeconds > totalLastSeconds) {
     Alert.warning("Lost time is more than planned time");

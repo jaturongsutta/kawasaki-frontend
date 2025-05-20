@@ -8,7 +8,8 @@
         <v-row justify="justify-start">
           <v-col cols="6">
             <label>Line</label>
-            <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getProcessList"></v-select>
+            <v-select v-model="formSearch.lineCd" :items="lineList"
+              @update:modelValue=" formSearch.processCd = null; getProcessList();"></v-select>
           </v-col>
           <v-col cols="3">
             <label>Process</label>
@@ -27,7 +28,6 @@
             <label>Date To</label>
             <n-date v-model="formSearch.dateTo" :min-date="formSearch.dateFrom"></n-date>
           </v-col>
-          
           <v-col cols="3">
             <label>Reason</label>
             <v-select v-model="formSearch.reasonCd" :items="[{ title: 'All', value: null }, ...reasonList]"></v-select>
@@ -91,7 +91,7 @@
       <n-loading :loading="isLoading" />
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="1024px">
+    <v-dialog v-model="dialog" max-width="80%">
       <New :is-p-l-c="isPLC" @on-add-successful="dialog = false; onSearch();"></New>
     </v-dialog>
 
@@ -99,26 +99,28 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject } from "vue";
+import { onMounted, ref, inject, onUnmounted } from "vue";
 import rules from "@/utils/rules";
 import New from "@/components/line-stop/new.vue";
 import * as api from "@/api/line-stop.js";
 import * as ddlApi from "@/api/dropdown-list.js";
-import { getDateFormat, getPaging, secondsToHHMMSS, secondsToMMSS } from "@/utils/utils.js";
+import { getDateFormat, getPaging, secondsToHHMMSS } from "@/utils/utils.js";
 import { useRouter } from "vue-router";
-
+import { usePageState } from '@/api/line-stop'
+const pageState = usePageState()
 
 const router = useRouter();
 const dialog = ref(false);
 const Alert = inject("Alert");
 
 const formSearch = ref({
-  lineCd: '',
-  dateFrom: '',
-  dateTo: '',
-  processCd: null,
-  reasonCd: null,
-  statusCd: null,
+  lineCd: pageState.line,
+  dateFrom: pageState.dateFrom,
+  dateTo: pageState.dateTo,
+  processCd: pageState.process,
+  reasonCd: pageState.reason,
+  typeCd: pageState.type,
+  statusCd: pageState.status,
 });
 
 const currentPage = ref(1);
@@ -178,12 +180,26 @@ onMounted(async () => {
   ddlApi.getPredefine("Stop_Type").then((data) => {
     typeList.value = data;
   });
-  
+
   ddlApi.lineAll().then((data) => {
     lineList.value = data;
   });
 
+  if (formSearch.value.lineCd != null) {
+    getProcessList();
+  }
+
   onSearch();
+});
+
+onUnmounted(() => {
+  pageState.line = formSearch.value.lineCd;
+  pageState.dateFrom = formSearch.value.dateFrom;
+  pageState.dateTo = formSearch.value.dateTo;
+  pageState.process = formSearch.value.processCd;
+  pageState.reason = formSearch.value.reasonCd;
+  pageState.type = formSearch.value.typeCd;
+  pageState.status = formSearch.value.statusCd;
 });
 
 const onSearch = () => {
@@ -269,7 +285,6 @@ const loadData = async (paginate) => {
 };
 
 const getProcessList = () => {
-  formSearch.value.processCd = null;
   ddlApi.lineMachine(formSearch.value.lineCd).then((data) => {
     processList.value = data;
   });
