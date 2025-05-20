@@ -75,72 +75,6 @@
                   @click="onStopPlanClick(item)"
                   v-if="['10', '20'].includes(item.status)"
                 ></n-gbtn-stop>
-                <!-- <v-icon
-                  icon="mdi mdi-cancel"
-                  style="color: red"
-                  v-if="item.action2"
-                ></v-icon> -->
-              </template>
-
-              <template v-slot:[`item.status`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.status }}
-                </div>
-              </template>
-              <template v-slot:[`item.production_date`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.production_date }}
-                </div>
-              </template>
-              <template v-slot:[`item.start_time`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.start_time }}
-                </div>
-              </template>
-              <template v-slot:[`item.finish_date`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.finish_date }}
-                </div>
-              </template>
-              <template v-slot:[`item.model`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.model }}
-                </div>
-              </template>
-              <template v-slot:[`item.shift`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.shift }}
-                </div>
-              </template>
-              <template v-slot:[`item.shift_time`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.shift_time }}
-                </div>
-              </template>
-              <template v-slot:[`item.ot`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.ot }}
-                </div>
-              </template>
-              <template v-slot:[`item.cycle_time`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.cycle_time }}
-                </div>
-              </template>
-              <template v-slot:[`item.shift`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.shift }}
-                </div>
-              </template>
-              <template v-slot:[`item.total_time`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.total_time }}
-                </div>
-              </template>
-              <template v-slot:[`item.target_fg`]="{ item }">
-                <div :class="{ textRunning: item.status == 'Running' }">
-                  {{ item.target_fg }}
-                </div>
               </template>
             </v-data-table>
           </v-col>
@@ -225,11 +159,21 @@ const totalItemsDetail = ref(8);
 const headersPlanCurrent = [
   { title: "", key: "action", sortable: false },
   { title: "", key: "action2", sortable: false },
-  { title: "Status", key: "status_name", sortable: false },
+  {
+    title: "Status",
+    key: "status_name",
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+    sortable: false,
+  },
   {
     title: "Production Date",
     key: "Plan_Date",
     sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
     value: (item) => {
       return getDateFormat(item.Plan_Date, "dd/MM/yyyy");
     },
@@ -238,22 +182,109 @@ const headersPlanCurrent = [
     title: "Start Time",
     key: "Plan_Start_Time",
     sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
     value: (item) => {
       return getDateFormat(item.Plan_Start_Time, "HH:mm");
     },
   },
-  { title: "Model", key: "Model_CD", sortable: false },
-  { title: "Shift", key: "Team_Name", sortable: false },
-  { title: "Shift Time", key: "Shift_Period_Name", sortable: false },
-  { title: "Break1", key: "B1", sortable: false },
-  { title: "Lunch Break", key: "B2", sortable: false },
-  { title: "Break2", key: "B3", sortable: false },
-  { title: "Break OT", key: "B4", sortable: false },
-  { title: "OT", key: "OT", sortable: false },
-  { title: "Cycle Time", key: "Cycle_Times", sortable: false },
-  { title: "Total Time(mins)", key: "plan_total_time", sortable: false },
-  { title: "Target FG", key: "plan_fg_amt", sortable: false },
-  { title: "Actual FG", key: "actual_fg_amt", sortable: false },
+  {
+    title: "Model",
+    key: "Model_CD",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Shift",
+    key: "Team_Name",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Shift Time",
+    key: "Shift_Period_Name",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Break1",
+    key: "B1",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Lunch Break",
+    key: "B2",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Break2",
+    key: "B3",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Break OT",
+    key: "B4",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "OT",
+    key: "OT",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Cycle Time",
+    key: "Cycle_Times",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Total Time(mins)",
+    key: "plan_total_time",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Target FG",
+    key: "plan_fg_amt",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
+  {
+    title: "Actual FG",
+    key: "actual_fg_amt",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+  },
 ];
 
 const itemsPlanCurrent = ref([]);
@@ -321,10 +352,11 @@ onMounted(() => {
 
   // Start interval to fetch data every 5 seconds
   intervalId.value = setInterval(() => {
-    if (formSearch.value.line) {
-      loadPlanCurrent(formSearch.value.line);
-    }
+    loadPlanCurrent(formSearch.value.line);
   }, 5000); // 5000ms = 5 seconds
+
+  loadPlanCurrent(formSearch.value.line);
+  onSearch();
 });
 
 onUnmounted(() => {
@@ -355,10 +387,12 @@ const newPlanClick = () => {
 };
 
 const loadPlanCurrent = (line) => {
-  api.getPalnListCurrent(line).then((data) => {
-    itemsPlanCurrent.value = data;
-    currentPlanTime.value = moment().format("YYYY-MM-DD HH:mm:ss");
-  });
+  if (formSearch.value.line) {
+    api.getPalnListCurrent(line).then((data) => {
+      itemsPlanCurrent.value = data;
+      currentPlanTime.value = moment().format("YYYY-MM-DD HH:mm:ss");
+    });
+  }
 };
 
 const onSearch = async () => {
