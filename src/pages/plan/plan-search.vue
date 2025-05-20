@@ -273,17 +273,41 @@ const headersPlanCurrent = [
     title: "Target FG",
     key: "plan_fg_amt",
     sortable: false,
-    cellProps: (cell) => ({
-      class: cell.item.status_name === "Running" ? "textRunning" : "",
-    }),
+    cellProps: (cell) => {
+      if (cell.item.actual_fg_amt < cell.item.plan_fg_amt) {
+        return {
+          class: "text-red",
+        };
+      } else if (cell.item.actual_fg_amt > cell.item.plan_fg_amt) {
+        return {
+          class: "text-green",
+        };
+      } else if (cell.item.status_name === "Running") {
+        return {
+          class: "textRunning",
+        };
+      }
+    },
   },
   {
     title: "Actual FG",
     key: "actual_fg_amt",
     sortable: false,
-    cellProps: (cell) => ({
-      class: cell.item.status_name === "Running" ? "textRunning" : "",
-    }),
+    cellProps: (cell) => {
+      if (cell.item.actual_fg_amt < cell.item.plan_fg_amt) {
+        return {
+          class: "text-red",
+        };
+      } else if (cell.item.actual_fg_amt > cell.item.plan_fg_amt) {
+        return {
+          class: "text-green",
+        };
+      } else if (cell.item.status_name === "Running") {
+        return {
+          class: "textRunning",
+        };
+      }
+    },
   },
 ];
 
@@ -509,6 +533,14 @@ const onDelete = (id) => {
 <style>
 .textRunning {
   color: #3366ff;
+  font-weight: bold;
+}
+.text-red {
+  color: red;
+  font-weight: bold;
+}
+.text-green {
+  color: green;
   font-weight: bold;
 }
 </style>
