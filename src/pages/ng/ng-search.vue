@@ -8,7 +8,7 @@
         <v-row justify="justify-start">
           <v-col cols="2">
             <label>Line</label>
-            <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue="getLineModelList"></v-select>
+            <v-select v-model="formSearch.lineCd" :items="lineList" @update:modelValue=" formSearch.modelCd = null;getLineModelList(formSearch.lineCd);"></v-select>
           </v-col>
           <v-col cols="2">
             <label>Date From</label>
@@ -171,11 +171,14 @@ onMounted(async () => {
     lineList.value = data;
   });
 
+  if (formSearch.value.lineCd != null) {
+    getLineModelList(formSearch.value.lineCd);
+  }
+
   onSearch();
 });
 
 const getLineModelList = (lineCd) => {
-  formSearch.value.modelCd = null;
   ddlApi.lineModel(lineCd).then((data) => {
     lineModelList.value = data;
   });
