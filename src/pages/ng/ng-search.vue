@@ -102,19 +102,20 @@ import * as api from "@/api/ng.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import { getDateFormat, getPaging } from "@/utils/utils.js";
 import { useRouter } from "vue-router";
-import NgInfo from "./ng-info.vue";
+import { usePageState } from '@/stores/search/ng'
+const pageState = usePageState()
 
 const router = useRouter();
 const dialog = ref(false);
 const Alert = inject("Alert");
 
 const formSearch = ref({
-  lineCd: '',
-  dateFrom: '',
-  dateTo: '',
-  modelCd: null,
-  reasonCd: null,
-  statusCd: null,
+  lineCd: pageState.line,
+  dateFrom: pageState.dateFrom,
+  dateTo: pageState.dateTo,
+  modelCd: pageState.model,
+  reasonCd: pageState.reason,
+  statusCd: pageState.status,
 });
 
 const currentPage = ref(1);
@@ -243,6 +244,7 @@ const loadData = async (paginate) => {
       searchOptions,
     };
 
+    pageState.setSearchData(data);
     const response = await api.search(data);
 
     items.value = response.data;
