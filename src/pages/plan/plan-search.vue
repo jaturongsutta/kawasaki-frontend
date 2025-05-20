@@ -273,21 +273,9 @@ const headersPlanCurrent = [
     title: "Target FG",
     key: "plan_fg_amt",
     sortable: false,
-    cellProps: (cell) => {
-      if (cell.item.actual_fg_amt < cell.item.plan_fg_amt) {
-        return {
-          class: "text-red",
-        };
-      } else if (cell.item.actual_fg_amt > cell.item.plan_fg_amt) {
-        return {
-          class: "text-green",
-        };
-      } else if (cell.item.status_name === "Running") {
-        return {
-          class: "textRunning",
-        };
-      }
-    },
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
   },
   {
     title: "Actual FG",
