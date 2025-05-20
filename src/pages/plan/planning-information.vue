@@ -619,6 +619,7 @@ const onshiftChange = (shiftCd) => {
 
 const onCopy = () => {
   mode = "NEW";
+  form.value.id = "";
   form.value.status = "";
   form.value.statusName = "";
   form.value.updatedByName = "";

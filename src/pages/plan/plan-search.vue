@@ -37,8 +37,9 @@
               :items="[{ title: 'All', value: null }, ...statusList]"
             ></v-select>
           </v-sheet>
-          <v-sheet class="pt-5" width="120">
+          <v-sheet class="pt-5" width="240">
             <n-btn-search @click="onSearch" />
+            <n-btn-reset @click="onReset" class="ml-3" />
           </v-sheet>
         </v-row>
 
@@ -190,16 +191,23 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref, inject } from "vue";
-import rules from "@/utils/rules";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/plan.js";
 
 import { getPaging, getDateFormat } from "@/utils/utils.js";
 import moment from "moment";
 import router from "@/router";
+import { usePageState } from "@/stores/search/plan";
+const pageState = usePageState();
 const Alert = inject("Alert");
 
-const formSearch = ref({});
+const formSearch = ref({
+  line: pageState.line,
+  dateFrom: pageState.dateFrom,
+  dateTo: pageState.dateTo,
+  lineModel: pageState.lineModel,
+  status: pageState.status,
+});
 
 const isLoading = ref(false);
 
@@ -327,6 +335,17 @@ onUnmounted(() => {
   }
 });
 
+const onReset = () => {
+  formSearch.value = {
+    line: null,
+    dateFrom: null,
+    dateTo: null,
+    lineModel: null,
+    status: null,
+  };
+  onSearch();
+};
+
 const newPlanClick = () => {
   // dialog.value = true;
 
@@ -359,6 +378,7 @@ const loadData = async (paginate) => {
       searchOptions,
     };
 
+    pageState.setSearchData(data);
     const response = await api.search(data);
 
     itemsDetail.value = response.data;
