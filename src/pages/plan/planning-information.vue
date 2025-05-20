@@ -209,7 +209,7 @@
 
           <v-col md="2">
             <label>Planning ID</label>
-            <v-text-field v-model="form.planningId" readonly></v-text-field>
+            <v-text-field v-model="form.id" readonly></v-text-field>
           </v-col>
 
           <v-col md="2">
@@ -439,7 +439,7 @@ const onCycleTimeChange = (cycleTime) => {
   calculatePlanFgAmt();
 };
 
-const onPlanStartTimeChange = (planStartTime) => {
+const onPlanStartTimeChange = async (planStartTime) => {
   if (isDoLoadData) return; // prevent multiple calls
   // filter working time from "workingTimes" #planStartTime between timeStart and timeEnd
   const filteredWorkingTime = workingTimes.filter((item) => {
@@ -460,14 +460,20 @@ const onPlanStartTimeChange = (planStartTime) => {
   });
   if (filteredWorkingTime.length > 0) {
     form.value.shiftPeriod = filteredWorkingTime[0].dN;
-    if (!form.value.planStopTime) {
-      form.value.planStopTime = getDateFormat(
-        filteredWorkingTime[0].timeEnd,
-        "HH:mm"
-      );
-    }
+    // if (!form.value.planStopTime) {
+    //   form.value.planStopTime = getDateFormat(
+    //     filteredWorkingTime[0].timeEnd,
+    //     "HH:mm"
+    //   );
+    // }
   } else {
     form.value.shiftPeriod = null;
+  }
+
+  const res = await api.getDefaultStopTime(form.value.shiftPeriod);
+  console.log("res", res);
+  if (res) {
+    form.value.planStopTime = getDateFormat(res, "HH:mm");
   }
 
   sumWorkingTime(form.value.shiftPeriod);
@@ -577,12 +583,25 @@ const calculateTotalTime = async (v) => {
 
 const calculatePlanFgAmt = () => {
   if (form.value.planTotalTime && cycleTimeVModel.value) {
-    const cycleTimeMins = convertCycleTime(cycleTimeVModel.value);
-    if (cycleTimeMins === 0) {
+    // แปลง cycle_time ("HH:mm:ss" หรือ "mm:ss" หรือ "HH:mm") เป็นวินาที
+    const parts = cycleTimeVModel.value.split(":").map(Number);
+    let cycleTimeSeconds = 0;
+    if (parts.length === 3) {
+      cycleTimeSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length === 2) {
+      cycleTimeSeconds = parts[0] * 60 + parts[1];
+    } else if (parts.length === 1) {
+      cycleTimeSeconds = parts[0];
+    }
+
+    if (cycleTimeSeconds === 0) {
       form.value.planFgAmt = 0;
       return;
     }
-    form.value.planFgAmt = Math.floor(form.value.planTotalTime / cycleTimeMins);
+    // Plan_Total_Time เป็นนาที → *60 เพื่อเป็นวินาที
+    form.value.planFgAmt = Math.round(
+      (form.value.planTotalTime * 60) / cycleTimeSeconds
+    );
   } else {
     form.value.planFgAmt = 0;
   }
@@ -600,8 +619,11 @@ const onshiftChange = (shiftCd) => {
 
 const onCopy = () => {
   mode = "NEW";
+  form.value.id = "";
   form.value.status = "";
-  form.value.statusName = "Draft";
+  form.value.statusName = "";
+  form.value.updatedByName = "";
+  form.value.updatedDate = "";
 };
 
 const onSave = async () => {

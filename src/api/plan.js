@@ -173,3 +173,8 @@ export function getPlanDateTimeWithOvernight(
 
   return { start_dt, stop_dt };
 }
+
+export const getDefaultStopTime = async (shiftPeriod) => {
+  const response = await axios.get(`/plan/default-stop-time/${shiftPeriod}`);
+  return response.data;
+};

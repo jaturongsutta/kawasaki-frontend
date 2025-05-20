@@ -11,12 +11,6 @@ export const useAppStore = defineStore("app", {
     },
   },
   persist: {
-    enabled: true, // เปิดใช้งานการบันทึกสถานะ
-    strategies: [
-      {
-        key: "app", // ชื่อคีย์ใน localStorage
-        storage: localStorage, // ใช้ localStorage
-      },
-    ],
+    storage: localStorage, // data in localStorage persists even after the browser is closed and reopened.
   },
 });
