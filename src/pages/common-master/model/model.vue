@@ -138,7 +138,7 @@ const headers = [
   {
     title: "Cycle Time (mins)", key: "Cycle_Time", sortable: false
   },
-  { title: "Status", key: "Status", sortable: false },
+  { title: "Status", key: "Status_Name", sortable: false },
   { title: "Updated By", key: "Updated_By", sortable: false },
   {
     title: "Updated Date",

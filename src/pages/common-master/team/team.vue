@@ -54,7 +54,7 @@
               <v-row>
                 <v-col cols="12">
                   <label class="require-field">Team </label>
-                  <v-text-field v-model="form.teamName" :rules="[rules.required]"/>
+                  <v-text-field v-model="form.teamName" :rules="[rules.required]" />
                 </v-col>
                 <v-col cols="12">
                   <label class="require-field">Operation </label>
@@ -100,13 +100,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject, computed } from "vue";
+import { onMounted, ref, inject } from "vue";
 import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/team.js";
 import rules from "@/utils/rules";
 import { getDateFormat } from "@/utils/utils";
-import UserList from "../user/user-list.vue";
 
 const Alert = inject("Alert");
 const frmInfo = ref(null);
@@ -124,7 +123,7 @@ const headers = [
   {
     title: "Leader", key: "Leader", sortable: false
   },
-  { title: "Status", key: "Status", sortable: false },
+  { title: "Status", key: "Status_Name", sortable: false },
   { title: "Updated By", key: "Updated_By", sortable: false },
   {
     title: "Updated Date",
