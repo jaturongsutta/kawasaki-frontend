@@ -154,7 +154,7 @@ const lineList = ref([]);
 const lineModelList = ref([]);
 const statusList = ref([]);
 
-const totalItemsDetail = ref(8);
+const totalItemsDetail = ref(0);
 
 const headersPlanCurrent = [
   { title: "", key: "action", sortable: false },
@@ -428,11 +428,11 @@ const loadData = async (paginate) => {
     const response = await api.search(data);
 
     itemsDetail.value = response.data;
-    totalItems.value = response.total_record;
+    totalItemsDetail.value = response.total_record;
   } catch (error) {
     console.error("Error fetching API:", error);
     itemsDetail.value = [];
-    totalItems.value = 0;
+    totalItemsDetail.value = 0;
   }
   isLoading.value = false;
 };
