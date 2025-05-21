@@ -68,7 +68,7 @@
 
             <v-col cols="3">
               <label>Process</label>
-              <v-select v-model="formInfo.Process_CD" :items="processList"
+              <v-select v-model="formInfo.Process_CD" :items="processList" placeholder="No Process Selected"
                 :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
             <v-col cols="3">
