@@ -51,7 +51,7 @@
         <v-row>
           <v-col>
             <v-data-table-server v-model:page="currentPage" :headers="headersDetail" :items="items"
-              :items-per-page="pageSize">
+              :items-per-page="pageSize" :items-length="totalItems" @update:options="loadData">
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit :permission="false" @click="onEdit(item.id)"></n-gbtn-edit>
 
