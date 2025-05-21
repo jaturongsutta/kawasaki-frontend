@@ -490,7 +490,7 @@ const onStopPlanClick = (item) => {
 };
 
 const onDelete = (id) => {
-  Alert.confirm("Are you sure you want to delete this line ?").then(
+  Alert.confirm("Are you sure you want to delete this plan ?").then(
     ({ isConfirmed }) => {
       if (isConfirmed) {
         isLoading.value = true;
