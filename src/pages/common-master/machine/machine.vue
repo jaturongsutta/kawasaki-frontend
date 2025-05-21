@@ -143,7 +143,7 @@ const headers = [
   { title: "Machine No", key: "Machine_No", sortable: false },
   { title: "Process Code", key: "Process_CD", sortable: false },
   { title: "Map Code", key: "Map_CD", sortable: false },
-  { title: "Status", key: "Status", sortable: false },
+  { title: "Status", key: "Status_Name", sortable: false },
   { title: "Updated By", key: "Updated_By", sortable: false },
   {
     title: "Updated Date",
