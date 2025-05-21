@@ -68,7 +68,12 @@ watch(timeInput, (newValue) => {
       // hours = sp[0]; // fix 00
       minutes = sp[1];
       seconds = sp[2];
+    } else {
+      return;
     }
+    console.log("sp", sp);
+    console.log("minutes", minutes);
+    console.log("seconds", seconds);
     const formattedValue = `00:${minutes.padStart(2, "0")}:${seconds}`;
     emit("update:modelValue", formattedValue);
   } else {
