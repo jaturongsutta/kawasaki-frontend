@@ -75,7 +75,7 @@ onMounted(() => {
 });
 
 const onView = (item) => {
-  const filename = item.folders + "_" + item.filename;
+  const filename = item.folders + "|" + item.filename;
   router.push({
     name: "application-log-preview",
     params: { logtype: "BatchJob", filename: filename },
