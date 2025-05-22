@@ -169,7 +169,7 @@ export function getPlanDateTimeWithOvernight(
       stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
     }
   } else {
-    if (planStopTime < "08:00:00") {
+    if (planStopTime < "08:00:00" || planStopTime < planStartTime) {
       stopDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
     }
   }
