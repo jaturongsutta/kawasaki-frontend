@@ -9,7 +9,7 @@
         <v-card-text class="mb-3">
           <v-row>
             <v-col>
-              <label>PK Code</label>
+              <label class="require-field">PK Code</label>
               <v-text-field
                 v-model="form.pkCd"
                 :rules="[rules.required]"
@@ -17,7 +17,7 @@
               ></v-text-field>
             </v-col>
             <v-col>
-              <label>Line Code</label>
+              <label class="require-field">Line Code</label>
               <v-text-field
                 v-model="form.lineCd"
                 :rules="[rules.required]"
@@ -25,14 +25,14 @@
               ></v-text-field>
             </v-col>
             <v-col>
-              <label>Line Name</label>
+              <label class="require-field">Line Name</label>
               <v-text-field
                 v-model="form.lineName"
                 :rules="[rules.required]"
               ></v-text-field>
             </v-col>
             <v-col>
-              <label>Status</label>
+              <label class="require-field">Status</label>
               <v-select
                 v-model="form.isActive"
                 :items="[...statusList]"
@@ -96,7 +96,19 @@
                   ></v-checkbox-btn>
                 </template>
                 <template v-slot:[`item.action`]="{ item }">
-                  <n-gbtn-delete @click="onDeleteModel(item)"></n-gbtn-delete>
+                  <!-- <n-gbtn-delete
+                    @click="onDeleteModel(item)"
+                    v-if="item.isActive === 'Y'"
+                  ></n-gbtn-delete> -->
+                  <n-gbtn-edit
+                    @click="
+                      () => {
+                        item.rowState = 'UPDATE';
+                      }
+                    "
+                    v-if="item.rowState === 'NONE'"
+                  ></n-gbtn-edit>
+                  <!-- {{ item.rowState }} -->
                 </template>
 
                 <template v-slot:[`item.modelCd`]="{ item }">
@@ -116,6 +128,16 @@
                   ></v-select>
                   <div v-else v-text="item.modelCd"></div>
                 </template>
+
+                <template v-slot:[`item.isActive`]="{ item }">
+                  <v-select
+                    v-if="item.rowState === 'UPDATE'"
+                    v-model="item.isActive"
+                    :items="[...statusList]"
+                    hide-details="auto"
+                  ></v-select>
+                  <div v-else v-text="item.statusName"></div>
+                </template>
               </v-data-table>
             </v-col>
           </v-row>
@@ -132,7 +154,6 @@
 
           <v-row>
             <v-col cols="8">
-              <n-loading :loading="isLoadingProcess" />
               <v-data-table
                 v-model="isSelectedProcess"
                 :headers="headersProcess"
@@ -167,11 +188,12 @@
                     item-title="value"
                     item-value="value"
                     hide-details="auto"
+                    :rules="[rules.required]"
                   ></v-select>
                   <div v-else v-text="item.processCd"></div>
                 </template>
                 <template v-slot:[`item.wt`]="{ item }">
-                  <n-time
+                  <n-time-mins
                     v-model="item.wt"
                     hide-details="auto"
                     @update:model-value="
@@ -181,13 +203,36 @@
                         }
                       }
                     "
-                  ></n-time>
+                    :rules="[rules.required]"
+                  ></n-time-mins>
                 </template>
                 <template v-slot:[`item.ht`]="{ item }">
-                  <n-time v-model="item.ht" hide-details="auto"></n-time>
+                  <n-time-mins
+                    v-model="item.ht"
+                    hide-details="auto"
+                    @update:model-value="
+                      (o) => {
+                        if (item.rowState === 'NONE') {
+                          item.rowState = 'UPDATE';
+                        }
+                      }
+                    "
+                    :rules="[rules.required]"
+                  ></n-time-mins>
                 </template>
                 <template v-slot:[`item.mt`]="{ item }">
-                  <n-time v-model="item.mt" hide-details="auto"></n-time>
+                  <n-time-mins
+                    v-model="item.mt"
+                    hide-details="auto"
+                    @update:model-value="
+                      (o) => {
+                        if (item.rowState === 'NONE') {
+                          item.rowState = 'UPDATE';
+                        }
+                      }
+                    "
+                    :rules="[rules.required]"
+                  ></n-time-mins>
                 </template>
               </v-data-table>
             </v-col>
@@ -198,6 +243,7 @@
                 :items-per-page="-1"
                 style="width: 300px"
                 hide-default-footer
+                :sort-by="[{ key: 'toolCd', order: 'asc' }]"
               >
                 <template v-slot:[`item.isActive`]="{ item }">
                   <v-checkbox
@@ -206,7 +252,9 @@
                     hide-details
                     @update:model-value="
                       (o) => {
-                        item.rowState = 'UPDATE';
+                        if (item.rowState === 'NONE') {
+                          item.rowState = 'UPDATE';
+                        }
                       }
                     "
                   ></v-checkbox>
@@ -224,6 +272,8 @@
             </v-col>
           </v-row>
         </v-card-text>
+
+        <n-loading :loading="isLoading" />
       </v-card>
     </v-form>
   </div>
@@ -235,6 +285,8 @@ import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/line.js";
 import rules from "@/utils/rules";
+import { getDateFormat } from "@/utils/utils";
+
 const route = useRoute();
 
 const router = useRouter();
@@ -244,6 +296,8 @@ const form = ref({});
 const mode = ref("NEW");
 
 let mToolAll = [];
+
+const isLoading = ref(false);
 
 const isLoadingProcess = ref(false);
 const statusList = ref([]);
@@ -304,58 +358,67 @@ onMounted(() => {
 
   if (route.params.id) {
     console.log("edit mode ", route.params.id);
-    mode.value = "EDIT";
-
-    api.getById(route.params.id).then((data) => {
-      form.value = data;
-
-      form.value.wt = "50:55:55";
-
-      console.log("data.lineModel ", data.lineModel);
-      itemsModel.value = data.lineModel.map((item) => {
-        return {
-          mode: "NONE",
-          modelCd: item.modelCd,
-          partNo: item.partNo,
-          isActive: item.isActive,
-        };
-      });
-
-      itemsProcessAll = data.lineMachine.map((item) => {
-        return {
-          rowState: "NONE",
-          seq: item.seq,
-          lineCd: item.lineCd,
-          modelCd: item.modelCd,
-          processCd: item.processCd,
-          wt: item.wt,
-          ht: item.ht,
-          mt: item.mt,
-          isActive: item.isActive,
-        };
-      });
-
-      itemsLineToolAll = data.lineTool.map((item) => {
-        return {
-          rowState: "NONE",
-          lineCd: item.lineCd,
-          modelCd: item.modelCd,
-          processCd: item.processCd,
-          toolCd: item.toolCd,
-          isActive: item.isActive,
-        };
-      });
-
-      console.log("itemsModel.value ", itemsModel.value);
-    });
+    doLoadData();
   }
 });
+
+const doLoadData = async () => {
+  mode.value = "EDIT";
+
+  isLoading.value = true;
+  api.getById(route.params.id).then((data) => {
+    isLoading.value = false;
+    form.value = data;
+
+    form.value.updatedDate = getDateFormat(data.updatedDate);
+
+    // form.value.wt = "50:55:55";
+
+    console.log("data.lineModel ", data.lineModel);
+    itemsModel.value = data.lineModel.map((item) => {
+      return {
+        rowState: "NONE",
+        modelCd: item.modelCd,
+        partNo: item.partNo,
+        isActive: item.isActive,
+        statusName: item.statusName,
+      };
+    });
+
+    itemsProcessAll = data.lineMachine.map((item) => {
+      return {
+        rowState: "NONE",
+        lineCd: item.lineCd,
+        modelCd: item.modelCd,
+        processCd: item.processCd,
+        wt: item.wt,
+        ht: item.ht,
+        mt: item.mt,
+        isActive: item.isActive,
+      };
+    });
+
+    itemsLineToolAll = data.lineTool.map((item) => {
+      return {
+        rowState: "NONE",
+        lineCd: item.lineCd,
+        modelCd: item.modelCd,
+        processCd: item.processCd,
+        toolCd: item.toolCd,
+        isActive: item.isActive,
+      };
+    });
+
+    console.log("itemsModel.value ", itemsModel.value);
+  });
+};
 
 const onAddModel = () => {
   itemsModel.value.push({
     rowState: "NEW",
     Model_Code: "",
     Is_Active: "Y",
+    statusName: "Active",
   });
 };
 
@@ -382,19 +445,25 @@ const onAddProcess = () => {
 };
 
 const onSave = async () => {
+  itemsLineToolAll.forEach((item) => {
+    item.isActive = item.isActive === "Y" ? "Y" : "N";
+  });
   const payload = {
     ...form.value,
 
     lineModel: itemsModel.value,
     lineMachine: itemsProcessAll,
     lineTool: itemsLineToolAll,
-
-    // models: itemsModel.value,
-    // processes: itemsProcess.value,
   };
   const { valid } = await frmInfo.value.validate();
   let res;
   if (valid) {
+    if (!validateModel()) {
+      return;
+    }
+    if (!validateProcess()) {
+      return;
+    }
     console.log("payload ", payload);
     if (route.params.id) {
       // Edit Mode
@@ -406,7 +475,8 @@ const onSave = async () => {
 
     if (res.status === 0) {
       Alert.success();
-      // router.go(-1);
+      // doLoadData();
+      router.go(-1);
     } else {
       Alert.warning(res.message);
     }
@@ -421,17 +491,27 @@ const onSelectedModel = (o, item) => {
 };
 
 const onDeleteModel = (r) => {
-  if (r.mode === "NEW") {
+  if (r.rowState === "NEW") {
     itemsModel.value = itemsModel.value.filter(
       (item) => item.modelCd !== r.modelCd
     );
   } else {
-    itemsModel.value = itemsModel.value.map((item) => {
-      if (item.modelCd === r.modelCd) {
-        item.mode = "DELETE";
-        return item;
+    Alert.confirm("Are you sure you want to delete this model ?").then(
+      ({ isConfirmed }) => {
+        if (isConfirmed) {
+          isLoadingProcess.value = true;
+          api.deleteModel(form.value.lineCd, r.modelCd).then((res) => {
+            isLoadingProcess.value = false;
+            if (res.status === 0) {
+              Alert.success("Inactive successfully");
+              doLoadData();
+            } else {
+              Alert.warning(res.message);
+            }
+          });
+        }
       }
-    });
+    );
   }
 };
 
@@ -445,25 +525,11 @@ const tableModelSelected = (selected) => {
       (item) => item.modelCd === currentModelCd
     );
 
-    // api.getProcessByModelCd(form.value.lineCd, currentModelCd).then((data) => {
-    //   isLoadingProcess.value = false;
-
-    //   console.log("data ", data);
-    //   let i = 0;
-    //   itemsProcess.value = data.map((item) => {
-    //     return {
-    //       rowState: "UPDATE",
-    //       seq: ++i,
-    //       lineCd: item.lineCd,
-    //       modelCd: item.modelCd,
-    //       processCd: item.processCd,
-    //       wt: item.wt,
-    //       ht: item.ht,
-    //       mt: item.mt,
-    //       isActive: item.isActive,
-    //     };
-    //   });
-    // });
+    // set seq
+    let i = 0;
+    for (let item of itemsProcess.value) {
+      item.seq = ++i;
+    }
   } else {
     currentModelCd = "";
     itemsProcess.value = [];
@@ -484,6 +550,7 @@ const tableProcessSelected = (selected) => {
     console.log("itemsLineToolAll ", itemsLineToolAll);
     console.log("itemsLineTool.value ", itemsLineTool.value);
 
+    // case no tool
     if (itemsLineTool.value.length === 0) {
       console.log("new line tool");
       const mTool = mToolAll.filter(
@@ -513,17 +580,109 @@ const tableProcessSelected = (selected) => {
           item.modelCd === currentModelCd && item.processCd === currentProcessCd
       );
     } else {
+      // case already exist
       console.log("tool already exists");
       itemsLineTool.value = itemsLineToolAll.filter(
         (item) =>
           item.modelCd === currentModelCd && item.processCd === currentProcessCd
       );
     }
+
+    // check m_tool by processCd length !== itemsLineTool.value.length , and add tool is missing in array
+    // check m_tool length !== itemsLineTool.value.length
+    const mTool = mToolAll.filter(
+      (item) => item.processCd === currentProcessCd
+    );
+
+    console.log("mTool ", mTool);
+    console.log("mTool length ", mTool.length);
+    console.log("itemsLineTool.value length ", itemsLineTool.value.length);
+    if (mTool.length !== itemsLineTool.value.length) {
+      console.log("new line tool");
+
+      const missingTools = mTool.filter(
+        (tool) =>
+          !itemsLineTool.value.some(
+            (item) =>
+              item.processCd === tool.processCd && item.toolCd === tool.toolCd
+          )
+      );
+
+      console.log("missingTools", missingTools);
+      const lineTool = missingTools.map((item) => {
+        return {
+          rowState: "NEW",
+          lineCd: form.value.lineCd,
+          modelCd: currentModelCd,
+          processCd: currentProcessCd,
+          toolCd: item.toolCd,
+          isActive: "N",
+        };
+      });
+
+      for (let i = 0; i < lineTool.length; i++) {
+        itemsLineToolAll.push({
+          ...lineTool[i],
+        });
+      }
+
+      console.log("itemsLineToolAll ", itemsLineToolAll);
+      itemsLineTool.value = itemsLineToolAll.filter(
+        (item) =>
+          item.modelCd === currentModelCd && item.processCd === currentProcessCd
+      );
+    }
+    console.log("itemsLineTool.value ", itemsLineTool.value);
+    console.log("itemsLineToolAll ", itemsLineToolAll);
+
+    // end check m_tool length !== itemsLineTool.value.length
   } else {
     itemsLineTool.value = [];
     console.log("unselected");
     currentProcessCd = "";
   }
+};
+
+// validate on save check duplicate model
+const validateModel = () => {
+  const modelCodes = itemsModel.value.map((item) => item.modelCd);
+  const uniqueModelCodes = new Set(modelCodes);
+
+  if (uniqueModelCodes.size !== modelCodes.length) {
+    Alert.warning("Duplicate model codes found.");
+    return false;
+  }
+  return true;
+};
+
+// validate on save check duplicate process by modelCd and processCd
+const validateProcess = () => {
+  //check processCd not null
+  for (const item of itemsProcessAll) {
+    if (!item.processCd) {
+      Alert.warning("Please select process code.");
+      return false;
+    }
+  }
+
+  const pairs = itemsProcessAll.map(
+    (item) => `${item.modelCd}__${item.processCd}`
+  );
+  const uniquePairs = new Set(pairs);
+
+  if (uniquePairs.size !== pairs.length) {
+    Alert.warning("Duplicate process codes found (same model and process).");
+    return false;
+  }
+
+  // check wt, ht, mt not null
+  for (const item of itemsProcessAll) {
+    if (!item.wt || !item.ht || !item.mt) {
+      Alert.warning("Please fill in all time fields (W.T., H.T., M.T.).");
+      return false;
+    }
+  }
+  return true;
 };
 
 // const selectedProcess = (selected, item) => {
@@ -551,4 +710,13 @@ const tableProcessSelected = (selected) => {
 // };
 </script>
 
-<style scoped></style>
+<style scoped>
+.btn-blue {
+  background-color: #007bff;
+  color: white;
+}
+.btn-gray {
+  background-color: #6c757d;
+  color: white;
+}
+</style>

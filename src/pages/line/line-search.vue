@@ -42,7 +42,6 @@
           :items="items"
           :items-length="totalItems"
           @update:options="loadData"
-          class="n-table"
         >
           <template v-slot:[`item.action`]="{ item }">
             <n-gbtn-edit @click="onEdit(item.Line_CD)"></n-gbtn-edit>
@@ -85,7 +84,7 @@ const headers = [
   { title: "Pk Code", key: "PK_CD", sortable: false },
   { title: "Line Code", key: "Line_CD", sortable: false },
   { title: "Line Name", key: "Line_Name", sortable: false },
-  { title: "Status", key: "Status", sortable: false },
+  { title: "Status", key: "Status_Name", sortable: false },
   { title: "Updated By", key: "UPDATED_BY", sortable: false },
   {
     title: "Updated Date",

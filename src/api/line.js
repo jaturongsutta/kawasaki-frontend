@@ -75,3 +75,10 @@ export const remove = async (id) => {
     throw error;
   }
 };
+
+export const deleteModel = async (lineCd, modelCd) => {
+  const response = await axios.delete(
+    `/line/delete-line-model/${lineCd}/${modelCd}`
+  );
+  return response.data;
+};
