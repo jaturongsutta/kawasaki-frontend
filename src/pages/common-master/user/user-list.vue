@@ -87,7 +87,7 @@ const headers = [
   { title: "First Name", key: "First_Name", sortable: true },
   { title: "Last Name", key: "Last_Name", sortable: true },
   { title: "Position Name", key: "Position_Name", sortable: true },
-  { title: "Status", key: "Status", sortable: true },
+  { title: "Status", key: "Status_Name", sortable: true },
   // { title: "Created By", key: "Created_By", sortable: true },
   // {
   //   title: "Created Date",

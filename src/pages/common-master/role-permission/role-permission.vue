@@ -194,7 +194,7 @@ const headers = [
   { title: "", key: "action", sortable: false },
   { title: "Role Name EN", key: "Role_Name_EN", sortable: true },
   { title: "Role Name TH", key: "Role_Name_TH", sortable: true },
-  { title: "Status", key: "Status", sortable: true },
+  { title: "Status", key: "Status_Name", sortable: true },
   { title: "Created By", key: "Created_By", sortable: true },
   {
     title: "Created Date",
