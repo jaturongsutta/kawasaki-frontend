@@ -2,6 +2,8 @@ import Home from "@/pages/home.vue";
 import Login from "@/pages/login.vue";
 import planSearch from "@/pages/plan/plan-search.vue";
 import planningInformation from "@/pages/plan/planning-information.vue";
+import logErrorList from "@/pages/common-master/application-log/log-error-list.vue";
+import logBatchList from "@/pages/common-master/application-log/log-batch-list.vue";
 const routes = [
   {
     path: "/",
@@ -89,6 +91,16 @@ const routes = [
         name: "application-log",
         component: () =>
           import("@/pages/common-master/application-log/log-list.vue"),
+      },
+      {
+        path: "/common-master/application-log/log-error-list",
+        name: "log-error-list",
+        component: logErrorList,
+      },
+      {
+        path: "/common-master/application-log/log-batchjob-list",
+        name: "log-batchjob-list",
+        component: logBatchList,
       },
       {
         path: "/common-master/application-log/preview-log/:logtype/:filename",
