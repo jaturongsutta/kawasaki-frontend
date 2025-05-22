@@ -4,6 +4,7 @@
       <v-tabs v-model="tab">
         <v-tab value="one">Combined</v-tab>
         <v-tab value="two">Error</v-tab>
+        <v-tab value="batchjob">Batch Job</v-tab>
       </v-tabs>
 
       <v-card-text>
@@ -15,6 +16,10 @@
           <v-tabs-window-item value="two">
             <log-error-list></log-error-list>
           </v-tabs-window-item>
+
+          <v-tabs-window-item value="batchjob">
+            <log-batch-job-list></log-batch-job-list>
+          </v-tabs-window-item>
         </v-tabs-window>
       </v-card-text>
     </v-card>
@@ -24,6 +29,7 @@
 import { ref } from "vue";
 import logDetailList from "@/components/application-log/log-detail-list.vue";
 import logErrorList from "@/components/application-log/log-error-list.vue";
+import logBatchJobList from "@/components/application-log/log-batch-job-list.vue";
 const tab = ref("one");
 </script>
 
