@@ -1,5 +1,13 @@
 <template>
   <div>
+    <div class="float-end">
+      <b>Database time :</b>
+      {{ formatDate(databaseTime) }}
+    </div>
+    <br />
+    <div class="float-end">
+      <b>Schedule time :</b> {{ formatDate(databaseTime) }}
+    </div>
     <v-data-table
       v-model:page="currentPage"
       :headers="headers"
@@ -47,9 +55,14 @@
 import { onMounted, ref } from "vue";
 import * as api from "@/api/common-master/application-log";
 import { useRouter } from "vue-router";
+import { formatDate } from "@/utils/date";
 
 const router = useRouter();
 let isLoading = ref(false);
+
+const databaseTime = ref("");
+const scheduleTime = ref("");
+
 const headers = [
   { title: "", key: "action", sortable: false },
   { title: "Line", key: "folders", sortable: true },
@@ -71,6 +84,11 @@ onMounted(() => {
     items.value.sort((a, b) => b.filename.localeCompare(a.filename));
 
     isLoading.value = false;
+  });
+
+  api.getTime().then((res) => {
+    databaseTime.value = res.databaseTime;
+    scheduleTime.value = res.scheduleTime;
   });
 });
 
