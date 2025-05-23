@@ -285,7 +285,9 @@ import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/line.js";
 import rules from "@/utils/rules";
-import { getDateFormat } from "@/utils/utils";
+// import { getDateFormat } from "@/utils/utils";
+
+import { getCurrrentDate, getDateFormat } from "@/utils/utils.js";
 
 const route = useRoute();
 
@@ -369,8 +371,7 @@ const doLoadData = async () => {
   api.getById(route.params.id).then((data) => {
     isLoading.value = false;
     form.value = data;
-
-    form.value.updatedDate = getDateFormat(data.updatedDate);
+    form.value.updatedDate = getDateFormat(form.value.updatedDate);
 
     // form.value.wt = "50:55:55";
 

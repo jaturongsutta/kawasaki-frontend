@@ -68,6 +68,8 @@ import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/line.js";
 import rules from "@/utils/rules";
 import moment from "moment";
+
+import { getCurrrentDate, getDateFormat } from "@/utils/utils.js";
 const Alert = inject("Alert");
 const router = useRouter();
 let formSearch = ref({
@@ -91,9 +93,7 @@ const headers = [
     key: "UPDATED_DATE",
     sortable: false,
     value: (item) => {
-      return item.UPDATED_DATE
-        ? moment(item.UPDATED_DATE).utc().format("DD/MM/YYYY HH:mm:ss")
-        : "";
+      return item.UPDATED_DATE ? getDateFormat(item.UPDATED_DATE) : "";
     },
   },
 ];
