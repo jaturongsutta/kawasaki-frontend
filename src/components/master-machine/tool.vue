@@ -153,7 +153,7 @@ const headers = [
         },
     },
     { title: "Reset", key: "reset", sortable: false },
-    { title: "Status", key: "Status", sortable: false },
+    { title: "Status", key: "Status_Name", sortable: false },
     { title: "Updated By", key: "Updated_By", sortable: false },
     {
         title: "Updated Date",
