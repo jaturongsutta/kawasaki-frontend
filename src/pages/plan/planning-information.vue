@@ -193,6 +193,7 @@
               :items="userList"
               item-value="col_value"
               :readonly="status > '00'"
+              :rules="[rules.required]"
             ></v-select>
           </v-col>
 
@@ -697,8 +698,8 @@ const onUpdateAS400PlanAmt = () => {
 
 // Validation for Cycle Time !== 0
 const validateCycleTime = (value) => {
-  if (value == 0) {
-    return "Cycle Time must be greater than 0";
+  if (value == 0 || value == null || value == "00:00") {
+    return "Cycle Time must be greater than 00:00";
   }
   return true;
 };
