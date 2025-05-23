@@ -15,6 +15,10 @@ if (localStorage.getItem("jwt")) {
 
 axios.interceptors.request.use(
   function (config) {
+    // Encode # in the URL path (not in query string) for case # 'CYH#6'
+    if (config.url && config.url.includes("#")) {
+      config.url = config.url.replace(/#/g, "%23");
+    }
     if (["post", "put", "delete"].includes(config.method)) {
       // Update Token
       const ignoreRefresh = ["/auth/"];

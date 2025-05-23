@@ -2,7 +2,7 @@ import axios from "@/utils/axios";
 import { DateTime } from "luxon";
 
 export const getPalnListCurrent = async (line) => {
-  line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
+  // line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
   const response = await axios.get(`/plan/plan-list-current/${line}`);
   return response.data;
 };
@@ -23,7 +23,7 @@ export const getWorkingTimeAll = async () => {
 };
 
 export const getLineModel = async (line) => {
-  line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
+  // line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
   const response = await axios.get(`/plan/line-model/${line}`);
   return response.data;
 };
@@ -90,7 +90,7 @@ export const getPlanTotalTime = async (
   b4,
   ot
 ) => {
-  line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
+  // line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
   // Convert boolean values to 'Y' or 'N'
   b1 = b1 === "Y" ? "Y" : "N";
   b2 = b2 === "Y" ? "Y" : "N";
@@ -118,7 +118,7 @@ export const validatePlanTimeOverlap = async (
   planStopTime,
   id
 ) => {
-  lineCd = encodeURIComponent(lineCd); // Encode parameter for case # 'CYH#6'
+  // lineCd = encodeURIComponent(lineCd); // Encode parameter for case # 'CYH#6'
   // startTime: "YYYY-MM-dd HH:mm:ss"
   // stopTime: "YYYY-MM-dd HH:mm:ss"
 

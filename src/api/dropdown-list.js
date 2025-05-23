@@ -130,7 +130,7 @@ export const machine = async () => {
 
 export const lineModel = async (line) => {
   try {
-    line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
+    // line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
     const { data } = await axios.get(`dropdown-list/line-model/${line}`);
 
     return data;
@@ -149,7 +149,7 @@ export const shift = async () => {
 };
 
 export const lineMachine = async (line, model = null) => {
-  line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
+  // line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
   try {
     if (model === null) {
       const { data } = await axios.get(`dropdown-list/line-machine/${line}`);
