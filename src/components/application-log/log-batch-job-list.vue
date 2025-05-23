@@ -6,7 +6,7 @@
     </div>
     <br />
     <div class="float-end">
-      <b>Schedule time :</b> {{ formatDate(databaseTime) }}
+      <b>Schedule time :</b> {{ formatDate(scheduleTime) }}
     </div>
     <v-data-table
       v-model:page="currentPage"
