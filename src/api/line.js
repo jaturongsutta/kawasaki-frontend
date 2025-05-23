@@ -8,9 +8,10 @@ export const search = async (data) => {
   }
 };
 
-export const getById = async (id) => {
+export const getById = async (line) => {
   try {
-    const response = await axios.get(`/line/getById/${id}`);
+    line = encodeURIComponent(line); // Encode parameter for case # 'CYH#6'
+    const response = await axios.get(`/line/getById/${line}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -19,6 +20,7 @@ export const getById = async (id) => {
 
 export const getProcessByModelCd = async (lineCd, modelCd) => {
   try {
+    lineCd = encodeURIComponent(lineCd); // Encode parameter for case # 'CYH#6'
     const response = await axios.get(
       `/line/getProcessByModel/${lineCd}/${modelCd}`
     );
@@ -30,6 +32,7 @@ export const getProcessByModelCd = async (lineCd, modelCd) => {
 
 export const getTool = async (lineCd, modelCd, processCd) => {
   try {
+    lineCd = encodeURIComponent(lineCd); // Encode parameter for case # 'CYH#6'
     const response = await axios.get(
       `/line/getTool/${lineCd}/${modelCd}/${processCd}`
     );
@@ -60,6 +63,7 @@ export const add = async (data) => {
 
 export const update = async (id, data) => {
   try {
+    id = encodeURIComponent(id); // Encode parameter for case # 'CYH#6'
     const response = await axios.put(`/line/update/${id}`, data);
     return response.data;
   } catch (error) {
@@ -69,6 +73,7 @@ export const update = async (id, data) => {
 
 export const remove = async (id) => {
   try {
+    id = encodeURIComponent(id); // Encode parameter for case # 'CYH#6'
     const response = await axios.delete(`/line/delete/${id}`);
     return response.data;
   } catch (error) {
@@ -77,6 +82,7 @@ export const remove = async (id) => {
 };
 
 export const deleteModel = async (lineCd, modelCd) => {
+  lineCd = encodeURIComponent(lineCd); // Encode parameter for case # 'CYH#6'
   const response = await axios.delete(
     `/line/delete-line-model/${lineCd}/${modelCd}`
   );
