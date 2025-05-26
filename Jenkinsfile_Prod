@@ -1,0 +1,81 @@
+pipeline {
+    agent { label "WinNode" }
+    
+    environment {
+        GIT_URL = ""
+        DEPLOY_PATH = "D:\\IIS_Share\\kawasaki\\"
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clean Workspace
+                cleanWs()
+                 
+                // Checkout the repository
+                script {
+                    git branch: 'main', 
+                        url: GIT_URL
+                    
+                    // Retrieve last commit info
+                    def cmd = 'git log -1 --pretty="Last Commit: %%cd , Message : %%s" --date=iso'
+                    
+                    def commitMessage = bat(script: cmd, returnStdout: true).trim()
+                    // Parse the commit message to remove unnecessary parts
+                    def parsedMessage = commitMessage.substring(commitMessage.indexOf('>') + cmd.length()).trim()
+                    
+                    // Save the last commit info to an environment variable
+                    env.LAST_COMMIT = parsedMessage 
+                }
+                 
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                // Install dependencies using npm
+                //bat 'npm i'
+                bat 'npm install --prefer-offline'
+            }
+        } 
+        stage('Build') {
+            steps {
+                // Create or append to the .env file
+                bat '''
+                @echo off
+                (
+                    echo VITE_API_URL=http://192.168.1.15:81/api
+                    echo VITE_BASE_URL=/kawasaki
+                    echo VITE_GIT_COMMIT_LOG=%LAST_COMMIT%
+                ) >> .env
+                '''
+                
+                // Build the project using pnpm
+                bat 'npm run build'
+            }
+         
+        }
+        
+        stage('.Zip and backup') {
+            steps {
+                // Output the deployment path
+                bat ''' echo %DEPLOY_PATH%  ''' 
+                
+                
+                bat '''
+                    if exist "%DEPLOY_PATH%kawasaki-frontend-main-dev*.zip" (
+                        move /Y "%DEPLOY_PATH%kawasaki-frontend-main-dev*.zip" "%DEPLOY_PATH%backup\\"
+                    )
+                '''
+                
+                bat '''
+                    @echo on
+                    powershell -Command "$date = Get-Date -Format yyyyMMdd_HHmmss; $zipName = \\""%DEPLOY_PATH%kawasaki-frontend-main-dev_$date.zip\\"; Compress-Archive -Path dist, package.json, package-lock.json -DestinationPath $zipName"
+                '''
+        
+        
+                
+
+            }
+        }
+    }
+}
