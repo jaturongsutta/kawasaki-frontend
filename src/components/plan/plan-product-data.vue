@@ -57,12 +57,14 @@
                   readonly
                 ></v-text-field>
               </td>
-              <td>Actual Total Time</td>
               <td>
-                <v-text-field
+                <!-- Actual Total Time -->
+              </td>
+              <td>
+                <!-- <v-text-field
                   v-model="props.actualTotalTime"
                   readonly
-                ></v-text-field>
+                ></v-text-field> -->
               </td>
             </tr>
             <tr>
