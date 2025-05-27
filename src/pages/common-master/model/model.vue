@@ -75,15 +75,19 @@
                   <v-text-field v-model="form.partNo" :rules="[rules.required]"></v-text-field>
                 </v-col>
                 <v-col cols="6">
-                  <label>Part Upper </label>
+                  <label>Part 1 </label>
                   <v-text-field v-model="form.partUpper"></v-text-field>
                 </v-col>
 
                 <v-col cols="6">
-                  <label>Part Lower </label>
+                  <label>Part 2 </label>
                   <v-text-field v-model="form.partLower"></v-text-field>
                 </v-col>
-                <v-col cols="12">
+                <v-col cols="6">
+                  <label class="require-field">AS400 Product Code </label>
+                  <v-text-field v-model="form.as400ProductCd" :rules="[rules.required]"></v-text-field>
+                </v-col>
+                <v-col cols="6">
                   <label class="require-field">Status </label>
                   <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
                 </v-col>
