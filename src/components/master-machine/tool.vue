@@ -1,6 +1,10 @@
 <template>
     <div>
         <v-card-text>
+            <v-card-title>
+                <h4>Tool Information</h4>
+            </v-card-title>
+            <v-divider class="mb-2"></v-divider>
             <n-btn-add label="Add Tool" @click="onAdd"></n-btn-add>
             <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
                 :items="items" :items-length="totalItems" @update:options="loadData">
