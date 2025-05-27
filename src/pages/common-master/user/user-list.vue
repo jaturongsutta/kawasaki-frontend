@@ -12,16 +12,16 @@
           </v-col>
           <v-col>
             <label>First Name</label>
-            <v-text-field v-model="formSearch.firstname"></v-text-field>
+            <v-text-field v-model="formSearch.firstName"></v-text-field>
           </v-col>
           <v-col>
             <label>Last Name</label>
-            <v-text-field v-model="formSearch.lastname"></v-text-field>
+            <v-text-field v-model="formSearch.lastName"></v-text-field>
           </v-col>
           <v-col>
             <label>Status</label>
             <v-select
-              v-model="formSearch.isActive"
+              v-model="formSearch.status"
               :items="[{ title: 'All', value: null }, ...statusList]"
             ></v-select>
           </v-col>
@@ -72,12 +72,8 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/common-master/user.js";
 import moment from "moment";
-const Alert = inject("Alert");
-const frmInfo = ref(null);
 const router = useRouter();
 let formSearch = ref({});
-
-const dialog = ref(false);
 
 let statusList = ref([]);
 
