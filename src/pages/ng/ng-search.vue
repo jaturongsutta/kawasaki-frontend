@@ -26,7 +26,7 @@
           </v-col>
           <v-col cols="2">
             <label>Reason</label>
-            <v-select v-model="formSearch.reasonCd" :items="[{ title: 'All', value: null }, ...reasonList]"></v-select>
+            <v-text-field v-model="formSearch.reasonCd"></v-text-field>
           </v-col>
 
           <v-col cols="2">
@@ -150,6 +150,7 @@ const headersDetail = [
   { title: "Reason", key: "reason_name", sortable: false },
   { title: "Comment", key: "comment", sortable: false },
   { title: "Status", key: "status_name", sortable: false },
+  { title: "Type", key: "NG_Type", sortable: false },
   { title: "Update By", key: "Updated_By", sortable: false },
   {
     title: "Update Date", key: "Updated_Date", sortable: false, value: (item) => {

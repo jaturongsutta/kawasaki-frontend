@@ -58,11 +58,11 @@
               <v-text-field v-model="formInfo.part_no" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label>Part Upper</label>
+              <label>Part 1</label>
               <v-text-field v-model="formInfo.Part_Upper" readonly></v-text-field>
             </v-col>
             <v-col md="3">
-              <label>Part Lower</label>
+              <label>Part 2</label>
               <v-text-field v-model="formInfo.Part_Lower" readonly></v-text-field>
             </v-col>
 
@@ -87,12 +87,12 @@
                 :readonly="formInfo.Status === '90'" v-maska="'###'" />
             </v-col>
 
-            <v-col cols="3">
+            <v-col cols="6">
               <label class="require-field">Reason</label>
               <v-select v-model="formInfo.Reason_CD" :items="reasonList" item-value="predefine_cd" item-title="Value_EN"
                 :rules="[rules.required]" :readonly="formInfo.Status === '90'"></v-select>
             </v-col>
-            <v-col cols="9">
+            <v-col cols="6">
               <label>Comment</label>
               <v-text-field v-model="formInfo.Comment" :readonly="formInfo.Status === '90'"></v-text-field>
             </v-col>
