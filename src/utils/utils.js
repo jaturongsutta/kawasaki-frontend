@@ -90,3 +90,12 @@ export const secondsToMMSS = (totalSeconds) => {
 
   return `${pad(minutes)}:${pad(seconds)}`;
 };
+
+export const minutesToHHMMSS = (totalMinutes) => {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  const pad = (n) => String(n).padStart(2, "0");
+
+  return `${pad(hours)}:${pad(minutes)}:00`;
+};

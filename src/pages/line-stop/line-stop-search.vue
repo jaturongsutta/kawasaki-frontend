@@ -100,12 +100,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject, onUnmounted } from "vue";
+import { onMounted, ref, inject } from "vue";
 import rules from "@/utils/rules";
 import New from "@/components/line-stop/new.vue";
 import * as api from "@/api/line-stop.js";
 import * as ddlApi from "@/api/dropdown-list.js";
-import { getDateFormat, getPaging, secondsToHHMMSS } from "@/utils/utils.js";
+import { getDateFormat, getPaging, minutesToHHMMSS } from "@/utils/utils.js";
 import { useRouter } from "vue-router";
 import { usePageState } from '@/stores/search/line-stop'
 const pageState = usePageState()
@@ -263,7 +263,7 @@ const loadData = async (paginate) => {
     totalItems.value = response.total_record;
 
     /* Total line stop loss calculate */
-    totalLineStopLoss.value = secondsToHHMMSS(items.value.reduce((sum, row) => sum + row.Loss_Time, 0));
+    totalLineStopLoss.value = minutesToHHMMSS(items.value.reduce((sum, row) => sum + row.Loss_Time, 0));
 
 
     /* Percent Loss calculate */
