@@ -30,7 +30,12 @@
                         <v-container>
                             <v-row>
                                 <v-col cols="6">
-                                    <label class="require-field">Tool Code </label>
+                                    <label class="require-field">H Code</label>
+                                    <v-text-field v-model="form.hCode" :rules="[rules.required]"
+                                        :readonly="mode === 'Edit'"></v-text-field>
+                                </v-col>
+                                <v-col cols="6">
+                                    <label class="require-field">Tool No. </label>
                                     <v-text-field v-model="form.toolCd" :rules="[rules.required]"
                                         :readonly="mode === 'Edit'"></v-text-field>
                                 </v-col>
@@ -69,7 +74,7 @@
                                     <label>Map Code </label>
                                     <v-text-field v-model="form.mapCd"></v-text-field>
                                 </v-col>
-                                <v-col :cols="mode === 'Edit' ? '12' : '6'">
+                                <v-col :cols="mode === 'Edit' ? '6' : '12'">
                                     <label class="require-field">Status </label>
                                     <v-select v-model="form.isActive" :rules="[rules.required]"
                                         :items="[...statusList]"></v-select>
@@ -120,7 +125,8 @@ const statusList = ref([]);
 
 const headers = [
     { title: "", key: "action", sortable: false },
-    { title: "Tool Code", key: "Tool_CD", sortable: false },
+    { title: "H Code", key: "H_Code", sortable: false },
+    { title: "Tool No.", key: "Tool_CD", sortable: false },
     { title: "Tool Name", key: "Tool_Name", sortable: false },
     {
         title: "Tool Life", key: "Tool_Life", sortable: false,
