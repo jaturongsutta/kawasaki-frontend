@@ -155,12 +155,12 @@
           </v-col>
 
           <v-col md="2">
-            <label>Part Upper</label>
+            <label>Part 1</label>
             <v-text-field v-model="form.partUpper" readonly></v-text-field>
           </v-col>
 
           <v-col md="2">
-            <label>Part Lower</label>
+            <label>Part 2</label>
             <v-text-field v-model="form.partLower" readonly></v-text-field>
           </v-col>
 

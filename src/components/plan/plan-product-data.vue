@@ -91,7 +91,7 @@
             <tr>
               <td></td>
               <td></td>
-              <td>OK</td>
+              <td>Confirmed OK</td>
               <td>
                 <v-text-field v-model="props.okAmt" readonly></v-text-field>
               </td>
@@ -99,7 +99,7 @@
             <tr>
               <td></td>
               <td></td>
-              <td>NG</td>
+              <td>Confirmed NG</td>
               <td>
                 <v-text-field v-model="props.ngAmt" readonly></v-text-field>
               </td>
