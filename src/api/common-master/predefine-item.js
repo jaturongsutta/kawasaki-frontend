@@ -25,3 +25,14 @@ export const getById = async (predefineGroup, predefineCd, predefineItemCd) => {
     `/predefine-item/${predefineGroup}/${predefineCd}/${predefineItemCd}`
   );
 };
+
+export const getDropDownPredefindGroup = async () => {
+  try {
+    const { data } = await axios.get(
+      `predefine-item/get-dropdown-predefine-group`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

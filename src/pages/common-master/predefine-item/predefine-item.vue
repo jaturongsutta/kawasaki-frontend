@@ -8,7 +8,11 @@
         <v-row>
           <v-col>
             <label>Predefine Group</label>
-            <v-text-field v-model="formSearch.predefineGroup"></v-text-field>
+            <v-select
+              v-model="formSearch.predefineGroup"
+              :items="[{ title: 'All', value: null }, ...predefineGroupList]"
+            ></v-select>
+            <!-- <v-text-field v-model="formSearch.predefineGroup"></v-text-field> -->
           </v-col>
           <v-col>
             <label>Predefine Code</label>
@@ -216,10 +220,14 @@ onMounted(() => {
     formSearch.value.isActive = "Y";
   });
 
-  ddlApi.predefineGroup().then((data) => {
-    console.log("Predefine Group List:", data);
+  api.getDropDownPredefindGroup().then((data) => {
     predefineGroupList.value = data;
   });
+
+  // ddlApi.predefineGroup().then((data) => {
+  //   console.log("Predefine Group List:", data);
+  //   predefineGroupList.value = data;
+  // });
 });
 
 const onSearch = async () => {
@@ -280,12 +288,12 @@ const onAdd = () => {
 const onEdit = (predefineGroup, predefineCd, predefineItemCd) => {
   mode.value = "Edit";
   dialog.value = true;
+  ddlApi.getPredefine(predefineGroup).then((data) => {
+    predefineCdList.value = data;
+  });
   api.getById(predefineGroup, predefineCd, predefineItemCd).then((res) => {
     form.value = res.data;
     form.value.currentPredefineCd = predefineCd;
-    ddlApi.getPredefine(predefineGroup).then((data) => {
-      predefineCdList.value = data;
-    });
   });
 };
 
