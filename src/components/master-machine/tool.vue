@@ -229,7 +229,7 @@ const onEdit = async (item) => {
     dialog.value = true;
     isDialogLoading.value = true;
     try {
-        const res = await api.getById(item.Process_CD, item.Tool_CD);
+        const res = await api.getById(item.Process_CD, item.H_Code);
         isDialogLoading.value = false;
         if (res.status === 2) {
             Alert.error("Error ", res.message);
