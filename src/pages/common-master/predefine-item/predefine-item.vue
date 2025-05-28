@@ -78,7 +78,7 @@
       <v-form ref="frmInfo">
         <v-card>
           <v-card-title>
-            <span class="headline">{{ mode }} Predefine</span>
+            <span class="headline">{{ mode }} Predefine Item</span>
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
