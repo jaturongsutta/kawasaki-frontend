@@ -63,6 +63,15 @@ export const role = async () => {
   }
 };
 
+export const predefineGroup = async () => {
+  try {
+    const { data } = await axios.get(`dropdown-list/predefine-group-all`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const line = async () => {
   try {
     const { data } = await axios.get(`dropdown-list/line`);
