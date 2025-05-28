@@ -89,8 +89,9 @@
 
             <v-col cols="6">
               <label class="require-field">Reason</label>
-              <v-select v-model="formInfo.Reason_CD" :items="reasonList" item-value="predefine_cd" item-title="Value_EN"
-                :rules="[rules.required]" :readonly="formInfo.Status === '90'"></v-select>
+              <v-autocomplete :loading="loadingReason" v-model:search="searchReason" clearable
+                v-model="formInfo.Reason_CD" :items="reasonList" @update:model-value="onReasonSelected"
+                :rules="[rules.required]" :readonly="formInfo.Status === '90'"></v-autocomplete>
             </v-col>
             <v-col cols="6">
               <label>Comment</label>
@@ -130,13 +131,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject } from "vue";
+import { onMounted, ref, inject, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/ng.js";
 import rules from "@/utils/rules";
-import { getCurrrentDate, getDateFormat } from "@/utils/utils";
+import { getDateFormat } from "@/utils/utils";
 import { DateTime } from 'luxon'
+import { debounce } from "vuetify/lib/util/helpers.mjs";
 
 const route = useRoute();
 const router = useRouter();
@@ -184,10 +186,55 @@ let isLoading = ref(false);
 let isDialogLoading = ref(false);
 let pageMode = ref("add");
 
+/* Reason function */
+const searchReason = ref('');
+const loadingReason = ref(false);
+const isSelectingReason = ref(true);
+
+watch(searchReason, async (val) => {
+  fetchReasonItems(val);
+})
+
+const fetchReasonItems = debounce(async (query) => {
+  if (isSelectingReason.value) return;
+  if (!query) {
+    reasonList.value = []
+    return
+  }
+  loadingReason.value = true
+  try {
+    ddlApi.getPredefineItem("NG_Reason", query).then((data) => {
+      reasonList.value = data || [];
+      loadingReason.value = false
+    });
+  } catch (e) {
+    loadingReason.value = false
+    console.error(e)
+    reasonList.value = []
+  }
+}, 500)
+
+const onReasonSelected = (item) => {
+  if (item === null) {
+    loadReasonList();
+  }
+  isSelectingReason.value = true;
+  setTimeout(() => {
+    isSelectingReason.value = false;
+  }, 1000);
+}
+
+const loadReasonList = () => {
+  setTimeout(() => {
+    ddlApi.getPredefineItem("NG_Reason").then((data) => {
+      reasonList.value = data;
+    });
+  }, 100);
+}
+/* End Reason function */
+
 onMounted(() => {
-  ddlApi.getPredefine("NG_Reason").then((data) => {
-    reasonList.value = data;
-  });
+  loadReasonList();
 
   if (route.params.id) {
     console.log("edit ")
@@ -200,16 +247,14 @@ onMounted(() => {
     if (v) {
       const d = JSON.parse(v);
       formInfo.value = d;
+      formInfo.value.NG_Date = getDateFormat(formInfo.value.Plan_Date, "yyyy-MM-dd");
       formInfo.value.Plan_Date = getDateFormat(formInfo.value.Plan_Date, "dd/MM/yyyy");
       formInfo.value.Plan_Start_Time = getDateFormat(formInfo.value.Plan_Start_Time, "HH:mm");
       getProcessList();
     }
-
-    formInfo.value.NG_Date = getCurrrentDate();
     formInfo.value.NG_Time = DateTime.now().setZone('Asia/Bangkok').toFormat("HH:mm")
     formInfo.value.Quantity = 1;
   }
-
 });
 
 const getProcessList = () => {

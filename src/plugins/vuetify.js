@@ -47,10 +47,11 @@ export default createVuetify({
       variant: "outlined",
       color: "primary",
     },
-    // VAutocomplete: {
-    //   density: "compact",
-    //   variant: "outlined",
-    // },
+    VAutocomplete: {
+      density: "compact",
+      variant: "outlined",
+      color: "primary",
+    },
     // VCombobox: {
     //   density: "compact",
     //   variant: "outlined",

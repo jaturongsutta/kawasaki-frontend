@@ -8,6 +8,17 @@ export const getPredefine = async (args) => {
   }
 };
 
+export const getPredefineItem = async (group, search = null) => {
+  try {
+    const response = await axios.get(`/dropdown-list/predefine-group-item/${group}`, {
+      params: { search: search },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getMonth = async () => {
   const months = [
     { value: "1", title: "January" },
