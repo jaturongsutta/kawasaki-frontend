@@ -36,8 +36,9 @@
             </v-col>
             <v-col cols="12">
               <label class="require-field">Reason</label>
-              <v-select v-model="formInfo.Reason_CD" :items="reasonList" :rules="[rules.required]"
-                :readonly="formInfo.Status === '90'"></v-select>
+              <v-autocomplete :loading="loadingReason" v-model:search="searchReason" clearable
+                v-model="formInfo.Reason_CD" :items="reasonList" @update:model-value="onReasonSelected"
+                :rules="[rules.required]" :readonly="formInfo.Status === '90'"></v-autocomplete>
             </v-col>
             <v-col cols="12">
               <label>Comment</label>
@@ -77,13 +78,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject } from "vue";
+import { onMounted, ref, inject, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/line-stop.js";
 import rules from "@/utils/rules";
 import { getCurrrentDate, getDateFormat } from "@/utils/utils";
 import { DateTime } from "luxon";
+import { debounce } from "vuetify/lib/util/helpers.mjs";
 
 const route = useRoute();
 const router = useRouter();
@@ -134,11 +136,58 @@ const isDialogLoading = ref(false);
 const pageMode = ref("add");
 const planId = ref(null);
 
-onMounted(() => {
-  ddlApi.getPredefine("Stop_Reason").then((data) => {
-    reasonList.value = data;
-  });
+/* Reason function */
+const searchReason = ref('');
+const loadingReason = ref(false);
+const isSelectingReason = ref(true);
 
+watch(searchReason, async (val) => {
+  fetchReasonItems(val);
+})
+
+const fetchReasonItems = debounce(async (query) => {
+  if (isSelectingReason.value) return;
+
+  if (!query) {
+    reasonList.value = [];
+    loadReasonList();
+    return
+  }
+  loadingReason.value = true
+  try {
+    ddlApi.getPredefineItem("Stop_Reason", query).then((data) => {
+      reasonList.value = data || [];
+      loadingReason.value = false
+    });
+  } catch (e) {
+    loadingReason.value = false
+    console.error(e)
+    reasonList.value = []
+  }
+}, 500)
+
+const onReasonSelected = (item) => {
+  if (item === null) {
+    loadReasonList();
+  }
+  isSelectingReason.value = true;
+  setTimeout(() => {
+    isSelectingReason.value = false;
+  }, 1000);
+}
+
+const loadReasonList = () => {
+  setTimeout(() => {
+    ddlApi.getPredefineItem("Stop_Reason").then((data) => {
+      reasonList.value = data;
+    });
+  }, 100);
+}
+/* End Reason function */
+
+onMounted(() => {
+  loadReasonList();
+  
   if (route.params.id) {
     console.log("edit ")
     pageMode.value = "edit";

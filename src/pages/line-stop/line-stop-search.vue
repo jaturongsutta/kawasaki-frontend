@@ -30,7 +30,7 @@
           </v-col>
           <v-col cols="3">
             <label>Reason</label>
-            <v-select v-model="formSearch.reasonCd" :items="[{ title: 'All', value: null }, ...reasonList]"></v-select>
+            <v-text-field v-model="formSearch.reasonCd"></v-text-field>
           </v-col>
           <v-col cols="3">
             <label>Status</label>
@@ -128,7 +128,6 @@ const pageSize = ref(20);
 const totalItems = ref(0);
 const lineList = ref([]);
 const processList = ref([]);
-const reasonList = ref([]);
 const statusList = ref([]);
 const typeList = ref([]);
 let items = ref([]);
@@ -171,10 +170,6 @@ const headersDetail = [
 onMounted(async () => {
   ddlApi.getPredefine("Stop_Status").then((data) => {
     statusList.value = data;
-  });
-
-  ddlApi.getPredefine("Stop_Reason").then((data) => {
-    reasonList.value = data;
   });
 
   ddlApi.getPredefine("Stop_Type").then((data) => {

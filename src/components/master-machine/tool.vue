@@ -12,7 +12,7 @@
                     <n-gbtn-edit @click="onEdit(item)"></n-gbtn-edit>
                 </template>
                 <template v-slot:[`item.reset`]="{ item }">
-                    <n-btn-reset @click="onSaveHistory(item)" />
+                    <n-btn-reset @click="onReset(item)" />
                 </template>
 
                 <template v-slot:bottom>
@@ -40,8 +40,7 @@
                                 </v-col>
                                 <v-col cols="6">
                                     <label class="require-field">Tool No. </label>
-                                    <v-text-field v-model="form.toolCd" :rules="[rules.required]"
-                                        :readonly="mode === 'Edit'"></v-text-field>
+                                    <v-text-field v-model="form.toolCd" :rules="[rules.required]"></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
                                     <label class="require-field">Tool Name </label>
@@ -246,7 +245,7 @@ const onEdit = async (item) => {
     }
 };
 
-const onSaveHistory = async (item) => {
+const onReset = async (item) => {
     try {
         isLoading.value = true;
         const res = await api.reset(item);
@@ -284,7 +283,7 @@ const saveClick = async () => {
             res = await api.add(params);
         } else {
             console.log("Edit");
-            res = await api.update(params.toolCd, params);
+            res = await api.update(params.hCode, params);
         }
         isDialogLoading.value = false;
         if (res.status === 0) {

@@ -123,7 +123,6 @@ const pageSize = ref(20);
 const totalItems = ref(0);
 const lineList = ref([]);
 const lineModelList = ref([]);
-const reasonList = ref([]);
 const statusList = ref([]);
 let items = ref([]);
 let isLoading = ref(false);
@@ -162,10 +161,6 @@ const headersDetail = [
 onMounted(async () => {
   ddlApi.getPredefine("NG_Status").then((data) => {
     statusList.value = data;
-  });
-
-  ddlApi.getPredefine("NG_Reason").then((data) => {
-    reasonList.value = data;
   });
 
   ddlApi.lineAll().then((data) => {

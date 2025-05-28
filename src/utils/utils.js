@@ -99,11 +99,3 @@ export const minutesToHHMMSS = (totalMinutes) => {
 
   return `${pad(hours)}:${pad(minutes)}:00`;
 };
-
-export function debounce(fn, delay = 500) {
-  let timer = null
-  return (...args) => {
-    clearTimeout(timer)
-    timer = setTimeout(() => fn(...args), delay)
-  }
-}

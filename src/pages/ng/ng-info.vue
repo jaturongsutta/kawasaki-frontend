@@ -198,7 +198,8 @@ watch(searchReason, async (val) => {
 const fetchReasonItems = debounce(async (query) => {
   if (isSelectingReason.value) return;
   if (!query) {
-    reasonList.value = []
+    reasonList.value = [];
+    loadReasonList();
     return
   }
   loadingReason.value = true
