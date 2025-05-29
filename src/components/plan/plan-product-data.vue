@@ -301,7 +301,7 @@ onMounted(() => {
     statusList.value = data;
   });
 
-  ddlApi.getPredefine("NG_Reason").then((data) => {
+  ddlApi.getPredefineItem("NG_Reason").then((data) => {
     ngReasonList.value = data;
   });
 
