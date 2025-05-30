@@ -16,7 +16,7 @@
           </v-col>
           <v-col>
             <label>Predefine Item</label>
-            <v-text-field v-model="formSearch.predefineCd"></v-text-field>
+            <v-text-field v-model="formSearch.predefineItemCd"></v-text-field>
           </v-col>
           <v-col>
             <label>Value(EN)</label>
