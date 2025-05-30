@@ -5,51 +5,68 @@
     </v-card-title>
 
     <v-card-text>
-      <v-row>
-        <v-col md="4">
-          <label>Username</label>
-          <v-text-field
-            v-model="form.username"
-            :readonly="mode === 'edit'"
-          ></v-text-field>
-        </v-col>
-        <v-col md="4">
-          <label>Password</label>
-          <v-text-field type="password" v-model="form.password"></v-text-field>
-        </v-col>
-        <v-col md="4">
-          <label>Role</label>
-          <v-select v-model="form.roles" :items="roleList"></v-select>
-        </v-col>
-        <v-col md="4">
-          <label>First Name</label>
-          <v-text-field v-model="form.firstName"></v-text-field>
-        </v-col>
-        <v-col md="4">
-          <label>Last Name</label>
-          <v-text-field v-model="form.lastName"></v-text-field>
-        </v-col>
+      <v-form ref="frmInfo">
+        <v-row>
+          <v-col md="4">
+            <label class="require-field">Username</label>
+            <v-text-field
+              v-model="form.username"
+              :readonly="mode === 'edit'"
+              :rules="[rules.required]"
+            ></v-text-field>
+          </v-col>
+          <v-col md="4">
+            <label>Password</label>
+            <v-text-field
+              type="password"
+              v-model="form.password"
+            ></v-text-field>
+          </v-col>
+          <v-col md="4">
+            <label class="require-field">Role</label>
+            <v-select
+              v-model="form.roles"
+              :items="roleList"
+              :rules="[rules.required]"
+            ></v-select>
+          </v-col>
+          <v-col md="4">
+            <label class="require-field">First Name</label>
+            <v-text-field
+              v-model="form.firstName"
+              :rules="[rules.required]"
+            ></v-text-field>
+          </v-col>
+          <v-col md="4">
+            <label>Last Name</label>
+            <v-text-field v-model="form.lastName"></v-text-field>
+          </v-col>
 
-        <v-col md="2">
-          <label>Position Name</label>
-          <v-text-field v-model="form.positionName"></v-text-field>
-        </v-col>
+          <v-col md="2">
+            <label>Position Name</label>
+            <v-text-field v-model="form.positionName"></v-text-field>
+          </v-col>
 
-        <v-col md="2">
-          <label>Status</label>
-          <v-select v-model="form.isActive" :items="statusList"></v-select>
-        </v-col>
-      </v-row>
+          <v-col md="2">
+            <label class="require-field">Status</label>
+            <v-select
+              v-model="form.isActive"
+              :items="statusList"
+              :rules="[rules.required]"
+            ></v-select>
+          </v-col>
+        </v-row>
 
-      <v-row>
-        <v-col>
-          <div class="d-flex justify-center">
-            <n-btn-save @click="onSave" />
-            <n-btn-cancel @click="router.go(-1)" class="ml-3" />
-          </div>
-        </v-col>
-      </v-row>
-      <n-loading :loading="isLoading" />
+        <v-row>
+          <v-col>
+            <div class="d-flex justify-center">
+              <n-btn-save @click="onSave" />
+              <n-btn-cancel @click="router.go(-1)" class="ml-3" />
+            </div>
+          </v-col>
+        </v-row>
+        <n-loading :loading="isLoading" />
+      </v-form>
     </v-card-text>
   </v-card>
 </template>
@@ -59,8 +76,12 @@ import { onMounted, ref, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as api from "@/api/common-master/user.js";
 import * as ddlApi from "@/api/dropdown-list.js";
+import rules from "@/utils/rules";
+
 const Alert = inject("Alert");
 const route = useRoute();
+
+const frmInfo = ref(null);
 
 const router = useRouter();
 const form = ref({
@@ -111,9 +132,12 @@ onMounted(() => {
 });
 
 const onSave = async () => {
-  isLoading.value = true;
   let res;
   console.log(form.value);
+
+  const { valid } = await frmInfo.value.validate();
+  if (!valid) return;
+  isLoading.value = true;
 
   try {
     if (route.params.id) {
