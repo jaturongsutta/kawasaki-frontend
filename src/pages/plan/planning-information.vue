@@ -600,7 +600,7 @@ const calculatePlanFgAmt = () => {
       return;
     }
     // Plan_Total_Time เป็นนาที → *60 เพื่อเป็นวินาที
-    form.value.planFgAmt = Math.round(
+    form.value.planFgAmt = Math.trunc(
       (form.value.planTotalTime * 60) / cycleTimeSeconds
     );
   } else {
