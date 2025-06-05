@@ -80,7 +80,7 @@ export const getPlanAmtAS400 = async (pkCd, partNo, planDate) => {
 
 // api post data
 export const getPlanTotalTime = async (
-  line,
+  lineCd,
   planDate,
   planStartTime,
   planStopTime,
@@ -98,7 +98,7 @@ export const getPlanTotalTime = async (
   b4 = b4 === "Y" ? "Y" : "N";
   ot = ot === "Y" ? "Y" : "N";
   const response = await axios.post(`/plan/get-plan-total-time`, {
-    line,
+    lineCd,
     planDate,
     planStartTime,
     planStopTime,
