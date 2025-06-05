@@ -21,8 +21,7 @@
             </v-col>
             <v-col :md="pageMode === 'edit' ? '3' : '6'">
                 <label>Status</label>
-                <v-select v-model="machineItem.isActive" :items="statusList"
-                    :rules="[rules.required]"></v-select>
+                <v-select v-model="machineItem.isActive" :items="statusList" :rules="[rules.required]"></v-select>
             </v-col>
             <v-col md="3" v-if="pageMode === 'edit'">
                 <label>Updated By</label>
@@ -46,7 +45,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject } from "vue";
+import { onMounted, ref, inject, defineEmits } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/machine.js";
@@ -59,6 +58,8 @@ const Alert = inject("Alert");
 const frmInfo = ref(null);
 const dialog = ref(false);
 const statusList = ref([]);
+
+const emit = defineEmits(["onLoadDataSuccess"]);
 
 let machineItem = ref({
     machineNo: '',
@@ -104,7 +105,7 @@ const loadData = async () => {
         }
         machineItem.value = response.data;
         machineItem.value.updatedDate = getDateFormat(machineItem.value.updatedDate);
-
+        emit("onLoadDataSuccess", machineItem.value);
     } catch (error) {
         console.error("Error fetching API:", error);
         machineItem.value = {}

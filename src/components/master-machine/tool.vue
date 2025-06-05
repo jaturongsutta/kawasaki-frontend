@@ -110,13 +110,17 @@
 </template>
 
 <script setup>
-import { onMounted, ref, inject } from "vue";
+import { onMounted, ref, inject, defineProps } from "vue";
 import { useRoute } from "vue-router";
 import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/tool.js";
 import rules from "@/utils/rules";
 import { getDateFormat, commaFormattedNumber, markNumberFormatOptions, convertCommaToPureNumber } from "@/utils/utils";
+
+const props = defineProps({
+    machineItem: Object,
+});
 
 const route = useRoute();
 const Alert = inject("Alert");
@@ -277,6 +281,7 @@ const saveClick = async () => {
         params.alarmAmt = convertCommaToPureNumber(params.alarmAmt);
         params.alertAmt = convertCommaToPureNumber(params.alertAmt);
         params.actualAmt = convertCommaToPureNumber(params.actualAmt);
+        params.machineNo = props.machineItem?.machineNo;
 
         if (mode.value === "Add") {
             console.log("Add");
