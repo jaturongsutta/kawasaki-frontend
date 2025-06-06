@@ -189,6 +189,16 @@
                     item-value="value"
                     hide-details="auto"
                     :rules="[rules.required]"
+                    @update:model-value="
+                      (val) => {
+                        const machine = machineList.find(
+                          (m) => m.value === val
+                        );
+                        if (machine) {
+                          item.machineNo = machine.title;
+                        }
+                      }
+                    "
                   ></v-select>
                   <div v-else v-text="item.processCd"></div>
                 </template>
@@ -243,7 +253,7 @@
                 :items-per-page="-1"
                 style="width: 300px"
                 hide-default-footer
-                :sort-by="[{ key: 'toolCd', order: 'asc' }]"
+                :sort-by="[{ key: 'hCode', order: 'asc' }]"
               >
                 <template v-slot:[`item.isActive`]="{ item }">
                   <v-checkbox
@@ -330,12 +340,13 @@ const headersProcess = ref([
     sortable: false,
   },
   { title: "Process", key: "processCd", sortable: false },
+  { title: "Machine No", key: "machineNo", sortable: false },
   { title: "W.T.(mins)", key: "wt", sortable: false },
   { title: "H.T.(mins)", key: "ht", sortable: false },
   { title: "M.T.(mins)", key: "mt", sortable: false },
 ]);
 const headersLineTool = ref([
-  { title: "Tool No", key: "toolCd", sortable: false },
+  { title: "H Code", key: "hCode", sortable: false },
   { title: "Active", key: "isActive", sortable: false },
 ]);
 
@@ -391,6 +402,7 @@ const doLoadData = async () => {
         rowState: "NONE",
         lineCd: item.lineCd,
         modelCd: item.modelCd,
+        machineNo: item.machineNo,
         processCd: item.processCd,
         wt: item.wt,
         ht: item.ht,
@@ -404,8 +416,9 @@ const doLoadData = async () => {
         rowState: "NONE",
         lineCd: item.lineCd,
         modelCd: item.modelCd,
+        machineNo: item.machineNo,
         processCd: item.processCd,
-        toolCd: item.toolCd,
+        hCode: item.hCode,
         isActive: item.isActive,
       };
     });
@@ -433,6 +446,7 @@ const onAddProcess = () => {
     seq: "",
     lineCd: form.value.lineCd,
     modelCd: currentModelCd,
+    machineNo: "",
     process: "",
     wt: "",
     ht: "",
@@ -466,6 +480,7 @@ const onSave = async () => {
       return;
     }
     console.log("payload ", payload);
+    isLoading.value = true;
     if (route.params.id) {
       // Edit Mode
       res = await api.update(route.params.id, payload);
@@ -473,6 +488,8 @@ const onSave = async () => {
       // Add Mode
       res = await api.add(payload);
     }
+
+    isLoading.value = false;
 
     if (res.status === 0) {
       Alert.success();
@@ -543,6 +560,7 @@ const tableProcessSelected = (selected) => {
 
     currentModelCd = selected[0].modelCd;
     currentProcessCd = selected[0].processCd;
+    const currentMachineNo = selected[0].machineNo;
 
     itemsLineTool.value = itemsLineToolAll.filter(
       (item) =>
@@ -555,7 +573,9 @@ const tableProcessSelected = (selected) => {
     if (itemsLineTool.value.length === 0) {
       console.log("new line tool");
       const mTool = mToolAll.filter(
-        (item) => item.processCd === currentProcessCd
+        (item) =>
+          item.processCd === currentProcessCd &&
+          item.machineNo === currentMachineNo
       );
 
       const lineTool = mTool.map((item) => {
@@ -563,8 +583,9 @@ const tableProcessSelected = (selected) => {
           rowState: "NEW",
           lineCd: form.value.lineCd,
           modelCd: currentModelCd,
+          machineNo: currentMachineNo,
           processCd: currentProcessCd,
-          toolCd: item.toolCd,
+          hCode: item.hCode,
           isActive: "N",
         };
       });
@@ -578,21 +599,27 @@ const tableProcessSelected = (selected) => {
       console.log("itemsLineToolAll ", itemsLineToolAll);
       itemsLineTool.value = itemsLineToolAll.filter(
         (item) =>
-          item.modelCd === currentModelCd && item.processCd === currentProcessCd
+          item.modelCd === currentModelCd &&
+          item.processCd === currentProcessCd &&
+          item.machineNo === currentMachineNo
       );
     } else {
       // case already exist
       console.log("tool already exists");
       itemsLineTool.value = itemsLineToolAll.filter(
         (item) =>
-          item.modelCd === currentModelCd && item.processCd === currentProcessCd
+          item.modelCd === currentModelCd &&
+          item.processCd === currentProcessCd &&
+          item.machineNo === currentMachineNo
       );
     }
 
     // check m_tool by processCd length !== itemsLineTool.value.length , and add tool is missing in array
     // check m_tool length !== itemsLineTool.value.length
     const mTool = mToolAll.filter(
-      (item) => item.processCd === currentProcessCd
+      (item) =>
+        item.processCd === currentProcessCd &&
+        item.machineNo === currentMachineNo
     );
 
     console.log("mTool ", mTool);
@@ -605,7 +632,9 @@ const tableProcessSelected = (selected) => {
         (tool) =>
           !itemsLineTool.value.some(
             (item) =>
-              item.processCd === tool.processCd && item.toolCd === tool.toolCd
+              item.processCd === tool.processCd &&
+              item.hCode === tool.hCode &&
+              item.machineNo === tool.machineNo
           )
       );
 
@@ -615,8 +644,9 @@ const tableProcessSelected = (selected) => {
           rowState: "NEW",
           lineCd: form.value.lineCd,
           modelCd: currentModelCd,
+          machineNo: currentMachineNo,
           processCd: currentProcessCd,
-          toolCd: item.toolCd,
+          hCode: item.hCode,
           isActive: "N",
         };
       });
@@ -630,7 +660,9 @@ const tableProcessSelected = (selected) => {
       console.log("itemsLineToolAll ", itemsLineToolAll);
       itemsLineTool.value = itemsLineToolAll.filter(
         (item) =>
-          item.modelCd === currentModelCd && item.processCd === currentProcessCd
+          item.modelCd === currentModelCd &&
+          item.processCd === currentProcessCd &&
+          item.machineNo === currentMachineNo
       );
     }
     console.log("itemsLineTool.value ", itemsLineTool.value);
