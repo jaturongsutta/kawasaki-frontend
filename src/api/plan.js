@@ -166,20 +166,27 @@ export function getPlanDateTimeWithOvernight(
     planStopTime = `${planStopTime}:00`;
   }
 
+  // Get current date and set time to 23:59:59
+  const endOfDay = DateTime.now()
+    .set({ hour: 23, minute: 59, second: 59, millisecond: 0 })
+    .toFormat("yyyy-MM-dd HH:mm:ss");
+
+  let start_dt = `${baseDate} ${planStartTime}`;
+  let stop_dt = `${baseDate} ${planStopTime}`;
+
+  // Example output: "2025-06-13 23:59:59"
+  // console.log("endOfDay", endOfDay);
+  // console.log("start_dt", start_dt);
+  // console.log("stop_dt", stop_dt);
+
   let stopDate = baseDate;
-  if (planStartTime < "08:00:00") {
+  if (start_dt > endOfDay) {
     startDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
-    if (planStopTime < "08:00:00") {
-      stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
-    }
-  } else {
-    if (planStopTime < "08:00:00" || planStopTime < planStartTime) {
-      stopDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
-    }
+    stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
   }
 
-  const start_dt = `${startDate} ${planStartTime}`;
-  const stop_dt = `${stopDate} ${planStopTime}`;
+  start_dt = `${startDate} ${planStartTime}`;
+  stop_dt = `${stopDate} ${planStopTime}`;
 
   console.log("start_dt", start_dt);
   console.log("stop_dt", stop_dt);
