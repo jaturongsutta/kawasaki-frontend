@@ -122,7 +122,7 @@ export const validatePlanTimeOverlap = async (
   // startTime: "YYYY-MM-dd HH:mm:ss"
   // stopTime: "YYYY-MM-dd HH:mm:ss"
 
-  const { start_dt, stop_dt } = getPlanDateTimeWithOvernight(
+  const { start_dt, stop_dt } = getPlanDateTimeWithOvernight2(
     planDate,
     planStartTime,
     planStopTime
@@ -140,56 +140,116 @@ export const validatePlanTimeOverlap = async (
   return response.data;
 };
 
-/**
- * Calculate start_dt and stop_dt for plan, handling overnight shift logic.
- * @param {string} planDate - format 'YYYY-MM-DD'
- * @param {string} planStartTime - format 'HH:mm:ss'
- * @param {string} planStopTime - format 'HH:mm:ss'
- * @returns {{ start_dt: string, stop_dt: string }}
- */
-export function getPlanDateTimeWithOvernight(
+// /**
+//  * Calculate start_dt and stop_dt for plan, handling overnight shift logic.
+//  * @param {string} planDate - format 'YYYY-MM-DD'
+//  * @param {string} planStartTime - format 'HH:mm:ss'
+//  * @param {string} planStopTime - format 'HH:mm:ss'
+//  * @returns {{ start_dt: string, stop_dt: string }}
+//  */
+// export function getPlanDateTimeWithOvernight(
+//   planDate,
+//   planStartTime,
+//   planStopTime
+// ) {
+//   // ตัดให้เหลือแค่ yyyy-MM-dd
+//   const baseDate = planDate.substring(0, 10);
+
+//   let startDate = baseDate;
+
+//   // if planStartTime format i s"08:00" then 08:00:00
+//   // if planStopTime format is "08:00" then 08:00:00
+//   if (planStartTime.length === 5) {
+//     planStartTime = `${planStartTime}:00`;
+//   }
+//   if (planStopTime.length === 5) {
+//     planStopTime = `${planStopTime}:00`;
+//   }
+
+//   // Get current date and set time to 23:59:59
+//   const endOfDay = DateTime.now()
+//     .set({ hour: 23, minute: 59, second: 59, millisecond: 0 })
+//     .toFormat("yyyy-MM-dd HH:mm:ss");
+
+//   let start_dt = `${baseDate} ${planStartTime}`;
+//   let stop_dt = `${baseDate} ${planStopTime}`;
+
+//   // Example output: "2025-06-13 23:59:59"
+//   // console.log("endOfDay", endOfDay);
+//   // console.log("start_dt", start_dt);
+//   // console.log("stop_dt", stop_dt);
+
+//   let stopDate = baseDate;
+//   if (start_dt > endOfDay) {
+//     startDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+//     stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
+//   }
+
+//   start_dt = `${startDate} ${planStartTime}`;
+//   stop_dt = `${stopDate} ${planStopTime}`;
+
+//   console.log("start_dt", start_dt);
+//   console.log("stop_dt", stop_dt);
+
+//   return { start_dt, stop_dt };
+// }
+
+export function getPlanDateTimeWithOvernight2(
   planDate,
   planStartTime,
   planStopTime
 ) {
-  // ตัดให้เหลือแค่ yyyy-MM-dd
+  // Ensure time format is HH:mm:ss
+  if (planStartTime.length === 5) planStartTime += ":00";
+  if (planStopTime.length === 5) planStopTime += ":00";
+
   const baseDate = planDate.substring(0, 10);
 
-  let startDate = baseDate;
+  // Convert time to numbers for easy comparison
+  const startTimeNum = Number(planStartTime.replace(/:/g, ""));
+  const stopTimeNum = Number(planStopTime.replace(/:/g, ""));
 
-  // if planStartTime format i s"08:00" then 08:00:00
-  // if planStopTime format is "08:00" then 08:00:00
-  if (planStartTime.length === 5) {
-    planStartTime = `${planStartTime}:00`;
+  // console.log("startTimeNum", startTimeNum);
+  // console.log("stopTimeNum", stopTimeNum);
+
+  let start_dt, stop_dt;
+
+  // Case 1: กะเช้า (08:00-20:00) หรือ Case 2: กะดึกภายในวัน (20:00-00:00)
+  if (
+    (startTimeNum >= 80000 &&
+      startTimeNum < 200000 &&
+      stopTimeNum > startTimeNum) || // 08:00-20:00
+    (startTimeNum >= 200000 &&
+      startTimeNum < 240000 &&
+      stopTimeNum > startTimeNum) // 20:00-00:00
+  ) {
+    console.log("Case 1 or Case 2");
+    start_dt = `${baseDate} ${planStartTime}`;
+    stop_dt = `${baseDate} ${planStopTime}`;
   }
-  if (planStopTime.length === 5) {
-    planStopTime = `${planStopTime}:00`;
+  // Case 3: กะดึกข้ามวัน (20:00-08:00)
+  else if (
+    (startTimeNum >= 200000 && stopTimeNum <= 80000) ||
+    (startTimeNum >= 200000 && stopTimeNum < startTimeNum)
+  ) {
+    console.log("Case 3");
+    start_dt = `${baseDate} ${planStartTime}`;
+    const nextDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+    stop_dt = `${nextDate} ${planStopTime}`;
   }
-
-  // Get current date and set time to 23:59:59
-  const endOfDay = DateTime.now()
-    .set({ hour: 23, minute: 59, second: 59, millisecond: 0 })
-    .toFormat("yyyy-MM-dd HH:mm:ss");
-
-  let start_dt = `${baseDate} ${planStartTime}`;
-  let stop_dt = `${baseDate} ${planStopTime}`;
-
-  // Example output: "2025-06-13 23:59:59"
-  // console.log("endOfDay", endOfDay);
-  // console.log("start_dt", start_dt);
-  // console.log("stop_dt", stop_dt);
-
-  let stopDate = baseDate;
-  if (start_dt > endOfDay) {
-    startDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
-    stopDate = DateTime.fromISO(baseDate).plus({ days: 2 }).toISODate();
+  // Case 4: กะดึกเช้าวันรุ่งขึ้น (00:00-08:00)
+  else if (startTimeNum < 80000 && stopTimeNum <= 80000) {
+    console.log("Case 4");
+    const nextDate = DateTime.fromISO(baseDate).plus({ days: 1 }).toISODate();
+    start_dt = `${nextDate} ${planStartTime}`;
+    stop_dt = `${nextDate} ${planStopTime}`;
   }
-
-  start_dt = `${startDate} ${planStartTime}`;
-  stop_dt = `${stopDate} ${planStopTime}`;
-
-  console.log("start_dt", start_dt);
-  console.log("stop_dt", stop_dt);
+  // Default fallback
+  else {
+    console.log("else");
+    start_dt = `${baseDate} ${planStartTime}`;
+    stop_dt = `${baseDate} ${planStopTime}`;
+  }
 
   return { start_dt, stop_dt };
 }
