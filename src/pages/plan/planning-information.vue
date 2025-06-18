@@ -644,7 +644,7 @@ const onSave = async () => {
 
     //validate validatePlanTimeOverlap
 
-    const _id = route.params.id ? route.params.id : "";
+    const _id = form.value.id ? form.value.id : "";
 
     const { valid, message } = await api.validatePlanTimeOverlap(
       form.value.lineCd,
