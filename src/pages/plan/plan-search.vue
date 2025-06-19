@@ -318,6 +318,14 @@ const headersDetail = [
       return getDateFormat(item.Plan_Start_Time, "HH:mm");
     },
   },
+  {
+    title: "Plan Stop Time",
+    key: "Plan_Stop_Time",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Plan_Stop_Time, "HH:mm");
+    },
+  },
   { title: "Shift", key: "Team_Name", sortable: false },
   { title: "Shift Period", key: "Shift_Period_Name", sortable: false },
   { title: "Break1", key: "B1", sortable: false },
