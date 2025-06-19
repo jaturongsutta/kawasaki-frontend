@@ -705,6 +705,9 @@ const validateCycleTime = (value) => {
 };
 
 const validatePlanDateBackDate = (planDate, planStartTime) => {
+  if (form.value.status > "00") {
+    return true; // ถ้า status > 00 ไม่ต้องตรวจสอบ
+  }
   // planDate: string (format 'yyyy-MM-dd')
   // planStartTime: string (format 'HH:mm:ss')
 
