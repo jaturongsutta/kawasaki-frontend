@@ -140,6 +140,40 @@ export const validatePlanTimeOverlap = async (
   return response.data;
 };
 
+export const validatePlanBreakTime = async (
+  lineCd,
+  planDate,
+  planStartTime,
+  planStopTime,
+  b1,
+  b2,
+  b3,
+  b4,
+  ot,
+  shiftPeriod,
+  id
+) => {
+  const { start_dt, stop_dt } = getPlanDateTimeWithOvernight2(
+    planDate,
+    planStartTime,
+    planStopTime
+  );
+
+  const response = await axios.post(`/plan/validate-plan-break-time`, {
+    lineCd,
+    planStartTime: start_dt,
+    planStopTime: stop_dt,
+    b1,
+    b2,
+    b3,
+    b4,
+    ot,
+    shiftPeriod,
+    id,
+  });
+  return response.data;
+};
+
 // /**
 //  * Calculate start_dt and stop_dt for plan, handling overnight shift logic.
 //  * @param {string} planDate - format 'YYYY-MM-DD'

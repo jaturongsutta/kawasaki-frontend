@@ -189,6 +189,17 @@ const headersPlanCurrent = [
     },
   },
   {
+    title: "Stop Time",
+    key: "Plan_Stop_Time",
+    sortable: false,
+    cellProps: (cell) => ({
+      class: cell.item.status_name === "Running" ? "textRunning" : "",
+    }),
+    value: (item) => {
+      return getDateFormat(item.Plan_Stop_Time, "HH:mm");
+    },
+  },
+  {
     title: "Model",
     key: "Model_CD",
     sortable: false,

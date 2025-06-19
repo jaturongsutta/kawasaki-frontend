@@ -646,6 +646,7 @@ const onSave = async () => {
 
     const _id = form.value.id ? form.value.id : "";
 
+    // validate plandate, start time, stop time dupplicate
     const { valid, message } = await api.validatePlanTimeOverlap(
       form.value.lineCd,
       form.value.planDate,
@@ -656,6 +657,26 @@ const onSave = async () => {
 
     if (!valid) {
       Alert.warning(message);
+      isLoading.value = false;
+      return;
+    }
+
+    const resValid = await api.validatePlanBreakTime(
+      form.value.lineCd,
+      form.value.planDate,
+      form.value.planStartTime,
+      form.value.planStopTime,
+      form.value.b1,
+      form.value.b2,
+      form.value.b3,
+      form.value.b4,
+      form.value.ot,
+      form.value.shiftPeriod,
+      _id
+    );
+
+    if (!resValid.valid) {
+      Alert.warning(resValid.message);
       isLoading.value = false;
       return;
     }
