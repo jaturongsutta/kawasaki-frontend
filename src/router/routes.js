@@ -71,6 +71,15 @@ const routes = [
     component: () =>
       import("@/pages/common-master/predefine-item/predefine-item.vue"),
   },
+   {
+    path: "/common-master/predefine-item-process",
+    name: "predefine-item-process",
+    meta: {
+      menuNo: "M1010",
+    },
+    component: () =>
+      import("@/pages/common-master/predefine-item-process/predefine.vue"),
+  },
   {
     path: "/common-master/menu",
     meta: {
