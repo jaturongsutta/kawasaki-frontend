@@ -5,24 +5,33 @@
         <h4>Reason Maching Process</h4>
       </v-card-title>
       <v-card-text>
-        <v-row >
+        <v-row>
           <v-col cols="12" sm="6" md="4" lg="2">
             <label>Predefine Group</label>
-            <v-select v-model="formSearch.predefineGroup"
-              :items="[{ title: 'All', value: null }, ...predefineGroupList]" dense
-              @update:model-value="onPredefineGroupSearchChange" />
+            <v-select
+              v-model="formSearch.predefineGroup"
+              :items="[{ title: 'All', value: null }, ...predefineGroupList]"
+              dense
+              @update:model-value="onPredefineGroupSearchChange"
+            />
           </v-col>
 
           <v-col cols="12" sm="6" md="4" lg="2">
             <label>Predefine</label>
-            <v-select v-model="formSearch.predefineCd" :items="[{ title: 'All', value: null }, ...predefineSearchList]"
-              dense />
+            <v-select
+              v-model="formSearch.predefineCd"
+              :items="[{ title: 'All', value: null }, ...predefineSearchList]"
+              dense
+            />
           </v-col>
 
           <v-col cols="12" sm="6" md="4" lg="2">
             <label>Process</label>
-            <v-select v-model="formSearch.processCd" :items="[{ title: 'All', value: null }, ...predefineProcessList]"
-              dense />
+            <v-select
+              v-model="formSearch.processCd"
+              :items="[{ title: 'All', value: null }, ...predefineProcessList]"
+              dense
+            />
           </v-col>
 
           <v-col cols="12" sm="6" md="4" lg="2">
@@ -37,11 +46,15 @@
 
           <v-col cols="12" sm="6" md="4" lg="2">
             <label>Status</label>
-            <v-select v-model="formSearch.isActive" :items="[{ title: 'All', value: null }, ...statusList]" dense />
+            <v-select
+              v-model="formSearch.isActive"
+              :items="[{ title: 'All', value: null }, ...statusList]"
+              dense
+            />
           </v-col>
         </v-row>
 
-        <div class="d-flex justify-center ">
+        <div class="d-flex justify-center">
           <n-btn-search @click="onSearch" />
           <n-btn-reset @click="onReset" class="ml-3" />
         </div>
@@ -58,21 +71,32 @@
             <n-btn-export label="Export Reason (PDF)" @click="onExportPDF" />
           </v-col>
         </v-row>
-        <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
-          :items="items" :items-length="totalItems" @update:options="loadData">
+        <v-data-table-server
+          v-model:page="currentPage"
+          v-model:items-per-page="pageSize"
+          :headers="headers"
+          :items="items"
+          :items-length="totalItems"
+          @update:options="loadData"
+        >
           <template v-slot:[`item.action`]="{ item }">
-            <n-gbtn-edit @click="
-              onEdit(
-                item.Predefine_Group,
-                item.Predefine_CD,
-                item.Process_CD,
-                item.Predefine_Item_CD
-              )
-              "></n-gbtn-edit>
+            <n-gbtn-edit
+              @click="
+                onEdit(
+                  item.Predefine_Group,
+                  item.Predefine_CD,
+                  item.Process_CD,
+                  item.Predefine_Item_CD
+                )
+              "
+            ></n-gbtn-edit>
           </template>
           <template v-slot:bottom>
-            <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
-              v-model:totalItems="totalItems"></n-pagination>
+            <n-pagination
+              v-model:currentPage="currentPage"
+              v-model:itemPerPage="pageSize"
+              v-model:totalItems="totalItems"
+            ></n-pagination>
           </template>
         </v-data-table-server>
         <n-loading :loading="isLoading" />
@@ -91,26 +115,45 @@
               <v-row>
                 <v-col cols="6">
                   <label class="require-field">Predefine Group </label>
-                  <v-select v-model="form.predefineGroup" :rules="[rules.required]" :items="predefineGroupList"
-                    @update:model-value="onPredefineGroupChange"></v-select>
+                  <v-select
+                    v-model="form.predefineGroup"
+                    :rules="[rules.required]"
+                    :items="predefineGroupList"
+                    @update:model-value="onPredefineGroupChange"
+                  ></v-select>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Predefine </label>
-                  <v-select v-model="form.predefineCd" :rules="[rules.required]" :items="predefineCdList"
-                    @update:model-value="onPredefineCdChange"></v-select>
+                  <v-select
+                    v-model="form.predefineCd"
+                    :rules="[rules.required]"
+                    :items="predefineCdList"
+                    @update:model-value="onPredefineCdChange"
+                  ></v-select>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Predefine Item </label>
-                  <v-select v-model="form.predefineItemCd" :rules="[rules.required]" :items="predefineItemList"
-                    @update:model-value=""></v-select>
+                  <v-select
+                    v-model="form.predefineItemCd"
+                    :rules="[rules.required]"
+                    :items="predefineItemList"
+                  ></v-select>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Process </label>
-                  <v-select v-model="form.processCd" :rules="[rules.required]" :items="predefineProcessList"></v-select>
+                  <v-select
+                    v-model="form.processCd"
+                    :rules="[rules.required]"
+                    :items="predefineProcessList"
+                  ></v-select>
                 </v-col>
                 <v-col cols="12">
                   <label>Status </label>
-                  <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
+                  <v-select
+                    v-model="form.isActive"
+                    :rules="[rules.required]"
+                    :items="[...statusList]"
+                  ></v-select>
                 </v-col>
               </v-row>
             </v-container>
@@ -245,9 +288,17 @@ const onAdd = () => {
   dialog.value = true;
 };
 
-const onExportPDF = () => {
-
-}
+const onExportPDF = async () => {
+  try {
+    isLoading.value = true;
+    await api.exportPdf(formSearch.value);
+  } catch (error) {
+    console.error("Error exporting PDF:", error);
+    Alert.error("Failed to export PDF: " + error.message);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const onEdit = (predefineGroup, predefineCd, processCd, predefineItemCd) => {
   mode.value = "Edit";
@@ -262,7 +313,7 @@ const onEdit = (predefineGroup, predefineCd, processCd, predefineItemCd) => {
 
   api.getById(processCd, predefineItemCd).then(async (res) => {
     form.value = res.data;
-    previousEditItem.value = { ...form.value }
+    previousEditItem.value = { ...form.value };
   });
 };
 
@@ -300,15 +351,15 @@ const onPredefineGroupSearchChange = (value) => {
   } else {
     predefineSearchList.value = [];
   }
-}
+};
 
 const onPredefineGroupChange = (value) => {
   console.log("Selected Predefine Group:", value);
   if (value) {
     predefineCdList.value = [];
     predefineItemList.value = [];
-    form.value.predefineCd = '';
-    form.value.predefineItemCd = '';
+    form.value.predefineCd = "";
+    form.value.predefineItemCd = "";
     ddlApi.getPredefine(value).then((data) => {
       predefineCdList.value = data;
     });
@@ -318,14 +369,15 @@ const onPredefineGroupChange = (value) => {
 };
 
 const onPredefineCdChange = (value) => {
-  console.log("predefineGroup : ", form.value.predefineGroup)
+  console.log("predefineGroup : ", form.value.predefineGroup);
   if (value) {
-    form.value.predefineItemCd = '';
-    api.getDropDownPredefindItem(form.value.predefineGroup, value).then((data) => {
-      predefineItemList.value = data;
-    });
-  }
-  else {
+    form.value.predefineItemCd = "";
+    api
+      .getDropDownPredefindItem(form.value.predefineGroup, value)
+      .then((data) => {
+        predefineItemList.value = data;
+      });
+  } else {
     predefineItemList.value = [];
   }
 };

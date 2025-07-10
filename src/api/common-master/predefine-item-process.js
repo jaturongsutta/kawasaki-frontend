@@ -69,3 +69,34 @@ export const getDropDownMachineProcess = async () => {
     throw error;
   }
 };
+
+export const exportPdf = async (data) => {
+  try {
+    const response = await axios.post(`/predefine-item-process/export`, data, {
+      responseType: "blob", // Important for handling binary data
+      headers: {
+        Accept: "application/pdf",
+      },
+    });
+
+    // Create blob URL for the PDF
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const url = window.URL.createObjectURL(blob);
+
+    // Create temporary link to download the file
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Export-${new Date().toISOString().split("T")[0]}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true, message: "PDF exported successfully" };
+  } catch (error) {
+    console.error("Error exporting PDF:", error);
+    throw error;
+  }
+};
