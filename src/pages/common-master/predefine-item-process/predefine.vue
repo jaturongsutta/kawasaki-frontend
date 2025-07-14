@@ -7,7 +7,7 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="6" md="4" lg="2">
-            <label>Predefine Group</label>
+            <label>Reason Type</label>
             <v-select
               v-model="formSearch.predefineGroup"
               :items="[{ title: 'All', value: null }, ...predefineGroupList]"
@@ -17,7 +17,7 @@
           </v-col>
 
           <v-col cols="12" sm="6" md="4" lg="2">
-            <label>Predefine</label>
+            <label>Reason Group</label>
             <v-select
               v-model="formSearch.predefineCd"
               :items="[{ title: 'All', value: null }, ...predefineSearchList]"
@@ -114,7 +114,7 @@
             <v-container>
               <v-row>
                 <v-col cols="6">
-                  <label class="require-field">Predefine Group </label>
+                  <label class="require-field">Reason Type </label>
                   <v-select
                     v-model="form.predefineGroup"
                     :rules="[rules.required]"
@@ -123,7 +123,7 @@
                   ></v-select>
                 </v-col>
                 <v-col cols="6">
-                  <label class="require-field">Predefine </label>
+                  <label class="require-field">Reason Group </label>
                   <v-select
                     v-model="form.predefineCd"
                     :rules="[rules.required]"
@@ -132,7 +132,7 @@
                   ></v-select>
                 </v-col>
                 <v-col cols="6">
-                  <label class="require-field">Predefine Item </label>
+                  <label class="require-field">Reason </label>
                   <v-select
                     v-model="form.predefineItemCd"
                     :rules="[rules.required]"
@@ -193,8 +193,8 @@ const previousEditItem = ref({});
 
 const headers = [
   { title: "", key: "action", sortable: false },
-  { title: "Predefine Group", key: "Predefine_Group", sortable: false },
-  { title: "Predefine Name", key: "Predefine_Name", sortable: false },
+  { title: "Reason Type", key: "Predefine_Group", sortable: false },
+  { title: "Reason Group", key: "Predefine_Name", sortable: false },
   { title: "Process", key: "Process_CD", sortable: false },
   { title: "Value(EN)", key: "Value_EN", sortable: false },
   { title: "Value(TH)", key: "Value_TH", sortable: false },
