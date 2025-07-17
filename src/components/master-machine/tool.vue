@@ -70,7 +70,7 @@
                                 <v-col v-if="mode === 'Edit'" cols="6">
                                     <label>Actual Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.actualAmt"
-                                        type="number" readonly></v-text-field>
+                                        type="text" readonly></v-text-field>
                                 </v-col>
 
                                 <v-col cols="6">
