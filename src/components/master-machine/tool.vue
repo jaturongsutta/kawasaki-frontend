@@ -202,7 +202,8 @@ const loadData = async (paginate) => {
 
     try {
         const data = {
-            process_cd: route.params.id,
+            machine_no: route.params.id,
+            process_cd: route.params.processCd,
             searchOptions,
         };
         isLoading.value = true;
@@ -274,7 +275,7 @@ const saveClick = async () => {
         isDialogLoading.value = true;
         let res = null;
 
-        form.value.processCd = route.params.id;
+        form.value.processCd = route.params.processCd;
         let params = { ...form.value }
         params.toolLife = convertCommaToPureNumber(params.toolLife);
         params.warningAmt = convertCommaToPureNumber(params.warningAmt);

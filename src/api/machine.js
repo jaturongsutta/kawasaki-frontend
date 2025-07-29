@@ -8,9 +8,9 @@ export const search = async (data) => {
   }
 };
 
-export const getById = async (id) => {
+export const getById = async (machineNo, processCd) => {
   try {
-    const response = await axios.get(`/machine/getById/${id}`);
+    const response = await axios.get(`/machine/getById/${machineNo}/${processCd}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -26,9 +26,9 @@ export const add = async (data) => {
   }
 };
 
-export const update = async (id, data) => {
+export const update = async (machineNo, processCd, data) => {
   try {
-    const response = await axios.put(`/machine/update/${id}`, data);
+    const response = await axios.put(`/machine/update/${machineNo}/${processCd}`, data);
     return response.data;
   } catch (error) {
     throw error;

@@ -35,7 +35,7 @@
         <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
           :items="items" :items-length="totalItems" @update:options="loadData">
           <template v-slot:[`item.action`]="{ item }">
-            <n-gbtn-edit @click="onEdit(item.Process_CD)"></n-gbtn-edit>
+            <n-gbtn-edit @click="onEdit(item.Machine_No, item.Process_CD)"></n-gbtn-edit>
           </template>
           <template v-slot:bottom>
             <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
@@ -128,11 +128,17 @@ import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/machine.js";
 import rules from "@/utils/rules";
 import { getDateFormat } from "@/utils/utils";
+import { usePageState } from '@/stores/search/master-machine'
+const pageState = usePageState()
 
 const router = useRouter();
 const Alert = inject("Alert");
 const frmInfo = ref(null);
-const formSearch = ref({});
+const formSearch = ref({
+  machine_no: pageState.machineNo,
+  process_cd: pageState.processCd,
+  status: pageState.status
+});
 const form = ref({});
 const mode = ref("Add");
 const dialog = ref(false);
@@ -185,6 +191,7 @@ const loadData = async (paginate) => {
       searchOptions,
     };
 
+    pageState.setSearchData(data);
     const response = await api.search(data);
 
     items.value = response.data;
@@ -210,8 +217,8 @@ const onAdd = () => {
   router.push({ name: "machine-info" });
 };
 
-const onEdit = (id) => {
-  router.push({ name: `machine-info`, params: { id: id } });
+const onEdit = (machineNo, processCd) => {
+  router.push({ name: `machine-info`, params: { id: machineNo, processCd: processCd } });
 };
 
 const saveClick = async () => {

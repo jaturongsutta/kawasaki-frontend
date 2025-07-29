@@ -207,7 +207,7 @@ const routes = [
         component: () => import("@/pages/common-master/machine/machine.vue"),
       },
       {
-        path: "/common-master/machine-info/:id?",
+        path: "/common-master/machine-info/:id?/:processCd?",
         name: "machine-info",
         component: () =>
           import("@/pages/common-master/machine/machine-info.vue"),
