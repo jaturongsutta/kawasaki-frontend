@@ -181,11 +181,11 @@
                   ></v-checkbox-btn>
                 </template>
                 <template v-slot:[`item.processCd`]="{ item }">
-                  <v-select
+                  <v-autocomplete
                     v-if="item.rowState === 'NEW'"
                     v-model="item.processCd"
                     :items="[...machineList]"
-                    item-title="value"
+                    item-title="title"
                     item-value="value"
                     hide-details="auto"
                     :rules="[rules.required]"
@@ -195,11 +195,12 @@
                           (m) => m.value === val
                         );
                         if (machine) {
-                          item.machineNo = machine.title;
+                          item.machineNo = machine.machineNo;
                         }
                       }
                     "
-                  ></v-select>
+                    autocomplete="off"
+                  ></v-autocomplete>
                   <div v-else v-text="item.processCd"></div>
                 </template>
                 <template v-slot:[`item.wt`]="{ item }">
@@ -362,7 +363,17 @@ onMounted(() => {
     modelList.value = data;
   });
   ddlApi.machine().then((data) => {
+    data = data.map((item) => {
+      return {
+        value: item.machineNo + "_" + item.processCd,
+        title: item.machineNo + " " + item.processCd,
+        machineNo: item.machineNo,
+        processCd: item.processCd,
+      };
+    });
     machineList.value = data;
+
+    console.log("machineList ", machineList.value);
   });
 
   api.getToolAll().then((data) => {
