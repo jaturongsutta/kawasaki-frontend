@@ -70,7 +70,7 @@
                                 <v-col v-if="mode === 'Edit'" cols="6">
                                     <label>Actual Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.actualAmt"
-                                        type="number" readonly></v-text-field>
+                                        type="text" readonly></v-text-field>
                                 </v-col>
 
                                 <v-col cols="6">
@@ -202,7 +202,8 @@ const loadData = async (paginate) => {
 
     try {
         const data = {
-            process_cd: route.params.id,
+            machine_no: route.params.id,
+            process_cd: route.params.processCd,
             searchOptions,
         };
         isLoading.value = true;
@@ -274,7 +275,7 @@ const saveClick = async () => {
         isDialogLoading.value = true;
         let res = null;
 
-        form.value.processCd = route.params.id;
+        form.value.processCd = route.params.processCd;
         let params = { ...form.value }
         params.toolLife = convertCommaToPureNumber(params.toolLife);
         params.warningAmt = convertCommaToPureNumber(params.warningAmt);

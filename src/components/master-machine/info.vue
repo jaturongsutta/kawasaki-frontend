@@ -97,7 +97,7 @@ const loadData = async () => {
     try {
         isLoading.value = true;
         let id = pageMode.value === 'edit' ? route.params.id : machineItem.value.machineNo;
-        const response = await api.getById(id);
+        const response = await api.getById(id, route.params.processCd);
 
         if (response.status === 2) {
             Alert.error("Error ", response.message);
@@ -125,7 +125,7 @@ const saveClick = async () => {
             res = await api.add(machineItem.value);
         } else {
             console.log("Edit");
-            res = await api.update(machineItem.value.processCd, machineItem.value);
+            res = await api.update(machineItem.value.machineNo, machineItem.value.processCd, machineItem.value);
         }
         isLoading.value = false;
         isDialogLoading.value = false;
