@@ -2,7 +2,7 @@
   <div>
     <v-card>
       <v-card-title>
-        <h4>Report-Efficiency</h4>
+        <h4>Report - Efficiency</h4>
       </v-card-title>
       <v-card-text>
         <v-form ref="frmSearch">
