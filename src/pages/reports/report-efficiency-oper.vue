@@ -134,10 +134,11 @@ const onExport = async () => {
 };
 
 const onClear = () => {
+  const currentDate = new Date();
   form.value = {
     lineCd: "",
-    month: "",
-    year: "",
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear(),
   };
 };
 
