@@ -12,8 +12,6 @@
               <v-select
                 v-model="form.lineCd"
                 :items="lineList"
-                item-title="title"
-                item-value="value"
                 :rules="[rules.required]"
               />
             </v-col>
@@ -72,11 +70,7 @@ const form = ref({
 const isLoading = ref(false);
 
 // Dropdown lists
-const lineList = ref([
-  { title: "CYH#6", value: "CYH#6" },
-  { title: "Line A", value: "LINE_A" },
-  { title: "Line B", value: "LINE_B" },
-]);
+const lineList = ref([]);
 
 const monthList = ref([]);
 
@@ -149,6 +143,10 @@ onMounted(() => {
   monthList.value = ddlApi.getMonth();
 
   yearList.value = ddlApi.getYear();
+
+  ddlApi.line().then((data) => {
+    lineList.value = data;
+  });
 
   // default month and year current month and year
   const currentDate = new Date();
