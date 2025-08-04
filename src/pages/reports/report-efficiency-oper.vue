@@ -5,42 +5,45 @@
         <h4>Report-Efficiency</h4>
       </v-card-title>
       <v-card-text>
-        <v-row>
-          <v-col cols="12" sm="6" md="3">
-            <label>Line</label>
-            <v-select
-              v-model="form.lineCd"
-              :items="lineList"
-              item-title="title"
-              item-value="value"
-            />
-          </v-col>
+        <v-form ref="frmSearch">
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
+              <label>Line</label>
+              <v-select
+                v-model="form.lineCd"
+                :items="lineList"
+                item-title="title"
+                item-value="value"
+                :rules="[rules.required]"
+              />
+            </v-col>
 
-          <v-col cols="12" sm="6" md="3">
-            <label>Month</label>
-            <v-select
-              v-model="form.month"
-              :items="monthList"
-              item-title="title"
-              item-value="value"
-            />
-          </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <label>Month</label>
+              <v-select
+                v-model="form.month"
+                :items="monthList"
+                item-title="title"
+                item-value="value"
+              />
+            </v-col>
 
-          <v-col cols="12" sm="6" md="3">
-            <label>Year</label>
-            <v-select
-              v-model="form.year"
-              :items="yearList"
-              item-title="title"
-              item-value="value"
-            />
-          </v-col>
-        </v-row>
+            <v-col cols="12" sm="6" md="3">
+              <label>Year</label>
+              <v-select
+                v-model="form.year"
+                :items="yearList"
+                item-title="title"
+                item-value="value"
+              />
+            </v-col>
+          </v-row>
 
-        <div class="d-flex justify-center mt-4">
-          <n-btn-export @click="onExport" class="mr-3"> </n-btn-export>
-          <n-btn-reset @click="onClear"> </n-btn-reset>
-        </div>
+          <div class="d-flex justify-center mt-4">
+            <n-btn-export @click="onExport" class="mr-3"> </n-btn-export>
+            <n-btn-reset @click="onClear"> </n-btn-reset>
+          </div>
+        </v-form>
       </v-card-text>
     </v-card>
 
@@ -50,10 +53,13 @@
 
 <script setup>
 import { ref, onMounted, inject } from "vue";
-import axios from "@/utils/axios";
 import * as ddlApi from "@/api/dropdown-list"; // Assuming ddlApi is the correct import for dropdown data
 import * as api from "@/api/reports";
+import rules from "@/utils/rules";
+
 const Alert = inject("Alert");
+
+const frmSearch = ref(null);
 
 // Form data
 const form = ref({
@@ -80,8 +86,8 @@ const yearList = ref([]);
 const onExport = async () => {
   try {
     // Validate required fields
-    if (!form.value.lineCd) {
-      Alert.warning("Please select Line");
+    const { valid } = await frmSearch.value.validate();
+    if (!valid) {
       return;
     }
 
