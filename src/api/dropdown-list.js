@@ -10,16 +10,19 @@ export const getPredefine = async (args) => {
 
 export const getPredefineItem = async (group, search = null) => {
   try {
-    const response = await axios.get(`/dropdown-list/predefine-group-item/${group}`, {
-      params: { search: search },
-    });
+    const response = await axios.get(
+      `/dropdown-list/predefine-group-item/${group}`,
+      {
+        params: { search: search },
+      }
+    );
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getMonth = async () => {
+export const getMonth = () => {
   const months = [
     { value: "1", title: "January" },
     { value: "2", title: "February" },
@@ -38,7 +41,7 @@ export const getMonth = async () => {
   return months;
 };
 
-export const getYear = async () => {
+export const getYear = () => {
   const years = [];
   const currentYear = new Date().getFullYear();
 

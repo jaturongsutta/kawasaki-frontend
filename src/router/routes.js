@@ -71,7 +71,7 @@ const routes = [
     component: () =>
       import("@/pages/common-master/predefine-item/predefine-item.vue"),
   },
-   {
+  {
     path: "/common-master/predefine-item-process",
     name: "predefine-item-process",
     meta: {
@@ -260,6 +260,14 @@ const routes = [
         component: () => import("@/pages/line/line-info.vue"),
       },
     ],
+  },
+
+  {
+    path: "/reports/report-efficiency-oper",
+    meta: {
+      menuNo: "M3001",
+    },
+    component: () => import("@/pages/reports/report-efficiency-oper.vue"),
   },
 ];
 
