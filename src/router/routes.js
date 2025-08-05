@@ -269,6 +269,13 @@ const routes = [
     },
     component: () => import("@/pages/reports/report-efficiency-oper.vue"),
   },
+  {
+    path: "/download-apk",
+    meta: {
+      requireAuth: false,
+    },
+    component: () => import("@/pages/download-apk.vue"),
+  },
 ];
 
 export default routes;
