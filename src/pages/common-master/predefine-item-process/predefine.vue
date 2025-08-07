@@ -6,51 +6,43 @@
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-col cols="12" sm="6" md="4" lg="2">
+          <v-col cols="12" sm="12" md="12" lg="6">
+            <label>Line</label>
+            <v-select v-model="formSearch.lineCd" item-title="lineName" :items="predefineLineList" dense />
+          </v-col>
+
+          <v-col cols="12" sm="6" md="4" lg="3">
             <label>Reason Type</label>
-            <v-select
-              v-model="formSearch.predefineGroup"
-              :items="[{ title: 'All', value: null }, ...predefineGroupList]"
-              dense
-              @update:model-value="onPredefineGroupSearchChange"
-            />
+            <v-select v-model="formSearch.predefineGroup"
+              :items="[{ title: 'All', value: null }, ...predefineGroupList]" dense
+              @update:model-value="onPredefineGroupSearchChange" />
           </v-col>
 
-          <v-col cols="12" sm="6" md="4" lg="2">
+          <v-col cols="12" sm="6" md="4" lg="3">
             <label>Reason Group</label>
-            <v-select
-              v-model="formSearch.predefineCd"
-              :items="[{ title: 'All', value: null }, ...predefineSearchList]"
-              dense
-            />
+            <v-select v-model="formSearch.predefineCd" :items="[{ title: 'All', value: null }, ...predefineSearchList]"
+              dense />
           </v-col>
 
-          <v-col cols="12" sm="6" md="4" lg="2">
+          <v-col cols="12" sm="6" md="4" lg="3">
             <label>Process</label>
-            <v-select
-              v-model="formSearch.processCd"
-              :items="[{ title: 'All', value: null }, ...predefineProcessList]"
-              dense
-            />
+            <v-autocomplete v-model="formSearch.processCd"
+              :items="[{ title: 'All', value: null }, ...predefineProcessList]" hide-details="auto"></v-autocomplete>
           </v-col>
 
-          <v-col cols="12" sm="6" md="4" lg="2">
+          <v-col cols="12" sm="6" md="4" lg="3">
             <label>Value (EN)</label>
             <v-text-field v-model="formSearch.valueEN" dense />
           </v-col>
 
-          <v-col cols="12" sm="6" md="4" lg="2">
+          <v-col cols="12" sm="6" md="4" lg="3">
             <label>Value (TH)</label>
             <v-text-field v-model="formSearch.valueTH" dense />
           </v-col>
 
-          <v-col cols="12" sm="6" md="4" lg="2">
+          <v-col cols="12" sm="6" md="4" lg="3">
             <label>Status</label>
-            <v-select
-              v-model="formSearch.isActive"
-              :items="[{ title: 'All', value: null }, ...statusList]"
-              dense
-            />
+            <v-select v-model="formSearch.isActive" :items="[{ title: 'All', value: null }, ...statusList]" dense />
           </v-col>
         </v-row>
 
@@ -71,32 +63,22 @@
             <n-btn-export label="Export Reason (PDF)" @click="onExportPDF" />
           </v-col>
         </v-row>
-        <v-data-table-server
-          v-model:page="currentPage"
-          v-model:items-per-page="pageSize"
-          :headers="headers"
-          :items="items"
-          :items-length="totalItems"
-          @update:options="loadData"
-        >
+        <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
+          :items="items" :items-length="totalItems" @update:options="loadData">
           <template v-slot:[`item.action`]="{ item }">
-            <n-gbtn-edit
-              @click="
-                onEdit(
-                  item.Predefine_Group,
-                  item.Predefine_CD,
-                  item.Process_CD,
-                  item.Predefine_Item_CD
-                )
-              "
-            ></n-gbtn-edit>
+            <n-gbtn-edit @click="
+              onEdit(
+                item.Predefine_Group,
+                item.Predefine_CD,
+                item.Process_CD,
+                item.Predefine_Item_CD,
+                item.Machine_No
+              )
+              "></n-gbtn-edit>
           </template>
           <template v-slot:bottom>
-            <n-pagination
-              v-model:currentPage="currentPage"
-              v-model:itemPerPage="pageSize"
-              v-model:totalItems="totalItems"
-            ></n-pagination>
+            <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
+              v-model:totalItems="totalItems"></n-pagination>
           </template>
         </v-data-table-server>
         <n-loading :loading="isLoading" />
@@ -115,45 +97,28 @@
               <v-row>
                 <v-col cols="6">
                   <label class="require-field">Reason Type </label>
-                  <v-select
-                    v-model="form.predefineGroup"
-                    :rules="[rules.required]"
-                    :items="predefineGroupList"
-                    @update:model-value="onPredefineGroupChange"
-                  ></v-select>
+                  <v-select v-model="form.predefineGroup" :rules="[rules.required]" :items="predefineGroupList"
+                    @update:model-value="onPredefineGroupChange"></v-select>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Reason Group </label>
-                  <v-select
-                    v-model="form.predefineCd"
-                    :rules="[rules.required]"
-                    :items="predefineCdList"
-                    @update:model-value="onPredefineCdChange"
-                  ></v-select>
+                  <v-select v-model="form.predefineCd" :rules="[rules.required]" :items="predefineCdList"
+                    @update:model-value="onPredefineCdChange"></v-select>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Reason </label>
-                  <v-select
-                    v-model="form.predefineItemCd"
-                    :rules="[rules.required]"
-                    :items="predefineItemList"
-                  ></v-select>
+                  <v-select v-model="form.predefineItemCd" :rules="[rules.required]"
+                    :items="predefineItemList"></v-select>
                 </v-col>
                 <v-col cols="6">
                   <label class="require-field">Process </label>
-                  <v-select
-                    v-model="form.processCd"
-                    :rules="[rules.required]"
-                    :items="predefineProcessList"
-                  ></v-select>
+                  <v-autocomplete v-model="form.processCd" :items="predefineProcessList" :rules="[rules.required]"
+                    hide-details="auto"></v-autocomplete>
+                  <!-- <v-select v-model="form.processCd" :rules="[rules.required]" :items="predefineProcessList"></v-select> -->
                 </v-col>
                 <v-col cols="12">
                   <label>Status </label>
-                  <v-select
-                    v-model="form.isActive"
-                    :rules="[rules.required]"
-                    :items="[...statusList]"
-                  ></v-select>
+                  <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
                 </v-col>
               </v-row>
             </v-container>
@@ -179,7 +144,7 @@ import rules from "@/utils/rules";
 import moment from "moment";
 const Alert = inject("Alert");
 const frmInfo = ref(null);
-const formSearch = ref({});
+const formSearch = ref({ lineCd: 'CYH#6' });
 const form = ref({});
 const mode = ref("Add");
 const dialog = ref(false);
@@ -190,12 +155,14 @@ const predefineCdList = ref([]);
 const predefineItemList = ref([]);
 const predefineProcessList = ref([]);
 const previousEditItem = ref({});
+const predefineLineList = ref([]);
 
 const headers = [
   { title: "", key: "action", sortable: false },
   { title: "Reason Type", key: "Predefine_Group", sortable: false },
   { title: "Reason Group", key: "Predefine_Name", sortable: false },
   { title: "Process", key: "Process_CD", sortable: false },
+  { title: "Machine No", key: "Machine_No", sortable: false },
   { title: "Value(EN)", key: "Value_EN", sortable: false },
   { title: "Value(TH)", key: "Value_TH", sortable: false },
   { title: "Status", key: "Status_Name", sortable: false },
@@ -229,8 +196,20 @@ onMounted(() => {
     predefineGroupList.value = data;
   });
 
-  api.getDropDownMachineProcess().then((data) => {
+  ddlApi.machine().then((data) => {
+    data = data.map((item) => {
+      return {
+        value: item.machineNo + "_" + item.processCd,
+        title: item.machineNo + " " + item.processCd,
+        machineNo: item.machineNo,
+        processCd: item.processCd,
+      };
+    });
     predefineProcessList.value = data;
+  });
+
+  ddlApi.line_().then((data) => {
+    predefineLineList.value = data;
   });
 });
 
@@ -246,11 +225,12 @@ const loadData = async (paginate) => {
 
   try {
     isLoading.value = true;
-    const data = {
+    let data = {
       ...formSearch.value,
       searchOptions,
     };
 
+    data = buildParamsWithMachineInfo(data);
     const response = await api.search(data);
 
     items.value = response.data;
@@ -291,7 +271,8 @@ const onAdd = () => {
 const onExportPDF = async () => {
   try {
     isLoading.value = true;
-    await api.exportPdf(formSearch.value);
+    const data = buildParamsWithMachineInfo(formSearch.value);
+    await api.exportPdf(data);
   } catch (error) {
     console.error("Error exporting PDF:", error);
     Alert.error("Failed to export PDF: " + error.message);
@@ -300,8 +281,9 @@ const onExportPDF = async () => {
   }
 };
 
-const onEdit = (predefineGroup, predefineCd, processCd, predefineItemCd) => {
+const onEdit = (predefineGroup, predefineCd, processCd, predefineItemCd, machineNo) => {
   mode.value = "Edit";
+  form.value = {};
   dialog.value = true;
 
   ddlApi.getPredefine(predefineGroup).then((data) => {
@@ -311,9 +293,17 @@ const onEdit = (predefineGroup, predefineCd, processCd, predefineItemCd) => {
     predefineItemList.value = data;
   });
 
-  api.getById(processCd, predefineItemCd).then(async (res) => {
-    form.value = res.data;
-    previousEditItem.value = { ...form.value };
+  api.getById(processCd, predefineItemCd, machineNo).then(async (res) => {
+
+    let data = { ...res.data };
+    previousEditItem.value = { ...data };
+    const transformed = {
+      ...data,
+      processCd: data.machineNo + '_' + data.processCd,
+    };
+
+    form.value = transformed
+
   });
 };
 
@@ -323,10 +313,14 @@ const saveClick = async () => {
     if (!valid) return;
     isDialogLoading.value = true;
     let res = null;
+
+    let params = { ...form.value };
+    params = buildParamsWithMachineInfo(params);
+
     if (mode.value === "Add") {
-      res = await api.saveAdd(form.value);
+      res = await api.saveAdd(params);
     } else {
-      res = await api.saveEdit(previousEditItem.value, form.value);
+      res = await api.saveEdit(previousEditItem.value, params);
     }
 
     isDialogLoading.value = false;
@@ -338,6 +332,7 @@ const saveClick = async () => {
       Alert.warning(res.data.message);
     }
   } catch (error) {
+    console.log("error ", error)
     isDialogLoading.value = false;
     Alert.error(error.message);
   }
@@ -351,6 +346,7 @@ const onPredefineGroupSearchChange = (value) => {
   } else {
     predefineSearchList.value = [];
   }
+  formSearch.value.predefineCd = null;
 };
 
 const onPredefineGroupChange = (value) => {
@@ -381,4 +377,20 @@ const onPredefineCdChange = (value) => {
     predefineItemList.value = [];
   }
 };
+
+function buildParamsWithMachineInfo(formValue) {
+  const v = predefineProcessList.value.find(
+    item => item.value === formValue.processCd
+  );
+
+  if (!v) {
+    return { ...formValue };
+  }
+
+  return {
+    ...formValue,
+    machineNo: v.machineNo,
+    processCd: v.processCd,
+  };
+}
 </script>

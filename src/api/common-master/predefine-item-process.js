@@ -15,14 +15,14 @@ export const saveAdd = async (data) => {
 
 export const saveEdit = async (prevItem, data) => {
   return await axios.put(
-    `/predefine-item-process/${prevItem.processCd}/${prevItem.predefineItemCd}`,
+    `/predefine-item-process/${prevItem.processCd}/${prevItem.predefineItemCd}/${prevItem.machineNo}`,
     data
   );
 };
 
-export const getById = async (processCd, predefineItemCd) => {
+export const getById = async (processCd, predefineItemCd, machineNo) => {
   return await axios.get(
-    `/predefine-item-process/${processCd}/${predefineItemCd}`
+    `/predefine-item-process/${processCd}/${predefineItemCd}/${machineNo}`
   );
 };
 
