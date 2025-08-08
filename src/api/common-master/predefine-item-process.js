@@ -86,7 +86,7 @@ export const exportPdf = async (data) => {
     // Create temporary link to download the file
     const link = document.createElement("a");
     link.href = url;
-    link.download = `Export-${new Date().toISOString().split("T")[0]}.pdf`;
+    link.download = `Export-${data.lineCd}-${new Date().toISOString().split("T")[0]}.pdf`;
     document.body.appendChild(link);
     link.click();
 
