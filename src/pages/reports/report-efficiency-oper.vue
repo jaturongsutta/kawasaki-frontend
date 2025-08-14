@@ -107,7 +107,13 @@ const onExport = async () => {
     // Create temporary link to download
     const link = document.createElement("a");
     link.href = url;
-    link.download = `report-efficiency-oper-${form.value.lineCd}-${month}-${year}.xlsx`;
+    // Add current date in yyyy-MM-dd format
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const dateStr = `${yyyy}-${mm}-${dd}`;
+    link.download = `${dateStr}.xlsx`;
     document.body.appendChild(link);
     link.click();
 
