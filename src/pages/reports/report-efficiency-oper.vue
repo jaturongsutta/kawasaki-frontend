@@ -109,11 +109,11 @@ const onExport = async () => {
     link.href = url;
     // Add current date in yyyy-MM-dd format
     const now = new Date();
-    const yyyy = now.getFullYear();
+    const yy = String(now.getFullYear()).slice(-2);
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
-    const dateStr = `${yyyy}-${mm}-${dd}`;
-    link.download = `${dateStr}.xlsx`;
+    const dateStr = `${yy}_${mm}_${dd}`;
+    link.download = `report-efficiency-${form.value.lineCd}-${month}-${year}(${dateStr}).xlsx`;
     document.body.appendChild(link);
     link.click();
 
