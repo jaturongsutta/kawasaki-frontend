@@ -32,6 +32,14 @@
               ></v-text-field>
             </v-col>
             <v-col>
+              <label class="require-field">Efficiency</label>
+              <n-input-number
+                v-model="form.efficiencyPercent"
+                :rules="[rules.required]"
+                digit="2"
+              ></n-input-number>
+            </v-col>
+            <v-col>
               <label class="require-field">Status</label>
               <v-select
                 v-model="form.isActive"
