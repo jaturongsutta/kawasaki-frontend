@@ -661,24 +661,26 @@ const onSave = async () => {
       return;
     }
 
-    const resValid = await api.validatePlanBreakTime(
-      form.value.lineCd,
-      form.value.planDate,
-      form.value.planStartTime,
-      form.value.planStopTime,
-      form.value.b1,
-      form.value.b2,
-      form.value.b3,
-      form.value.b4,
-      form.value.ot,
-      form.value.shiftPeriod,
-      _id
-    );
+    if (form.value.ot !== "Y") {
+      const resValid = await api.validatePlanBreakTime(
+        form.value.lineCd,
+        form.value.planDate,
+        form.value.planStartTime,
+        form.value.planStopTime,
+        form.value.b1,
+        form.value.b2,
+        form.value.b3,
+        form.value.b4,
+        form.value.ot,
+        form.value.shiftPeriod,
+        _id
+      );
 
-    if (!resValid.valid) {
-      Alert.warning(resValid.message);
-      isLoading.value = false;
-      return;
+      if (!resValid.valid) {
+        Alert.warning(resValid.message);
+        isLoading.value = false;
+        return;
+      }
     }
 
     let res = null;
