@@ -81,10 +81,10 @@
               <n-time v-model="formInfo.NG_Time" :rules="[rules.required]" :readonly="formInfo.Status === '90'" />
             </v-col>
             <v-col cols="3">
-              <label class="require-field">Quantity</label>
+              <label>Quantity</label>
               <n-input-number v-model="formInfo.Quantity"
-                :rules="[rules.required, v => /^\d{1,3}$/.test(v) || 'Only 3 digits allowed']"
-                :readonly="formInfo.Status === '90'" v-maska="'###'" />
+                :rules="[rules.required, v => /^\d{1,3}$/.test(v) || 'Only 3 digits allowed']" readonly
+                v-maska="'###'" />
             </v-col>
 
             <v-col cols="6">
@@ -177,7 +177,7 @@ let formInfo = ref({
   "Process_CD": "",
   "NG_Time": "",
   "NG_Date": "",
-  "Quantity": "",
+  "Quantity": "1",
   "Reason_CD": "",
   "Comment": ""
 });
