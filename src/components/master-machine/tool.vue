@@ -234,7 +234,7 @@ const onEdit = async (item) => {
     dialog.value = true;
     isDialogLoading.value = true;
     try {
-        const res = await api.getById(item.Process_CD, item.H_Code);
+        const res = await api.getById(props.machineItem?.machineNo, item.Process_CD, item.H_Code);
         isDialogLoading.value = false;
         if (res.status === 2) {
             Alert.error("Error ", res.message);
@@ -253,6 +253,7 @@ const onEdit = async (item) => {
 const onReset = async (item) => {
     try {
         isLoading.value = true;
+        item.machineNo = props.machineItem?.machineNo;
         const res = await api.reset(item);
         isLoading.value = false;
         if (res.status === 0) {
