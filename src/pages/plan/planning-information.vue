@@ -9,13 +9,8 @@
         <v-row>
           <v-col md="2">
             <label>Line</label>
-            <v-select
-              v-model="form.lineCd"
-              :items="lineList"
-              @update:model-value="onLineChange"
-              :rules="[rules.required]"
-              :readonly="status !== ''"
-            ></v-select>
+            <v-select v-model="form.lineCd" :items="lineList" @update:model-value="onLineChange"
+              :rules="[rules.required]" :readonly="status !== ''"></v-select>
           </v-col>
           <v-col md="2">
             <label>Line Name</label>
@@ -27,98 +22,60 @@
           </v-col>
           <v-col md="2">
             <label>Plan Date</label>
-            <n-date
-              v-model="form.planDate"
-              :rules="[
-                rules.required,
-                (v) =>
-                  validatePlanDateBackDate(form.planDate, form.planStartTime),
-              ]"
-              :readonly="status > '00'"
-              @update:model-value="onUpdateAS400PlanAmt"
-            >
+            <n-date v-model="form.planDate" :rules="[
+              rules.required,
+              (v) =>
+                validatePlanDateBackDate(form.planDate, form.planStartTime),
+            ]" :readonly="status > '00'" @update:model-value="onUpdateAS400PlanAmt">
             </n-date>
           </v-col>
           <v-col md="2">
             <label>Plan Start Time</label>
-            <n-time
-              v-model="form.planStartTime"
-              @update:model-value="onPlanStartTimeChange"
-              :rules="[rules.required]"
-              :readonly="status > '00'"
-            ></n-time>
+            <n-time v-model="form.planStartTime" @update:model-value="onPlanStartTimeChange" :rules="[rules.required]"
+              :readonly="status > '00'"></n-time>
           </v-col>
 
           <v-col md="2">
             <label>Plan Stop Time</label>
-            <n-time
-              v-model="form.planStopTime"
-              :rules="[rules.required]"
-              :readonly="status > '00'"
-              @update:model-value="onPlanStopTimeChange"
-            ></n-time>
+            <n-time v-model="form.planStopTime" :rules="[rules.required]" :readonly="status > '00'"
+              @update:model-value="onPlanStopTimeChange"></n-time>
           </v-col>
 
           <v-col md="2">
             <label>Shift</label>
-            <v-select
-              v-model="form.shiftTeam"
-              :items="shiftList"
-              @update:model-value="onshiftChange"
-              :rules="[rules.required]"
-              item-value="col_value"
-              :readonly="status > '00'"
-            ></v-select>
+            <v-select v-model="form.shiftTeam" :items="shiftList" @update:model-value="onshiftChange"
+              :rules="[rules.required]" item-value="col_value" :readonly="status > '00'"></v-select>
           </v-col>
 
           <v-col md="2">
             <label>Shift Period</label>
-            <v-select
-              v-model="form.shiftPeriod"
-              :items="shiftPeriodList"
-              readonly
-            ></v-select>
+            <v-select v-model="form.shiftPeriod" :items="shiftPeriodList" readonly></v-select>
           </v-col>
 
           <v-col md="1">
-            <v-checkbox
-              v-model="form.b1"
-              label="Break 1"
-              value="Y"
-              @update:model-value="calculateTotalTime"
-            ></v-checkbox>
+            <v-checkbox v-model="form.b1" label="Break 1" value="Y"
+              @update:model-value="calculateTotalTime"></v-checkbox>
           </v-col>
           <v-col md="1">
-            <v-checkbox
-              v-model="form.b2"
-              label="Lunch Break"
-              value="Y"
-              @update:model-value="calculateTotalTime"
-            ></v-checkbox>
+            <v-checkbox v-model="form.b2" label="Lunch Break" value="Y"
+              @update:model-value="calculateTotalTime"></v-checkbox>
           </v-col>
           <v-col md="1">
-            <v-checkbox
-              v-model="form.b3"
-              label="Break 2"
-              value="Y"
-              @update:model-value="calculateTotalTime"
-            ></v-checkbox>
+            <v-checkbox v-model="form.b3" label="Break 2" value="Y"
+              @update:model-value="calculateTotalTime"></v-checkbox>
           </v-col>
           <v-col md="1">
-            <v-checkbox
-              v-model="form.b4"
-              label="Break OT"
-              value="Y"
-              @update:model-value="calculateTotalTime"
-            ></v-checkbox>
+            <v-checkbox v-model="form.b4" label="Break OT" value="Y"
+              @update:model-value="calculateTotalTime"></v-checkbox>
           </v-col>
-          <v-col md="2">
-            <v-checkbox
-              v-model="form.ot"
-              label="OT"
-              value="Y"
-              @update:model-value="calculateTotalTime"
-            ></v-checkbox>
+          <v-col md="1">
+            <v-checkbox v-model="form.ot" label="OT" value="Y" @update:model-value="calculateTotalTime"></v-checkbox>
+          </v-col>
+
+          <v-col md="1">
+            <label class="require-field">Efficiency %</label>
+            <n-input-number v-model="form.efficiency_percent" :rules="[rules.required, validateMax100]" digit="2"
+              v-maska=[maskOptions] :readonly="status == '90' || status == '30'"></n-input-number>
           </v-col>
 
           <v-col md="1">
@@ -133,15 +90,8 @@
 
           <v-col md="2">
             <label>Model</label>
-            <v-select
-              v-model="form.modelCd"
-              :items="modelList"
-              item-title="Model_CD"
-              item-value="Model_CD"
-              @update:model-value="onModelChange"
-              :rules="[rules.required]"
-              :readonly="status > '00'"
-            ></v-select>
+            <v-select v-model="form.modelCd" :items="modelList" item-title="Model_CD" item-value="Model_CD"
+              @update:model-value="onModelChange" :rules="[rules.required]" :readonly="status > '00'"></v-select>
           </v-col>
 
           <v-col md="2">
@@ -173,12 +123,8 @@
             >
             </n-input-number> -->
 
-            <n-time-mins
-              v-model="cycleTimeVModel"
-              :rules="[rules.required, validateCycleTime]"
-              :readonly="status > '00'"
-              @update:model-value="onCycleTimeChange"
-            ></n-time-mins>
+            <n-time-mins v-model="cycleTimeVModel" :rules="[rules.required, validateCycleTime]"
+              :readonly="status > '00'" @update:model-value="onCycleTimeChange"></n-time-mins>
           </v-col>
 
           <v-col md="1">
@@ -188,24 +134,14 @@
 
           <v-col md="2">
             <label>Operator</label>
-            <v-select
-              v-model="form.operator"
-              :items="userList"
-              item-value="col_value"
-              :readonly="status > '00'"
-              :rules="[rules.required]"
-            ></v-select>
+            <v-select v-model="form.operator" :items="userList" item-value="col_value" :readonly="status > '00'"
+              :rules="[rules.required]"></v-select>
           </v-col>
 
           <v-col md="2">
             <label>Leader</label>
-            <v-select
-              v-model="form.leader"
-              :items="userList"
-              item-value="col_value"
-              :rules="[rules.required]"
-              :readonly="status > '00'"
-            ></v-select>
+            <v-select v-model="form.leader" :items="userList" item-value="col_value" :rules="[rules.required]"
+              :readonly="status > '00'"></v-select>
           </v-col>
 
           <v-col md="2">
@@ -232,10 +168,7 @@
       <v-row>
         <v-col>
           <div class="d-flex justify-center">
-            <n-btn-save
-              @click="onSave"
-              :disabled="['30', '90'].includes(status)"
-            />
+            <n-btn-save @click="onSave" :disabled="['30', '90'].includes(status)" />
             <n-btn-cancel @click="router.back()" class="ml-3" />
             <n-btn-copy v-if="status !== ''" @click="onCopy" class="ml-3" />
           </div>
@@ -247,16 +180,9 @@
         <v-col>
           <div v-if="status !== ''">
             <hr class="my-5" />
-            <plan-product-data
-              v-model="route.params.id"
-              :okAmt="form.okAmt"
-              :ngAmt="form.ngAmt"
-              :planFgAmt="form.planFgAmt"
-              :planTotalTime="form.planTotalTime"
-              :actualTotalTime="form.actualTotalTime"
-              :setupTime="form.setupTime"
-              :actualFgAmt="form.actualFgAmt"
-            ></plan-product-data>
+            <plan-product-data v-model="route.params.id" :okAmt="form.okAmt" :ngAmt="form.ngAmt"
+              :planFgAmt="form.planFgAmt" :planTotalTime="form.planTotalTime" :actualTotalTime="form.actualTotalTime"
+              :setupTime="form.setupTime" :actualFgAmt="form.actualFgAmt"></plan-product-data>
           </div>
         </v-col>
       </v-row>
@@ -374,6 +300,8 @@ const onLineChange = (lineCd) => {
 
   form.value.lineName = line ? line.lineName : "";
   form.value.pkCd = line ? line.pkCd : "";
+  form.value.efficiency_percent = line ? line.efficiency_percent : "";
+
   modelList.value = [];
   form.value.modelCd = null;
   form.value.productCd = null;
@@ -758,4 +686,22 @@ const validatePlanDateBackDate = (planDate, planStartTime) => {
   }
   return true;
 };
+
+const maskOptions = {
+  mask: "##[.##]",
+  tokens: {
+    "#": { pattern: /[0-9]/ },
+    ".": { pattern: /\./, escape: true }
+  }
+}
+
+const validateMax100 = (val) => {
+  if (val == null || val === "") return true
+
+  let num = parseFloat(String(val).replace(/,/g, ""))
+  if (num > 100) {
+    form.value.efficiency_percent = 100.0
+  }
+  return true
+}
 </script>
