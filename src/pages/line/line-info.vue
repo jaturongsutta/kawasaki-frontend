@@ -76,7 +76,7 @@
           </v-row>
 
           <v-row>
-            <v-col cols="6">
+            <v-col cols="12">
               <v-data-table
                 :headers="headersModel"
                 :items="itemsModel"
@@ -135,6 +135,57 @@
                     "
                   ></v-select>
                   <div v-else v-text="item.modelCd"></div>
+                </template>
+
+                <template v-slot:[`item.productCd`]="{ item }">
+                  <v-text-field
+                    v-model="item.productCd"
+                    v-if="item.rowState === 'UPDATE'"
+                    hide-details="auto"
+                  ></v-text-field>
+                  <div v-else v-text="item.productCd"></div>
+                </template>
+
+                <template v-slot:[`item.partNo`]="{ item }">
+                  <v-text-field
+                    v-model="item.partNo"
+                    v-if="item.rowState === 'UPDATE'"
+                    hide-details="auto"
+                  ></v-text-field>
+                  <div v-else v-text="item.partNo"></div>
+                </template>
+
+                <template v-slot:[`item.partUpper`]="{ item }">
+                  <v-text-field
+                    v-model="item.partUpper"
+                    v-if="item.rowState === 'UPDATE'"
+                    hide-details="auto"
+                  ></v-text-field>
+                  <div v-else v-text="item.partUpper"></div>
+                </template>
+                <template v-slot:[`item.partLower`]="{ item }">
+                  <v-text-field
+                    v-model="item.partLower"
+                    v-if="item.rowState === 'UPDATE'"
+                    hide-details="auto"
+                  ></v-text-field>
+                  <div v-else v-text="item.partLower"></div>
+                </template>
+                <template v-slot:[`item.cycleTime`]="{ item }">
+                  <n-time-mins
+                    v-model="item.cycleTime"
+                    v-if="item.rowState === 'UPDATE'"
+                    hide-details="auto"
+                  ></n-time-mins>
+                  <div v-else v-text="item.cycleTime"></div>
+                </template>
+                <template v-slot:[`item.as400ProductCd`]="{ item }">
+                  <v-text-field
+                    v-model="item.as400ProductCd"
+                    v-if="item.rowState === 'UPDATE'"
+                    hide-details="auto"
+                  ></v-text-field>
+                  <div v-else v-text="item.as400ProductCd"></div>
                 </template>
 
                 <template v-slot:[`item.isActive`]="{ item }">
@@ -334,7 +385,12 @@ let itemsLineToolAll = [];
 const headersModel = ref([
   { title: "", key: "action", sortable: false },
   { title: "Model Code", key: "modelCd", sortable: false },
+  { title: "Product Code", key: "productCd", sortable: false },
   { title: "Part No", key: "partNo", sortable: false },
+  { title: "Part 1", key: "partUpper", sortable: false },
+  { title: "Part 2", key: "partLower", sortable: false },
+  { title: "Cycle Time(mins)", key: "cycleTime", sortable: false },
+  { title: "AS400 Product Code", key: "as400ProductCd", sortable: false },
   { title: "Active", key: "isActive", sortable: false },
 ]);
 const headersProcess = ref([
@@ -411,6 +467,11 @@ const doLoadData = async () => {
         rowState: "NONE",
         modelCd: item.modelCd,
         partNo: item.partNo,
+        productCd: item.productCd,
+        partUpper: item.partUpper,
+        partLower: item.partLower,
+        cycleTime: item.cycleTime,
+        as400ProductCd: item.as400ProductCd,
         isActive: item.isActive,
         statusName: item.statusName,
       };
