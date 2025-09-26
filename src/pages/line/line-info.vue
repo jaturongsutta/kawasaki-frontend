@@ -10,42 +10,23 @@
           <v-row>
             <v-col>
               <label class="require-field">PK Code</label>
-              <v-text-field
-                v-model="form.pkCd"
-                :rules="[rules.required]"
-                :readonly="mode === 'EDIT'"
-              ></v-text-field>
+              <v-text-field v-model="form.pkCd" :rules="[rules.required]" :readonly="mode === 'EDIT'"></v-text-field>
             </v-col>
             <v-col>
               <label class="require-field">Line Code</label>
-              <v-text-field
-                v-model="form.lineCd"
-                :rules="[rules.required]"
-                :readonly="mode === 'EDIT'"
-              ></v-text-field>
+              <v-text-field v-model="form.lineCd" :rules="[rules.required]" :readonly="mode === 'EDIT'"></v-text-field>
             </v-col>
             <v-col>
               <label class="require-field">Line Name</label>
-              <v-text-field
-                v-model="form.lineName"
-                :rules="[rules.required]"
-              ></v-text-field>
+              <v-text-field v-model="form.lineName" :rules="[rules.required]"></v-text-field>
             </v-col>
             <v-col>
               <label class="require-field">Efficiency</label>
-              <n-input-number
-                v-model="form.efficiencyPercent"
-                :rules="[rules.required]"
-                digit="2"
-              ></n-input-number>
+              <n-input-number v-model="form.efficiencyPercent" :rules="[rules.required]" digit="2"></n-input-number>
             </v-col>
             <v-col>
               <label class="require-field">Status</label>
-              <v-select
-                v-model="form.isActive"
-                :items="[...statusList]"
-                :rules="[rules.required]"
-              ></v-select>
+              <v-select v-model="form.isActive" :items="[...statusList]" :rules="[rules.required]"></v-select>
             </v-col>
 
             <v-col>
@@ -67,134 +48,83 @@
 
           <v-row>
             <v-col>
-              <n-btn-add
-                label="New Model"
-                @click="onAddModel"
-                class="mt-3"
-              ></n-btn-add>
+              <n-btn-add label="New Model" @click="onAddModel" class="mt-3"></n-btn-add>
             </v-col>
           </v-row>
 
           <v-row>
             <v-col cols="12">
-              <v-data-table
-                :headers="headersModel"
-                :items="itemsModel"
-                item-key="modelCd"
-                :items-per-page="-1"
-                hide-default-footer
-                select-strategy="single"
-                item-value="modelCd"
-                show-select
-                @update:modelValue="tableModelSelected"
-                return-object
-              >
-                <template
-                  v-slot:item.data-table-select="{
-                    internalItem,
-                    isSelected,
-                    toggleSelect,
-                  }"
-                >
-                  <v-checkbox-btn
-                    :model-value="isSelected(internalItem)"
-                    color="primary"
+              <v-data-table :headers="headersModel" :items="itemsModel" item-key="modelCd" :items-per-page="-1"
+                hide-default-footer select-strategy="single" item-value="modelCd" show-select
+                @update:modelValue="tableModelSelected" return-object>
+                <template v-slot:item.data-table-select="{
+                  internalItem,
+                  isSelected,
+                  toggleSelect,
+                }">
+                  <v-checkbox-btn :model-value="isSelected(internalItem)" color="primary"
                     @update:model-value="toggleSelect(internalItem)"
-                    v-if="internalItem.value.rowState !== 'NEW'"
-                  ></v-checkbox-btn>
+                    v-if="internalItem.value.rowState !== 'NEW'"></v-checkbox-btn>
                 </template>
                 <template v-slot:[`item.action`]="{ item }">
                   <!-- <n-gbtn-delete
                     @click="onDeleteModel(item)"
                     v-if="item.isActive === 'Y'"
                   ></n-gbtn-delete> -->
-                  <n-gbtn-edit
-                    @click="
-                      () => {
-                        item.rowState = 'UPDATE';
-                      }
-                    "
-                    v-if="item.rowState === 'NONE'"
-                  ></n-gbtn-edit>
+                  <n-gbtn-edit @click="
+                    () => {
+                      item.rowState = 'UPDATE';
+                    }
+                  " v-if="item.rowState === 'NONE'"></n-gbtn-edit>
                   <!-- {{ item.rowState }} -->
                 </template>
 
                 <template v-slot:[`item.modelCd`]="{ item }">
-                  <v-select
-                    v-if="item.rowState === 'NEW'"
-                    v-model="item.modelSelect"
-                    :items="[...modelList]"
-                    item-title="value"
-                    item-value="value"
-                    return-object
-                    hide-details="auto"
-                    @update:model-value="
+                  <v-select v-if="item.rowState === 'NEW'" v-model="item.modelSelect" :items="[...modelList]"
+                    item-title="value" item-value="value" return-object hide-details="auto" @update:model-value="
                       (o) => {
                         onSelectedModel(o, item);
                       }
-                    "
-                  ></v-select>
+                    "></v-select>
                   <div v-else v-text="item.modelCd"></div>
                 </template>
 
                 <template v-slot:[`item.productCd`]="{ item }">
-                  <v-text-field
-                    v-model="item.productCd"
-                    v-if="item.rowState === 'UPDATE'"
-                    hide-details="auto"
-                  ></v-text-field>
+                  <v-text-field v-model="item.productCd" v-if="getRowState(item)"
+                    hide-details="auto"></v-text-field>
                   <div v-else v-text="item.productCd"></div>
                 </template>
 
                 <template v-slot:[`item.partNo`]="{ item }">
-                  <v-text-field
-                    v-model="item.partNo"
-                    v-if="item.rowState === 'UPDATE'"
-                    hide-details="auto"
-                  ></v-text-field>
+                  <v-text-field v-model="item.partNo" v-if="getRowState(item)"
+                    hide-details="auto"></v-text-field>
                   <div v-else v-text="item.partNo"></div>
                 </template>
 
                 <template v-slot:[`item.partUpper`]="{ item }">
-                  <v-text-field
-                    v-model="item.partUpper"
-                    v-if="item.rowState === 'UPDATE'"
-                    hide-details="auto"
-                  ></v-text-field>
+                  <v-text-field v-model="item.partUpper" v-if="getRowState(item)"
+                    hide-details="auto"></v-text-field>
                   <div v-else v-text="item.partUpper"></div>
                 </template>
                 <template v-slot:[`item.partLower`]="{ item }">
-                  <v-text-field
-                    v-model="item.partLower"
-                    v-if="item.rowState === 'UPDATE'"
-                    hide-details="auto"
-                  ></v-text-field>
+                  <v-text-field v-model="item.partLower" v-if="getRowState(item)"
+                    hide-details="auto"></v-text-field>
                   <div v-else v-text="item.partLower"></div>
                 </template>
                 <template v-slot:[`item.cycleTime`]="{ item }">
-                  <n-time-mins
-                    v-model="item.cycleTime"
-                    v-if="item.rowState === 'UPDATE'"
-                    hide-details="auto"
-                  ></n-time-mins>
+                  <n-time-mins v-model="item.cycleTime" v-if="getRowState(item)"
+                    hide-details="auto"></n-time-mins>
                   <div v-else v-text="item.cycleTime"></div>
                 </template>
                 <template v-slot:[`item.as400ProductCd`]="{ item }">
-                  <v-text-field
-                    v-model="item.as400ProductCd"
-                    v-if="item.rowState === 'UPDATE'"
-                    hide-details="auto"
-                  ></v-text-field>
+                  <v-text-field v-model="item.as400ProductCd" v-if="getRowState(item)"
+                    hide-details="auto"></v-text-field>
                   <div v-else v-text="item.as400ProductCd"></div>
                 </template>
 
                 <template v-slot:[`item.isActive`]="{ item }">
-                  <v-select
-                    v-if="item.rowState === 'UPDATE'"
-                    v-model="item.isActive"
-                    :items="[...statusList]"
-                    hide-details="auto"
-                  ></v-select>
+                  <v-select v-if="getRowState(item)" v-model="item.isActive" :items="[...statusList]"
+                    hide-details="auto"></v-select>
                   <div v-else v-text="item.statusName"></div>
                 </template>
               </v-data-table>
@@ -203,51 +133,27 @@
 
           <v-row>
             <v-col>
-              <n-btn-add
-                label="New Process"
-                @click="onAddProcess"
-                class="mt-3"
-              ></n-btn-add>
+              <n-btn-add label="New Process" @click="onAddProcess" class="mt-3"></n-btn-add>
             </v-col>
           </v-row>
 
           <v-row>
             <v-col cols="8">
-              <v-data-table
-                v-model="isSelectedProcess"
-                :headers="headersProcess"
-                :items="itemsProcess"
-                :items-per-page="-1"
-                hide-default-footer
-                select-strategy="single"
-                item-value="modelCd"
-                show-select
-                return-object
-                @update:modelValue="tableProcessSelected"
-              >
-                <template
-                  v-slot:item.data-table-select="{
-                    internalItem,
-                    isSelected,
-                    toggleSelect,
-                  }"
-                >
-                  <v-checkbox-btn
-                    :model-value="isSelected(internalItem)"
-                    color="primary"
+              <v-data-table v-model="isSelectedProcess" :headers="headersProcess" :items="itemsProcess"
+                :items-per-page="-1" hide-default-footer select-strategy="single" item-value="modelCd" show-select
+                return-object @update:modelValue="tableProcessSelected">
+                <template v-slot:item.data-table-select="{
+                  internalItem,
+                  isSelected,
+                  toggleSelect,
+                }">
+                  <v-checkbox-btn :model-value="isSelected(internalItem)" color="primary"
                     @update:model-value="toggleSelect(internalItem)"
-                    v-if="internalItem.value.rowState !== 'NEW'"
-                  ></v-checkbox-btn>
+                    v-if="internalItem.value.rowState !== 'NEW'"></v-checkbox-btn>
                 </template>
                 <template v-slot:[`item.processCd`]="{ item }">
-                  <v-autocomplete
-                    v-if="item.rowState === 'NEW'"
-                    v-model="item.processCd"
-                    :items="[...machineList]"
-                    item-title="title"
-                    item-value="value"
-                    hide-details="auto"
-                    :rules="[rules.required]"
+                  <v-autocomplete v-if="item.rowState === 'NEW'" v-model="item.processCd" :items="[...machineList]"
+                    item-title="title" item-value="value" hide-details="auto" :rules="[rules.required]"
                     @update:model-value="
                       (val) => {
                         const machine = machineList.find(
@@ -257,77 +163,49 @@
                           item.machineNo = machine.machineNo;
                         }
                       }
-                    "
-                    autocomplete="off"
-                  ></v-autocomplete>
+                    " autocomplete="off"></v-autocomplete>
                   <div v-else v-text="item.processCd"></div>
                 </template>
                 <template v-slot:[`item.wt`]="{ item }">
-                  <n-time-mins
-                    v-model="item.wt"
-                    hide-details="auto"
-                    @update:model-value="
-                      (o) => {
-                        if (item.rowState === 'NONE') {
-                          item.rowState = 'UPDATE';
-                        }
+                  <n-time-mins v-model="item.wt" hide-details="auto" @update:model-value="
+                    (o) => {
+                      if (item.rowState === 'NONE') {
+                        item.rowState = 'UPDATE';
                       }
-                    "
-                    :rules="[rules.required]"
-                  ></n-time-mins>
+                    }
+                  " :rules="[rules.required]"></n-time-mins>
                 </template>
                 <template v-slot:[`item.ht`]="{ item }">
-                  <n-time-mins
-                    v-model="item.ht"
-                    hide-details="auto"
-                    @update:model-value="
-                      (o) => {
-                        if (item.rowState === 'NONE') {
-                          item.rowState = 'UPDATE';
-                        }
+                  <n-time-mins v-model="item.ht" hide-details="auto" @update:model-value="
+                    (o) => {
+                      if (item.rowState === 'NONE') {
+                        item.rowState = 'UPDATE';
                       }
-                    "
-                    :rules="[rules.required]"
-                  ></n-time-mins>
+                    }
+                  " :rules="[rules.required]"></n-time-mins>
                 </template>
                 <template v-slot:[`item.mt`]="{ item }">
-                  <n-time-mins
-                    v-model="item.mt"
-                    hide-details="auto"
-                    @update:model-value="
-                      (o) => {
-                        if (item.rowState === 'NONE') {
-                          item.rowState = 'UPDATE';
-                        }
+                  <n-time-mins v-model="item.mt" hide-details="auto" @update:model-value="
+                    (o) => {
+                      if (item.rowState === 'NONE') {
+                        item.rowState = 'UPDATE';
                       }
-                    "
-                    :rules="[rules.required]"
-                  ></n-time-mins>
+                    }
+                  " :rules="[rules.required]"></n-time-mins>
                 </template>
               </v-data-table>
             </v-col>
             <v-col cols="4">
-              <v-data-table
-                :headers="headersLineTool"
-                :items="itemsLineTool"
-                :items-per-page="-1"
-                style="width: 300px"
-                hide-default-footer
-                :sort-by="[{ key: 'hCode', order: 'asc' }]"
-              >
+              <v-data-table :headers="headersLineTool" :items="itemsLineTool" :items-per-page="-1" style="width: 300px"
+                hide-default-footer :sort-by="[{ key: 'hCode', order: 'asc' }]">
                 <template v-slot:[`item.isActive`]="{ item }">
-                  <v-checkbox
-                    v-model="item.isActive"
-                    value="Y"
-                    hide-details
-                    @update:model-value="
-                      (o) => {
-                        if (item.rowState === 'NONE') {
-                          item.rowState = 'UPDATE';
-                        }
+                  <v-checkbox v-model="item.isActive" value="Y" hide-details @update:model-value="
+                    (o) => {
+                      if (item.rowState === 'NONE') {
+                        item.rowState = 'UPDATE';
                       }
-                    "
-                  ></v-checkbox>
+                    }
+                  "></v-checkbox>
                 </template>
               </v-data-table>
             </v-col>
@@ -585,6 +463,11 @@ const onSelectedModel = (o, item) => {
   console.log(o);
   item.modelCd = o.value;
   item.partNo = o.partNo;
+  item.productCd = o.title;
+  item.partLower = o.partLower;
+  item.partUpper = o.partUpper;
+  item.cycleTime = o.cycleTime;
+  item.as400ProductCd = o.as400ProductCd;
   item.isActive = o.isActive;
 };
 
@@ -798,6 +681,10 @@ const validateProcess = () => {
   return true;
 };
 
+const getRowState = (item) => {
+  return item.rowState === 'UPDATE' || item.rowState === 'NEW'
+}
+
 // const selectedProcess = (selected, item) => {
 //   console.log("selected ", selected);
 
@@ -828,6 +715,7 @@ const validateProcess = () => {
   background-color: #007bff;
   color: white;
 }
+
 .btn-gray {
   background-color: #6c757d;
   color: white;
