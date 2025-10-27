@@ -28,7 +28,10 @@
               <label class="require-field">Status</label>
               <v-select v-model="form.isActive" :items="[...statusList]" :rules="[rules.required]"></v-select>
             </v-col>
-
+            <v-col>
+              <label class="require-field">Leak</label>
+              <v-select v-model="form.isLeak" :items="[...leakStatus]" :rules="[rules.required]"></v-select>
+            </v-col>
             <v-col>
               <label>Updated By</label>
               <v-text-field v-model="form.updatedBy" readonly></v-text-field>
@@ -90,30 +93,25 @@
                 </template>
 
                 <template v-slot:[`item.productCd`]="{ item }">
-                  <v-text-field v-model="item.productCd" v-if="getRowState(item)"
-                    hide-details="auto"></v-text-field>
+                  <v-text-field v-model="item.productCd" v-if="getRowState(item)" hide-details="auto"></v-text-field>
                   <div v-else v-text="item.productCd"></div>
                 </template>
 
                 <template v-slot:[`item.partNo`]="{ item }">
-                  <v-text-field v-model="item.partNo" v-if="getRowState(item)"
-                    hide-details="auto"></v-text-field>
+                  <v-text-field v-model="item.partNo" v-if="getRowState(item)" hide-details="auto"></v-text-field>
                   <div v-else v-text="item.partNo"></div>
                 </template>
 
                 <template v-slot:[`item.partUpper`]="{ item }">
-                  <v-text-field v-model="item.partUpper" v-if="getRowState(item)"
-                    hide-details="auto"></v-text-field>
+                  <v-text-field v-model="item.partUpper" v-if="getRowState(item)" hide-details="auto"></v-text-field>
                   <div v-else v-text="item.partUpper"></div>
                 </template>
                 <template v-slot:[`item.partLower`]="{ item }">
-                  <v-text-field v-model="item.partLower" v-if="getRowState(item)"
-                    hide-details="auto"></v-text-field>
+                  <v-text-field v-model="item.partLower" v-if="getRowState(item)" hide-details="auto"></v-text-field>
                   <div v-else v-text="item.partLower"></div>
                 </template>
                 <template v-slot:[`item.cycleTime`]="{ item }">
-                  <n-time-mins v-model="item.cycleTime" v-if="getRowState(item)"
-                    hide-details="auto"></n-time-mins>
+                  <n-time-mins v-model="item.cycleTime" v-if="getRowState(item)" hide-details="auto"></n-time-mins>
                   <div v-else v-text="item.cycleTime"></div>
                 </template>
                 <template v-slot:[`item.as400ProductCd`]="{ item }">
@@ -251,6 +249,13 @@ const isLoading = ref(false);
 
 const isLoadingProcess = ref(false);
 const statusList = ref([]);
+const leakStatus = ref([{
+  value: "N",
+  title: "No",
+}, {
+  value: "Y",
+  title: "Yes",
+}]);
 const modelList = ref([]);
 const machineList = ref([]);
 const itemsModel = ref([]);
@@ -300,6 +305,7 @@ onMounted(() => {
   ddlApi.getPredefine({ group: "Is_Active", sortby: "text" }).then((data) => {
     statusList.value = data;
   });
+
 
   ddlApi.model_().then((data) => {
     modelList.value = data;
