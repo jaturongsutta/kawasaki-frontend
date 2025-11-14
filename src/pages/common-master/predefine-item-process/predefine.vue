@@ -2,7 +2,7 @@
   <div>
     <v-card>
       <v-card-title>
-        <h4>Reason Maching Process</h4>
+        <h4>Reason Matching Process</h4>
       </v-card-title>
       <v-card-text>
         <v-row>
@@ -89,7 +89,7 @@
       <v-form ref="frmInfo">
         <v-card>
           <v-card-title>
-            <span class="headline">{{ mode }} Reason Maching Process</span>
+            <span class="headline">{{ mode }} Reason Matching Process</span>
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
@@ -200,7 +200,7 @@ onMounted(() => {
     data = data.map((item) => {
       return {
         value: item.machineNo + "_" + item.processCd,
-        title: item.machineNo + " " + item.processCd,
+        title: item.processCd,
         machineNo: item.machineNo,
         processCd: item.processCd,
       };
