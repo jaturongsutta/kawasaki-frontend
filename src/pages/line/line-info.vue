@@ -314,7 +314,7 @@ onMounted(() => {
     data = data.map((item) => {
       return {
         value: item.machineNo + "_" + item.processCd,
-        title: item.machineNo + " " + item.processCd,
+        title: item.processCd,
         machineNo: item.machineNo,
         processCd: item.processCd,
       };
