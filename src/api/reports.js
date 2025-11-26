@@ -17,3 +17,13 @@ export const exportEfficiencyReport = async ({ lineCd, month, year }) => {
   });
   return response;
 };
+
+
+export const searchCYHTestingResult = async (data) => {
+  try {
+    const response = await axios.post(`/report-cyh-leak-test/search-testing-result`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

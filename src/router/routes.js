@@ -279,6 +279,13 @@ const routes = [
     },
     component: () => import("@/pages/download-apk.vue"),
   },
+  {
+    path: "/reports/cyh/testing-result-report",
+    meta: {
+      menuNo: "M3201",
+    },
+    component: () => import("@/pages/reports/cyh-leak-test-report/testing-result-report.vue"),
+  },
 ];
 
 export default routes;
