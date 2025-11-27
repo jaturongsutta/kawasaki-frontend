@@ -63,6 +63,15 @@ export const searchMachineTracking = async (data) => {
   }
 };
 
+export const searchMachineRunning = async (data) => {
+  try {
+    const response = await axios.post(`/report-cyh-leak-test/search-machine-running`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const exportCYHTestingResultReport = async (data) => {
   const response = await axios.post('/report-cyh-leak-test/export', data, {
     responseType: "blob",
@@ -87,6 +96,17 @@ export const exportCYHTestingResultSummaryReport = async (data) => {
 
 export const exportCYHMachineTrackingReport = async (data) => {
   const response = await axios.post('/report-cyh-leak-test/export-machine-tracking', data, {
+    responseType: "blob",
+    headers: {
+      Accept:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    },
+  });
+  return response;
+};
+
+export const exportCYHMachineRunningReport = async (data) => {
+  const response = await axios.post('/report-cyh-leak-test/export-machine-running', data, {
     responseType: "blob",
     headers: {
       Accept:
