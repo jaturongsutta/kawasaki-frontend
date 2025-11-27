@@ -40,7 +40,7 @@
         <v-row>
           <v-col>
             <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headersDetail"
-              :items="items" :items-length="totalItems" @update:options="loadData">
+              :items="items" :items-length="totalItems" @update:options="loadData" hide-default-footer>
               <template #header="{ columns }">
                 <tr>
                   <th v-for="col in columns" :key="col.key" :style="{
@@ -63,11 +63,9 @@
                   </td>
                 </tr>
               </template>
-              <template v-slot:bottom>
-                <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
-                  v-model:totalItems="totalItems"></n-pagination>
-              </template>
             </v-data-table-server>
+
+            <div style="height: 50px;"></div>
           </v-col>
         </v-row>
       </v-card-text>
@@ -79,12 +77,13 @@
 <script setup>
 import { ref, onMounted, inject } from "vue";
 import * as api from "@/api/reports";
-import { getDateFormat, getPaging } from "@/utils/utils.js";
+import { getDateFormat, getFirstDayOfMonth, getPaging } from "@/utils/utils.js";
+import { getLastDateOfMonth } from "@/utils/date";
 const Alert = inject("Alert");
 
 const frmSearch = ref(null);
 const currentPage = ref(1);
-const pageSize = ref(100);
+const pageSize = ref(100000);
 const totalItems = ref(0);
 let items = ref([]);
 // Loading states
@@ -98,11 +97,11 @@ const headersDetail = [
 
   {
     title: "Plan Start Date", key: "Plan_Start_Date", sortable: false, width: 180,
-    format: (item) => getDateFormat(item.Plan_Start_Date, "dd/MM/yyyy")
+    format: (item) => getDateFormat(item.Plan_Start_Date, "yyyy MMM dd")
   },
   {
     title: "Plan End Date", key: "Plan_End_Date", sortable: false, width: 180,
-    format: (item) => getDateFormat(item.Plan_End_Date, "dd/MM/yyyy")
+    format: (item) => getDateFormat(item.Plan_End_Date, "yyyy MMM dd")
   },
   { title: "Machine", key: "Machine_No", sortable: false },
 
@@ -119,8 +118,8 @@ const headersDetail = [
 ];
 
 const formSearch = ref({
-  planDateStart: '',
-  planDateEnd: '',
+  planDateStart: getFirstDayOfMonth(),
+  planDateEnd: getLastDateOfMonth(),
   machineNo: null,
   workType: null,
 });
@@ -172,8 +171,8 @@ const loadData = async (paginate) => {
 
 const onReset = () => {
   formSearch.value = {
-    planDateStart: '',
-    planDateEnd: '',
+    planDateStart: getFirstDayOfMonth(),
+    planDateEnd: getLastDateOfMonth(),
     machineNo: null,
     workType: null,
   };

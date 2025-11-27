@@ -38,6 +38,14 @@ export function getDateFormat(date, format) {
   return null;
 }
 
+export function getFirstDayOfMonth() {
+  return DateTime.now().startOf("month").toFormat("yyyy-MM-dd");
+}
+
+export function getLastDayOfMonth() {
+  return DateTime.now().endOf("month").toFormat("yyyy-MM-dd");
+}
+
 export function getCurrrentDate() {
   return DateTime.now().toISODate();
 }

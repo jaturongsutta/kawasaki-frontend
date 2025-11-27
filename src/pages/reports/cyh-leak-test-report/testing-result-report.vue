@@ -112,7 +112,8 @@
 <script setup>
 import { ref, onMounted, inject } from "vue";
 import * as api from "@/api/reports";
-import { getDateFormat, getPaging } from "@/utils/utils.js";
+import { getDateFormat, getFirstDayOfMonth, getPaging } from "@/utils/utils.js";
+import { getLastDateOfMonth } from "@/utils/date";
 const Alert = inject("Alert");
 
 const frmSearch = ref(null);
@@ -130,12 +131,12 @@ const headersDetail = [
   { title: "Machine", key: "Machine_No", sortable: false },
 
   {
-    title: "Start Date", key: "Start_Date", sortable: false, width: 180,
-    format: (item) => getDateFormat(item.Start_Date)
+    title: "Start Date", key: "Start_Date", sortable: false, width: 200,
+    format: (item) => getDateFormat(item.Start_Date, 'yyyy MMM dd HH:mm:ss')
   },
   {
-    title: "End Date", key: "End_Date", sortable: false, width: 180,
-    format: (item) => getDateFormat(item.End_Date)
+    title: "End Date", key: "End_Date", sortable: false, width: 200,
+    format: (item) => getDateFormat(item.End_Date, 'yyyy MMM dd HH:mm:ss')
   },
 
   { title: "Plan Year", key: "plan_year", sortable: false },
@@ -189,8 +190,8 @@ const headersDetail = [
 ];
 
 const formSearch = ref({
-  planDateStart: '',
-  planDateEnd: '',
+  planDateStart: getFirstDayOfMonth(),
+  planDateEnd: getLastDateOfMonth(),
   machineNo: null,
   workType: null,
   mcDate: null,
@@ -243,8 +244,8 @@ const loadData = async (paginate) => {
 
 const onReset = () => {
   formSearch.value = {
-    planDateStart: '',
-    planDateEnd: '',
+    planDateStart: getFirstDayOfMonth(),
+    planDateEnd: getLastDateOfMonth(),
     machineNo: null,
     workType: null,
     mcDate: null,
@@ -264,7 +265,7 @@ const onExport = async () => {
     }
 
     isLoading.value = true;
-   
+
     // Call the API function
     const response = await api.exportCYHTestingResultReport(formSearch.value);
 

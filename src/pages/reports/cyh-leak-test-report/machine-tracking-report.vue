@@ -2,21 +2,21 @@
   <div>
     <v-card>
       <v-card-title>
-        <h4>Testing Result Report</h4>
+        <h4>Machine Tracking Report</h4>
       </v-card-title>
       <v-card-text>
         <v-form ref="frmSearch">
           <v-row>
-            <v-col cols="12" sm="6" md="2">
+            <v-col cols="12" sm="6" md="3">
               <label>Plan Start Date</label>
               <n-date v-model="formSearch.planDateStart" @update:modelValue="formSearch.planDateEnd = null"></n-date>
             </v-col>
-            <v-col cols="12" sm="6" md="2">
+            <v-col cols="12" sm="6" md="3">
               <label>Plan End Date</label>
               <n-date v-model="formSearch.planDateEnd" :min-date="formSearch.planDateStart"></n-date>
             </v-col>
 
-            <v-col cols="12" sm="6" md="2">
+            <v-col cols="12" sm="6" md="3">
               <label>Machine</label>
               <v-select v-model="formSearch.machineNo" :items="[{ title: 'All', value: null }, ...machineList]"
                 item-title="title" item-value="value" />
@@ -25,10 +25,6 @@
             <v-col cols="12" sm="6" md="3">
               <label>Work Type</label>
               <v-select v-model="formSearch.workType" :items="worktypeList" item-title="title" item-value="value" />
-            </v-col>
-            <v-col cols="12" sm="12" md="3">
-              <label>M/C Date</label>
-              <v-text-field v-model="formSearch.mcDate"></v-text-field>
             </v-col>
           </v-row>
           <div class="d-flex justify-center mt-2 mb-1">
@@ -63,36 +59,9 @@
                     width: (col.width || 120) + 'px',
                     minWidth: (col.width || 120) + 'px',
                   }">
-
-                    <div v-if="col.key === 'FG'" :style="{
-                      background: item.FG == 1 ? '#4CAF50' : '#F44336',
-                      color: 'white',
-                      textAlign: 'center',
-                      fontWeight: '600',
-                      borderRadius: '4px',
-                      padding: '4px 0'
-                    }">
-                      {{ item.FG }}
-                    </div>
-
-                    <div v-else-if="['NG_P1', 'NG_P2', 'NG_P3', 'NG_P4', 'NG_TB'].includes(col.key)" :style="{
-                      background: item[col.key] == 1 ? '#4CAF50'
-                        : item[col.key] == 2 ? '#F44336'
-                          : 'transparent',
-                      color: item[col.key] == 1 || item[col.key] == 2 ? 'white' : 'inherit',
-                      textAlign: 'center',
-                      fontWeight: item[col.key] == 1 || item[col.key] == 2 ? '600' : 'normal',
-                      borderRadius: '4px',
-                      padding: '4px 0'
-                    }">
-                      {{ item[col.key] }}
-                    </div>
-
-                    <div v-else>
+                    <div>
                       {{ col.format ? col.format(item) : item[col.key] }}
                     </div>
-
-
                   </td>
                 </tr>
               </template>
@@ -112,7 +81,8 @@
 <script setup>
 import { ref, onMounted, inject } from "vue";
 import * as api from "@/api/reports";
-import { getDateFormat, getPaging } from "@/utils/utils.js";
+import { getDateFormat, getFirstDayOfMonth, getPaging } from "@/utils/utils.js";
+import { getLastDateOfMonth } from "@/utils/date";
 const Alert = inject("Alert");
 
 const frmSearch = ref(null);
@@ -127,73 +97,21 @@ const machineList = ref([]);
 const worktypeList = ref([]);
 
 const headersDetail = [
+  {
+    title: "State Date", key: "State_Date", sortable: false, width: 200,
+    format: (item) => getDateFormat(item.State_Date, 'yyyy MMM dd HH:mm:ss')
+  },
   { title: "Machine", key: "Machine_No", sortable: false },
-
-  {
-    title: "Start Date", key: "Start_Date", sortable: false, width: 180,
-    format: (item) => getDateFormat(item.Start_Date)
-  },
-  {
-    title: "End Date", key: "End_Date", sortable: false, width: 180,
-    format: (item) => getDateFormat(item.End_Date)
-  },
-
-  { title: "Plan Year", key: "plan_year", sortable: false },
-  { title: "Plan Month", key: "plan_month", sortable: false },
-  { title: "Plan Day", key: "plan_day", sortable: false },
-
-  { title: "Shift", key: "Shift_Period", sortable: false },
+  { title: "Machine State", key: "Machine_State", sortable: false },
   { title: "Machine Type", key: "Machine_Type", sortable: false },
-
   { title: "M/C Date", key: "MC_Date", sortable: false },
-  { title: "Original M/C Date", key: "ori_MC_Date", sortable: false },
-
-  { title: "M/C No", key: "MC_No", sortable: false },
-  { title: "M/C Day", key: "MC_Day", sortable: false },
-  { title: "M/C Month", key: "MC_Month", sortable: false },
-  { title: "M/C Year", key: "MC_Year", sortable: false },
-  { title: "M/C Line", key: "MC_Line", sortable: false },
-  { title: "M/C Shift", key: "MC_Shift", sortable: false },
-
-  { title: "Work Type", key: "Work_Type", sortable: false },
-  { title: "Model", key: "Model_CD", sortable: false },
-
-  { title: "Part No.", key: "part", sortable: false },
-
-  { title: "G/S", key: "GS_No", sortable: false },
-  { title: "FG", key: "FG", sortable: false },
-
-  // ---- NG CH1–CH5 (ตาม JSON: NG_P1, NG_P2...) ----
-  { title: "P1, OH, CH1", key: "NG_P1", sortable: false },
-  { title: "P2, WJ, CH2", key: "NG_P2", sortable: false },
-  { title: "P3, CC, CH3", key: "NG_P3", sortable: false },
-  { title: "P4, -, CH4", key: "NG_P4", sortable: false },
-  { title: "P5, T/B, CH5", key: "NG_TB", sortable: false },
-
-  // ---- NG Values ----
-  { title: "P1, OH, CH1 Value", key: "NG_P1_Value", sortable: false },
-  { title: "P2, WJ, CH2 Value", key: "NG_P2_Value", sortable: false },
-  { title: "P3, CC, CH3 Value", key: "NG_P3_Value", sortable: false },
-  { title: "P4, -, CH4 Value", key: "NG_P4_Value", sortable: false },
-  { title: "P5, T/B, CH5 Value", key: "NG_TB_Value", sortable: false },
-
-  // ---- C/A & Casting ----
-  { title: "C/A Date", key: "Casting_Date", sortable: false },
-  { title: "Mold No", key: "Mold_No", sortable: false },
-  { title: "C/A No", key: "Casting_No", sortable: false },
-
-  { title: "Casting Day", key: "Casting_Day", sortable: false },
-  { title: "Casting Month", key: "Casting_Month", sortable: false },
-  { title: "Casting Year", key: "Casting_Year", sortable: false },
-  { title: "Mold Number", key: "Mold_Number", sortable: false },
 ];
 
 const formSearch = ref({
-  planDateStart: '',
-  planDateEnd: '',
-  machineNo: '',
+  planDateStart: getFirstDayOfMonth(),
+  planDateEnd: getLastDateOfMonth(),
+  machineNo: null,
   workType: null,
-  mcDate: null,
 });
 
 onMounted(async () => {
@@ -229,7 +147,7 @@ const loadData = async (paginate) => {
       searchOptions,
     };
 
-    const response = await api.searchCYHTestingResult(data);
+    const response = await api.searchMachineTracking(data);
     console.log("response => ", response)
     items.value = response.data;
     totalItems.value = response.total_record;
@@ -243,11 +161,10 @@ const loadData = async (paginate) => {
 
 const onReset = () => {
   formSearch.value = {
-    planDateStart: '',
-    planDateEnd: '',
-    machineNo: '',
+    planDateStart: getFirstDayOfMonth(),
+    planDateEnd: getLastDateOfMonth(),
+    machineNo: null,
     workType: null,
-    mcDate: null,
   };
   items.value = [];
   totalItems.value = 0;
@@ -264,9 +181,9 @@ const onExport = async () => {
     }
 
     isLoading.value = true;
-   
+
     // Call the API function
-    const response = await api.exportCYHTestingResultReport(formSearch.value);
+    const response = await api.exportCYHMachineTrackingReport(formSearch.value);
 
     // Create blob and download file
     const blob = new Blob([response.data], {
@@ -290,7 +207,7 @@ const onExport = async () => {
 
     const timestamp = `${YY}${MM}${DD}${hh}${mm}${ss}`;
 
-    link.download = `Report1-Testing-Result-${timestamp}.xlsx`;
+    link.download = `Report3-Machine-Tracking-${timestamp}.xlsx`;
     document.body.appendChild(link);
     link.click();
 
