@@ -191,7 +191,7 @@ const headersDetail = [
 const formSearch = ref({
   planDateStart: '',
   planDateEnd: '',
-  machineNo: null,
+  machineNo: '',
   workType: null,
   mcDate: null,
 });
@@ -245,7 +245,7 @@ const onReset = () => {
   formSearch.value = {
     planDateStart: '',
     planDateEnd: '',
-    machineNo: null,
+    machineNo: '',
     workType: null,
     mcDate: null,
   };

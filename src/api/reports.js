@@ -45,8 +45,28 @@ export const searchCYHTestingResult = async (data) => {
   }
 };
 
+export const searchCYHTestingResultSummary = async (data) => {
+  try {
+    const response = await axios.post(`/report-cyh-leak-test/search-testing-result-summary`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const exportCYHTestingResultReport = async (data) => {
   const response = await axios.post('/report-cyh-leak-test/export', data, {
+    responseType: "blob",
+    headers: {
+      Accept:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    },
+  });
+  return response;
+};
+
+export const exportCYHTestingResultSummaryReport = async (data) => {
+  const response = await axios.post('/report-cyh-leak-test/export-testing-result-summary', data, {
     responseType: "blob",
     headers: {
       Accept:

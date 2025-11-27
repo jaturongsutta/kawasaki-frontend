@@ -286,6 +286,34 @@ const routes = [
     },
     component: () => import("@/pages/reports/cyh-leak-test-report/testing-result-report.vue"),
   },
+  {
+    path: "/reports/cyh/testing-result-summary-report",
+    meta: {
+      menuNo: "M3202",
+    },
+    component: () => import("@/pages/reports/cyh-leak-test-report/testing-result-summary-report.vue"),
+  },
+  {
+    path: "/reports/cyh/machine-tracking-report",
+    meta: {
+      menuNo: "M3203",
+    },
+    component: () => import("@/pages/reports/cyh-leak-test-report/machine-tracking-report.vue"),
+  },
+  {
+    path: "/reports/cyh/machine-running-report",
+    meta: {
+      menuNo: "M3204",
+    },
+    component: () => import("@/pages/reports/cyh-leak-test-report/machine-running-report.vue"),
+  },
+  {
+    path: "/reports/cyh/machine-noplan-summary-report",
+    meta: {
+      menuNo: "M3205",
+    },
+    component: () => import("@/pages/reports/cyh-leak-test-report/machine-noplan-summary-report.vue"),
+  },
 ];
 
 export default routes;
