@@ -18,6 +18,23 @@ export const exportEfficiencyReport = async ({ lineCd, month, year }) => {
   return response;
 };
 
+export const getMachine = async (data) => {
+  try {
+    const response = await axios.get(`/report-cyh-leak-test/machine`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getWorktype = async (data) => {
+  try {
+    const response = await axios.get(`/report-cyh-leak-test/worktype`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const searchCYHTestingResult = async (data) => {
   try {
@@ -26,4 +43,15 @@ export const searchCYHTestingResult = async (data) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const exportCYHTestingResultReport = async (data) => {
+  const response = await axios.post('/report-cyh-leak-test/export', data, {
+    responseType: "blob",
+    headers: {
+      Accept:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    },
+  });
+  return response;
 };

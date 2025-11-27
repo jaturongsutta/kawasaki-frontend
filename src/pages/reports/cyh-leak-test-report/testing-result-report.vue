@@ -7,10 +7,6 @@
       <v-card-text>
         <v-form ref="frmSearch">
           <v-row>
-            <!-- <v-col cols="12" sm="6" md="3">
-              <label>Line</label>
-              <v-select v-model="form.lineCd" :items="lineList" :rules="[rules.required]" />
-            </v-col> -->
             <v-col cols="12" sm="6" md="2">
               <label>Plan Start Date</label>
               <n-date v-model="formSearch.planDateStart" @update:modelValue="formSearch.planDateEnd = null"></n-date>
@@ -22,12 +18,13 @@
 
             <v-col cols="12" sm="6" md="2">
               <label>Machine</label>
-              <v-select v-model="formSearch.machineNo" :items="monthList" item-title="title" item-value="value" />
+              <v-select v-model="formSearch.machineNo" :items="[{ title: 'All', value: null }, ...machineList]"
+                item-title="title" item-value="value" />
             </v-col>
 
             <v-col cols="12" sm="6" md="3">
               <label>Work Type</label>
-              <v-select v-model="formSearch.workType" :items="yearList" item-title="title" item-value="value" />
+              <v-select v-model="formSearch.workType" :items="worktypeList" item-title="title" item-value="value" />
             </v-col>
             <v-col cols="12" sm="12" md="3">
               <label>M/C Date</label>
@@ -36,7 +33,7 @@
           </v-row>
           <div class="d-flex justify-center mt-2 mb-1">
             <n-btn-search @click="onSearch" />
-            <n-btn-reset class="ml-3" @click="onClear"> </n-btn-reset>
+            <n-btn-reset class="ml-3" @click="onReset"> </n-btn-reset>
             <n-btn-export @click="onExport" class="ml-3"> </n-btn-export>
           </div>
         </v-form>
@@ -48,13 +45,57 @@
           <v-col>
             <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headersDetail"
               :items="items" :items-length="totalItems" @update:options="loadData">
-              <template v-slot:[`item.action`]="{ item }">
-                <n-gbtn-edit :permission="false" @click="onEdit(item.id)"></n-gbtn-edit>
-
-                <n-gbtn-delete :permission="false" v-if="item.status === '00' && item.ID_Ref === null"
-                  @click="onDelete(item.id)"></n-gbtn-delete>
+              <template #header="{ columns }">
+                <tr>
+                  <th v-for="col in columns" :key="col.key" :style="{
+                    width: (col.width || 120) + 'px',
+                    minWidth: (col.width || 120) + 'px',
+                  }">
+                    {{ col.title }}
+                  </th>
+                </tr>
               </template>
 
+
+              <template #item="{ item, columns }">
+                <tr>
+                  <td v-for="col in columns" :key="col.key" :style="{
+                    width: (col.width || 120) + 'px',
+                    minWidth: (col.width || 120) + 'px',
+                  }">
+
+                    <div v-if="col.key === 'FG'" :style="{
+                      background: item.FG == 1 ? '#4CAF50' : '#F44336',
+                      color: 'white',
+                      textAlign: 'center',
+                      fontWeight: '600',
+                      borderRadius: '4px',
+                      padding: '4px 0'
+                    }">
+                      {{ item.FG }}
+                    </div>
+
+                    <div v-else-if="['NG_P1', 'NG_P2', 'NG_P3', 'NG_P4', 'NG_TB'].includes(col.key)" :style="{
+                      background: item[col.key] == 1 ? '#4CAF50'
+                        : item[col.key] == 2 ? '#F44336'
+                          : 'transparent',
+                      color: item[col.key] == 1 || item[col.key] == 2 ? 'white' : 'inherit',
+                      textAlign: 'center',
+                      fontWeight: item[col.key] == 1 || item[col.key] == 2 ? '600' : 'normal',
+                      borderRadius: '4px',
+                      padding: '4px 0'
+                    }">
+                      {{ item[col.key] }}
+                    </div>
+
+                    <div v-else>
+                      {{ col.format ? col.format(item) : item[col.key] }}
+                    </div>
+
+
+                  </td>
+                </tr>
+              </template>
               <template v-slot:bottom>
                 <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
                   v-model:totalItems="totalItems"></n-pagination>
@@ -65,46 +106,47 @@
       </v-card-text>
       <n-loading :loading="isLoading" />
     </v-card>
-    <n-loading :loading="isLoading" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, inject } from "vue";
-import * as ddlApi from "@/api/dropdown-list"; // Assuming ddlApi is the correct import for dropdown data
 import * as api from "@/api/reports";
-import rules from "@/utils/rules";
-import {  getPaging } from "@/utils/utils.js";
+import { getDateFormat, getPaging } from "@/utils/utils.js";
 const Alert = inject("Alert");
 
 const frmSearch = ref(null);
-
-// Form data
-const form = ref({
-  lineCd: "",
-  month: "",
-  year: "",
-});
-
 const currentPage = ref(1);
 const pageSize = ref(20);
 const totalItems = ref(0);
 let items = ref([]);
+// Loading states
+const isLoading = ref(false);
+// Dropdown lists
+const machineList = ref([]);
+const worktypeList = ref([]);
 
 const headersDetail = [
-   { title: "Machine", key: "Machine_No", sortable: false },
-  { title: "Start Date", key: "Start_Date", sortable: false },
-  { title: "End Date", key: "End_Date", sortable: false },
+  { title: "Machine", key: "Machine_No", sortable: false },
 
-  { title: "Plan Year", key: "Plan_Year", sortable: false },
-  { title: "Plan Month", key: "Plan_Month", sortable: false },
-  { title: "Plan Day", key: "Plan_Day", sortable: false },
+  {
+    title: "Start Date", key: "Start_Date", sortable: false, width: 180,
+    format: (item) => getDateFormat(item.Start_Date)
+  },
+  {
+    title: "End Date", key: "End_Date", sortable: false, width: 180,
+    format: (item) => getDateFormat(item.End_Date)
+  },
 
-  { title: "Shift", key: "Shift", sortable: false },
+  { title: "Plan Year", key: "plan_year", sortable: false },
+  { title: "Plan Month", key: "plan_month", sortable: false },
+  { title: "Plan Day", key: "plan_day", sortable: false },
+
+  { title: "Shift", key: "Shift_Period", sortable: false },
   { title: "Machine Type", key: "Machine_Type", sortable: false },
 
   { title: "M/C Date", key: "MC_Date", sortable: false },
-  { title: "Original M/C Date", key: "Original_MC_Date", sortable: false },
+  { title: "Original M/C Date", key: "ori_MC_Date", sortable: false },
 
   { title: "M/C No", key: "MC_No", sortable: false },
   { title: "M/C Day", key: "MC_Day", sortable: false },
@@ -115,26 +157,30 @@ const headersDetail = [
 
   { title: "Work Type", key: "Work_Type", sortable: false },
   { title: "Model", key: "Model_CD", sortable: false },
-  { title: "Part No.", key: "Part_No", sortable: false },
+
+  { title: "Part No.", key: "part", sortable: false },
 
   { title: "G/S", key: "GS_No", sortable: false },
   { title: "FG", key: "FG", sortable: false },
 
-  { title: "P1, OH, CH1", key: "P1_CH1", sortable: false },
-  { title: "P2, WJ, CH2", key: "P2_CH2", sortable: false },
-  { title: "P3, CC, CH3", key: "P3_CH3", sortable: false },
-  { title: "P4, -, CH4", key: "P4_CH4", sortable: false },
-  { title: "P5, T/B, CH5", key: "P5_CH5", sortable: false },
+  // ---- NG CH1–CH5 (ตาม JSON: NG_P1, NG_P2...) ----
+  { title: "P1, OH, CH1", key: "NG_P1", sortable: false },
+  { title: "P2, WJ, CH2", key: "NG_P2", sortable: false },
+  { title: "P3, CC, CH3", key: "NG_P3", sortable: false },
+  { title: "P4, -, CH4", key: "NG_P4", sortable: false },
+  { title: "P5, T/B, CH5", key: "NG_TB", sortable: false },
 
-  { title: "P1, OH, CH1 Value", key: "P1_CH1_Value", sortable: false },
-  { title: "P2, WJ, CH2 Value", key: "P2_CH2_Value", sortable: false },
-  { title: "P3, CC, CH3 Value", key: "P3_CH3_Value", sortable: false },
-  { title: "P4, -, CH4 Value", key: "P4_CH4_Value", sortable: false },
-  { title: "P5, T/B, CH5 Value", key: "P5_CH5_Value", sortable: false },
+  // ---- NG Values ----
+  { title: "P1, OH, CH1 Value", key: "NG_P1_Value", sortable: false },
+  { title: "P2, WJ, CH2 Value", key: "NG_P2_Value", sortable: false },
+  { title: "P3, CC, CH3 Value", key: "NG_P3_Value", sortable: false },
+  { title: "P4, -, CH4 Value", key: "NG_P4_Value", sortable: false },
+  { title: "P5, T/B, CH5 Value", key: "NG_TB_Value", sortable: false },
 
-  { title: "C/A Date", key: "CA_Date", sortable: false },
+  // ---- C/A & Casting ----
+  { title: "C/A Date", key: "Casting_Date", sortable: false },
   { title: "Mold No", key: "Mold_No", sortable: false },
-  { title: "C/A No", key: "CA_No", sortable: false },
+  { title: "C/A No", key: "Casting_No", sortable: false },
 
   { title: "Casting Day", key: "Casting_Day", sortable: false },
   { title: "Casting Month", key: "Casting_Month", sortable: false },
@@ -142,27 +188,22 @@ const headersDetail = [
   { title: "Mold Number", key: "Mold_Number", sortable: false },
 ];
 
-// Loading states
-const isLoading = ref(false);
-
-// Dropdown lists
-const lineList = ref([]);
-
-const monthList = ref([]);
-
-const yearList = ref([]);
-
-
 const formSearch = ref({
-  planDateStart:'',
-  planDateEnd:'',
+  planDateStart: '',
+  planDateEnd: '',
   machineNo: '',
-  workType: '',
-  mcDate: '',
+  workType: null,
+  mcDate: null,
 });
 
 onMounted(async () => {
+  api.getMachine().then((v) => {
+    machineList.value = v.data;
+  });
 
+  api.getWorktype().then((v) => {
+    worktypeList.value = v.data;
+  });
   onSearch();
 });
 
@@ -188,25 +229,29 @@ const loadData = async (paginate) => {
       searchOptions,
     };
 
-    // pageState.setSearchData(data);
     const response = await api.searchCYHTestingResult(data);
-console.log("response => ",response)
+    console.log("response => ", response)
     items.value = response.data;
     totalItems.value = response.total_record;
-    
-    // /* Total line stop loss calculate */
-    // totalLineStopLoss.value = minutesToHHMMSS(items.value.reduce((sum, row) => sum + row.Loss_Time, 0));
-
-
-    // /* Percent Loss calculate */
-    // percentLoss.value = calculateLossPercentage(items.value);
-
   } catch (error) {
     console.error("Error fetching API:", error);
     items.value = [];
     totalItems.value = 0;
   }
   isLoading.value = false;
+};
+
+const onReset = () => {
+  formSearch.value = {
+    planDateStart: '',
+    planDateEnd: '',
+    machineNo: '',
+    workType: null,
+    mcDate: null,
+  };
+  items.value = [];
+  totalItems.value = 0;
+  onSearch();
 };
 
 // Methods
@@ -218,18 +263,10 @@ const onExport = async () => {
       return;
     }
 
-    // Use selected month and year from form
-    const month = form.value.month || "07";
-    const year = form.value.year || "2025";
-
     isLoading.value = true;
-
+   
     // Call the API function
-    const response = await api.exportEfficiencyReport({
-      lineCd: form.value.lineCd,
-      month,
-      year,
-    });
+    const response = await api.exportCYHTestingResultReport(formSearch.value);
 
     // Create blob and download file
     const blob = new Blob([response.data], {
@@ -242,11 +279,18 @@ const onExport = async () => {
     link.href = url;
     // Add current date in yyyy-MM-dd format
     const now = new Date();
-    const yy = String(now.getFullYear()).slice(-2);
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
-    const dateStr = `${yy}_${mm}_${dd}`;
-    link.download = `report-efficiency-${form.value.lineCd}-${month}-${year}(${dateStr}).xlsx`;
+
+    const YY = String(now.getFullYear()).slice(-2);
+    const MM = String(now.getMonth() + 1).padStart(2, "0");
+    const DD = String(now.getDate()).padStart(2, "0");
+
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mm = String(now.getMinutes()).padStart(2, "0");
+    const ss = String(now.getSeconds()).padStart(2, "0");
+
+    const timestamp = `${YY}${MM}${DD}${hh}${mm}${ss}`;
+
+    link.download = `Report1-Testing-Result-${timestamp}.xlsx`;
     document.body.appendChild(link);
     link.click();
 
@@ -266,32 +310,6 @@ const onExport = async () => {
   }
 };
 
-const onClear = () => {
-  const currentDate = new Date();
-  form.value = {
-    lineCd: "",
-    month: currentDate.getMonth() + 1,
-    year: currentDate.getFullYear(),
-  };
-};
-
-onMounted(() => {
-  // Load initial data or dropdown lists if needed
-  // You can add API calls here to populate dropdown lists
-
-  monthList.value = ddlApi.getMonth();
-
-  yearList.value = ddlApi.getYear();
-
-  ddlApi.line().then((data) => {
-    lineList.value = data;
-  });
-
-  // default month and year current month and year
-  const currentDate = new Date();
-  form.value.month = (currentDate.getMonth() + 1).toString(); // Months are 0-indexed
-  form.value.year = currentDate.getFullYear();
-});
 </script>
 
 <style scoped>
