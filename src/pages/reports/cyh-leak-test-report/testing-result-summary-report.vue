@@ -64,8 +64,10 @@
                 </tr>
               </template>
             </v-data-table-server>
-
-            <div style="height: 50px;"></div>
+            <v-divider></v-divider>
+            <div style="height: 72px;">
+              <div class="text-subtitle-1 pl-3 pt-5">Total: {{ totalItems }} items</div>
+            </div>
           </v-col>
         </v-row>
       </v-card-text>

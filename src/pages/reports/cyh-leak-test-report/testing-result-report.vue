@@ -7,11 +7,11 @@
       <v-card-text>
         <v-form ref="frmSearch">
           <v-row>
-            <v-col cols="12" sm="6" md="2">
+            <v-col cols="12" sm="6" md="3">
               <label>Plan Start Date</label>
               <n-date v-model="formSearch.planDateStart" @update:modelValue="formSearch.planDateEnd = null"></n-date>
             </v-col>
-            <v-col cols="12" sm="6" md="2">
+            <v-col cols="12" sm="6" md="3">
               <label>Plan End Date</label>
               <n-date v-model="formSearch.planDateEnd" :min-date="formSearch.planDateStart"></n-date>
             </v-col>
@@ -22,11 +22,11 @@
                 item-title="title" item-value="value" />
             </v-col>
 
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="2">
               <label>Work Type</label>
               <v-select v-model="formSearch.workType" :items="worktypeList" item-title="title" item-value="value" />
             </v-col>
-            <v-col cols="12" sm="12" md="3">
+            <v-col cols="12" sm="12" md="2">
               <label>M/C Date</label>
               <v-text-field v-model="formSearch.mcDate"></v-text-field>
             </v-col>
