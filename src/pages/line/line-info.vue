@@ -92,6 +92,12 @@
                   <div v-else v-text="item.modelCd"></div>
                 </template>
 
+                <template v-slot:[`item.worker`]="{ item }">
+                  <v-text-field v-model="item.worker" v-if="getRowState(item)" hide-details="auto"
+                    v-maska="markNumberFormatOptions" type="text" :rules="[rules.required]"></v-text-field>
+                  <div v-else v-text="item.worker"></div>
+                </template>
+
                 <template v-slot:[`item.productCd`]="{ item }">
                   <v-text-field v-model="item.productCd" v-if="getRowState(item)" hide-details="auto"></v-text-field>
                   <div v-else v-text="item.productCd"></div>
@@ -233,7 +239,7 @@ import * as api from "@/api/line.js";
 import rules from "@/utils/rules";
 // import { getDateFormat } from "@/utils/utils";
 
-import { getCurrrentDate, getDateFormat } from "@/utils/utils.js";
+import { getCurrrentDate, getDateFormat, markNumberFormatOptions } from "@/utils/utils.js";
 
 const route = useRoute();
 
@@ -268,6 +274,7 @@ let itemsLineToolAll = [];
 const headersModel = ref([
   { title: "", key: "action", sortable: false },
   { title: "Model Code", key: "modelCd", sortable: false },
+  { title: "Worker", key: "worker", sortable: false },
   { title: "Product Code", key: "productCd", sortable: false },
   { title: "Part No", key: "partNo", sortable: false },
   { title: "Part 1", key: "partUpper", sortable: false },
@@ -358,6 +365,7 @@ const doLoadData = async () => {
         as400ProductCd: item.as400ProductCd,
         isActive: item.isActive,
         statusName: item.statusName,
+        worker: item.worker
       };
     });
 
@@ -467,6 +475,7 @@ const onSave = async () => {
 
 const onSelectedModel = (o, item) => {
   console.log(o);
+  item.worker = '1';
   item.modelCd = o.value;
   item.partNo = o.partNo;
   item.productCd = o.title;
