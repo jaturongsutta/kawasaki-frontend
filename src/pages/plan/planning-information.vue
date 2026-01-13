@@ -90,11 +90,15 @@
 
           <v-col md="2">
             <label>Model</label>
-            <v-select v-model="form.modelCd" :items="modelList" item-title="Model_CD" item-value="Model_CD"
+            <v-select v-model="form.modelName" :items="modelList" item-title="Model_Name" item-value="Model_Name"
               @update:model-value="onModelChange" :rules="[rules.required]" :readonly="status > '00'"></v-select>
           </v-col>
 
-          <v-col md="2">
+          <v-col md="1">
+            <label>Worker</label>
+            <v-text-field v-model="form.worker" readonly></v-text-field>
+          </v-col>
+          <v-col md="1">
             <label>Product Code</label>
             <v-text-field v-model="form.productCd" readonly></v-text-field>
           </v-col>
@@ -256,6 +260,9 @@ onMounted(async () => {
 
       api.getLineModel(form.value.lineCd).then((data) => {
         modelList.value = data;
+        const model = modelList.value.find((item) => item.Model_Name === form.value.modelName && item.worker === form.value.worker);
+        form.value.modelCd = model.Model_CD;
+
         // if (data.length > 0) {
         //   form.value.productCd = data[0].Product_CD;
         //   form.value.partNo = data[0].Part_No;
@@ -304,6 +311,7 @@ const onLineChange = (lineCd) => {
 
   modelList.value = [];
   form.value.modelCd = null;
+  form.value.worker = null;
   form.value.productCd = null;
   form.value.partNo = null;
   form.value.partUpper = null;
@@ -317,12 +325,13 @@ const onLineChange = (lineCd) => {
   });
 };
 
-const onModelChange = (modelCd) => {
-  const model = modelList.value.find((item) => item.Model_CD === modelCd);
+const onModelChange = (modelName) => {
+  const model = modelList.value.find((item) => item.Model_Name === modelName);
 
   const oldPartNo = form.value.partNo;
 
   if (!model) {
+    form.value.worker = "";
     form.value.productCd = "";
     form.value.partNo = "";
     form.value.partUpper = "";
@@ -330,6 +339,7 @@ const onModelChange = (modelCd) => {
     cycleTimeVModel.value = "";
     return;
   }
+  form.value.worker = model ? model.worker : "";
   form.value.productCd = model ? model.Product_CD : "";
   form.value.partNo = model ? model.Part_No : "";
   form.value.partUpper = model ? model.Part_Upper : "";
@@ -612,11 +622,16 @@ const onSave = async () => {
     }
 
     let res = null;
+
+    const model = modelList.value.find((item) => item.Model_Name === form.value.modelName);
+    const params = { ...form.value };
+    params.modelCd = model.Model_CD;
+
     if (mode === "EDIT") {
-      res = await api.updatePlan(route.params.id, form.value);
+      res = await api.updatePlan(route.params.id, params);
     } else {
       // New and Copy mode
-      res = await api.newPlan(form.value);
+      res = await api.newPlan(params);
     }
     isLoading.value = false;
 
