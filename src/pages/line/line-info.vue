@@ -98,6 +98,12 @@
                   <div v-else v-text="item.worker"></div>
                 </template>
 
+                <template v-slot:[`item.modelName`]="{ item }">
+                  <v-text-field v-model="item.modelName" v-if="getRowState(item)" hide-details="auto"
+                    :rules="[rules.required]"></v-text-field>
+                  <div v-else v-text="item.modelName"></div>
+                </template>
+
                 <template v-slot:[`item.productCd`]="{ item }">
                   <v-text-field v-model="item.productCd" v-if="getRowState(item)" hide-details="auto"></v-text-field>
                   <div v-else v-text="item.productCd"></div>
@@ -277,6 +283,7 @@ const headersModel = ref([
   { title: "", key: "action", sortable: false },
   { title: "Model Code", key: "modelCd", sortable: false },
   { title: "Worker", key: "worker", sortable: false },
+  { title: "Model Name", key: "modelName", sortable: false },
   { title: "Product Code", key: "productCd", sortable: false },
   { title: "Part No", key: "partNo", sortable: false },
   { title: "Part 1", key: "partUpper", sortable: false },
@@ -360,6 +367,7 @@ const doLoadData = async () => {
         rowState: "NONE",
         id: item.id,
         modelCd: item.modelCd,
+        modelName: item.modelName,
         partNo: item.partNo,
         productCd: item.productCd,
         partUpper: item.partUpper,
@@ -454,6 +462,7 @@ const onSelectedModel = (o, item) => {
   console.log(o);
   item.worker = '1';
   item.modelCd = o.value;
+  item.modelName = o.value;
   item.partNo = o.partNo;
   item.productCd = o.title;
   item.partLower = o.partLower;
