@@ -270,6 +270,8 @@ const itemsProcess = ref([]);
 let itemsProcessAll = [];
 const itemsLineTool = ref([]);
 
+const selectedId = ref(null);
+
 let itemsLineToolAll = [];
 const headersModel = ref([
   { title: "", key: "action", sortable: false },
@@ -356,6 +358,7 @@ const doLoadData = async () => {
     itemsModel.value = data.lineModel.map((item) => {
       return {
         rowState: "NONE",
+        id: item.id,
         modelCd: item.modelCd,
         partNo: item.partNo,
         productCd: item.productCd,
@@ -368,33 +371,6 @@ const doLoadData = async () => {
         worker: item.worker
       };
     });
-
-    itemsProcessAll = data.lineMachine.map((item) => {
-      return {
-        rowState: "NONE",
-        lineCd: item.lineCd,
-        modelCd: item.modelCd,
-        machineNo: item.machineNo,
-        processCd: item.processCd,
-        wt: item.wt,
-        ht: item.ht,
-        mt: item.mt,
-        isActive: item.isActive,
-      };
-    });
-
-    itemsLineToolAll = data.lineTool.map((item) => {
-      return {
-        rowState: "NONE",
-        lineCd: item.lineCd,
-        modelCd: item.modelCd,
-        machineNo: item.machineNo,
-        processCd: item.processCd,
-        hCode: item.hCode,
-        isActive: item.isActive,
-      };
-    });
-
     console.log("itemsModel.value ", itemsModel.value);
   });
 };
@@ -415,6 +391,7 @@ const onAddProcess = () => {
   }
   itemsProcessAll.push({
     rowState: "NEW",
+    id: selectedId.value,
     seq: "",
     lineCd: form.value.lineCd,
     modelCd: currentModelCd,
@@ -514,18 +491,56 @@ const onDeleteModel = (r) => {
 const tableModelSelected = (selected) => {
   console.log("selected ", selected);
   if (selected.length > 0) {
+    itemsLineTool.value = [];
     currentModelCd = selected[0].modelCd;
-    // isLoadingProcess.value = true;
+    selectedId.value = selected[0].id;
 
-    itemsProcess.value = itemsProcessAll.filter(
-      (item) => item.modelCd === currentModelCd
-    );
+    isLoading.value = true;
+    api.getLineMachineAndToolsById(selectedId.value).then((data) => {
+      isLoading.value = false;
 
-    // set seq
-    let i = 0;
-    for (let item of itemsProcess.value) {
-      item.seq = ++i;
-    }
+      itemsProcessAll = data.lineMachine.map((item) => {
+        return {
+          rowState: "NONE",
+          id: item.id,
+          lineCd: item.lineCd,
+          modelCd: item.modelCd,
+          machineNo: item.machineNo,
+          processCd: item.processCd,
+          wt: item.wt,
+          ht: item.ht,
+          mt: item.mt,
+          isActive: item.isActive,
+        };
+      });
+
+      itemsLineToolAll = data.lineTool.map((item) => {
+        return {
+          rowState: "NONE",
+          id: item.id,
+          lineCd: item.lineCd,
+          modelCd: item.modelCd,
+          machineNo: item.machineNo,
+          processCd: item.processCd,
+          hCode: item.hCode,
+          isActive: item.isActive,
+        };
+      });
+
+      console.log("itemsLineToolAll.value ", itemsLineToolAll.value);
+
+
+      itemsProcess.value = itemsProcessAll.filter(
+        (item) => item.modelCd === currentModelCd
+      );
+      console.log(' itemsProcess.value ', itemsProcess.value)
+      // set seq
+      let i = 0;
+      for (let item of itemsProcess.value) {
+        item.seq = ++i;
+      }
+    });
+
   } else {
     currentModelCd = "";
     itemsProcess.value = [];
@@ -559,6 +574,7 @@ const tableProcessSelected = (selected) => {
       const lineTool = mTool.map((item) => {
         return {
           rowState: "NEW",
+          id: selectedId.value,
           lineCd: form.value.lineCd,
           modelCd: currentModelCd,
           machineNo: currentMachineNo,
@@ -656,13 +672,17 @@ const tableProcessSelected = (selected) => {
 
 // validate on save check duplicate model
 const validateModel = () => {
-  const modelCodes = itemsModel.value.map((item) => item.modelCd);
-  const uniqueModelCodes = new Set(modelCodes);
+  const keys = itemsModel.value.map(
+    item => `${item.modelCd}__${item.worker}`
+  );
 
-  if (uniqueModelCodes.size !== modelCodes.length) {
-    Alert.warning("Duplicate model codes found.");
+  const uniqueKeys = new Set(keys);
+
+  if (uniqueKeys.size !== keys.length) {
+    Alert.warning("Duplicate model + worker found.");
     return false;
   }
+
   return true;
 };
 

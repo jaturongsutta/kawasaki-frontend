@@ -18,6 +18,15 @@ export const getById = async (line) => {
   }
 };
 
+export const getLineMachineAndToolsById = async (id) => {
+  try {
+    const response = await axios.get(`/line/getLineMachineTool/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getProcessByModelCd = async (lineCd, modelCd) => {
   try {
     // lineCd = encodeURIComponent(lineCd); // Encode parameter for case # 'CYH#6'
