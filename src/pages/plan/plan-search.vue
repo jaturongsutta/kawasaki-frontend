@@ -59,7 +59,7 @@
         <v-row>
           <v-col>
             <v-data-table
-              v-model:page="currentPage"
+              v-model:page="currentProductionPage"
               :headers="headersPlanCurrent"
               :items="itemsPlanCurrent"
               :items-per-page="pageSize"
@@ -93,11 +93,13 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-data-table
+            <v-data-table-server
               v-model:page="currentPage"
               :headers="headersDetail"
               :items="itemsDetail"
               :items-per-page="pageSize"
+              :items-length="totalItemsDetail"
+               @update:options="loadData"
             >
               <template v-slot:[`item.action`]="{ item }">
                 <n-gbtn-edit @click="onEditPlan(item.id)"></n-gbtn-edit>
@@ -115,7 +117,7 @@
                   v-model:totalItems="totalItemsDetail"
                 ></n-pagination>
               </template>
-            </v-data-table>
+            </v-data-table-server>
           </v-col>
         </v-row>
       </v-card-text>
@@ -147,6 +149,7 @@ const isLoading = ref(false);
 
 const currentPlanTime = ref();
 const currentPage = ref(1);
+const currentProductionPage = ref(1);
 const pageSize = ref(20);
 
 const lineList = ref([]);
