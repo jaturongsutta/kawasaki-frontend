@@ -32,6 +32,7 @@
     <v-card class="mt-3">
       <v-card-text>
         <n-btn-add label="Add" @click="onAdd"></n-btn-add>
+        <n-btn label="Tool Life Alarm Setup" class="orange-gradient-btn ml-3" @click="onToolLifeSetup"></n-btn>
         <v-data-table-server v-model:page="currentPage" v-model:items-per-page="pageSize" :headers="headers"
           :items="items" :items-length="totalItems" @update:options="loadData">
           <template v-slot:[`item.action`]="{ item }">
@@ -46,7 +47,7 @@
       </v-card-text>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="600px">
+    <!-- <v-dialog v-model="dialog" max-width="600px">
       <v-form ref="frmInfo">
         <v-card>
           <v-card-title>
@@ -101,6 +102,90 @@
                 <v-col cols="6" v-if="mode === 'Edit'">
                   <label class="require-field">Updated Date </label>
                   <v-text-field v-model="form.Updated_Date" :rules="[rules.required]" :readonly="mode === 'Edit'"
+                    placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
+                </v-col>
+
+              </v-row>
+            </v-container>
+          </v-card-text>
+
+          <v-divider></v-divider>
+          <div class="d-flex justify-center py-3">
+            <n-btn-save @click="saveClick" class="me-3"></n-btn-save>
+            <n-btn-cancel text @click="dialog = false"></n-btn-cancel>
+          </div>
+        </v-card>
+      </v-form>
+      <n-loading :loading="isDialogLoading" />
+    </v-dialog> -->
+
+    <v-dialog v-model="dialog" max-width="600px">
+      <v-form ref="frmInfo">
+        <v-card>
+          <v-card-title class="d-flex align-center justify-space-between">
+            <span class="headline">Tool Life Alarm Setup</span>
+            <n-btn-add label="Add" @click="onAdd"></n-btn-add>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="6">
+                  <label class="require-field">H Code</label>
+                  <v-text-field v-model="form.hCode" :rules="[rules.required]"
+                    :readonly="mode === 'Edit'"></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <label class="require-field">Tool No. </label>
+                  <v-text-field v-model="form.toolCd" :rules="[rules.required]"></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <label class="require-field">Tool Name </label>
+                  <v-text-field v-model="form.toolName" :rules="[rules.required]"></v-text-field>
+                </v-col>
+
+                <v-col cols="6">
+                  <label>Tool Life </label>
+                  <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.toolLife" type="text"
+                    inputmode="numeric" readonly></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <label>Warning Amt </label>
+                  <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.warningAmt" type="text"
+                    readonly></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <label>Alert Amt </label>
+                  <v-text-field v-maska="markNumberFormatOptions" v-model="form.alertAmt" type="text"
+                    inputmode="numeric" reverse readonly></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <label>Alarm Amt </label>
+                  <v-text-field v-maska="markNumberFormatOptions" type="text" v-model="form.alarmAmt" reverse
+                    readonly></v-text-field>
+                </v-col>
+                <v-col v-if="mode === 'Edit'" cols="6">
+                  <label>Actual Amt </label>
+                  <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.actualAmt" type="text"
+                    readonly></v-text-field>
+                </v-col>
+
+                <v-col cols="6">
+                  <label>Prog No </label>
+                  <v-text-field v-model="form.mapCd"></v-text-field>
+                </v-col>
+                <v-col :cols="mode === 'Edit' ? '6' : '12'">
+                  <label class="require-field">Status </label>
+                  <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
+                </v-col>
+                <v-col cols="6" v-if="mode === 'Edit'">
+                  <label>Updated By </label>
+                  <v-text-field v-model="form.updatedBy" :readonly="mode === 'Edit'"></v-text-field>
+                </v-col>
+
+                <v-col cols="6" v-if="mode === 'Edit'">
+                  <label>Updated Date </label>
+                  <v-text-field v-model="form.updatedDate" :readonly="mode === 'Edit'"
                     placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
                 </v-col>
 
@@ -247,4 +332,19 @@ const saveClick = async () => {
     Alert.error(error.message);
   }
 };
+
+const onToolLifeSetup = () => {
+  // mode.value = "Add";
+  // console.log("Add");
+  // form.value = {
+  // };
+  dialog.value = true;
+};
+
 </script>
+<style scoped>
+.orange-gradient-btn {
+  background-image: linear-gradient(310deg, #f57c00, #ffb74d 100%);
+  color: #fff;
+}
+</style>

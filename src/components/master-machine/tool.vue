@@ -11,9 +11,9 @@
                 <template v-slot:[`item.action`]="{ item }">
                     <n-gbtn-edit @click="onEdit(item)"></n-gbtn-edit>
                 </template>
-                <template v-slot:[`item.reset`]="{ item }">
+                <!-- <template v-slot:[`item.reset`]="{ item }">
                     <n-btn-reset @click="onReset(item)" />
-                </template>
+                </template> -->
 
                 <template v-slot:bottom>
                     <n-pagination v-model:currentPage="currentPage" v-model:itemPerPage="pageSize"
@@ -48,24 +48,24 @@
                                 </v-col>
 
                                 <v-col cols="6">
-                                    <label class="require-field">Tool Life </label>
+                                    <label>Tool Life </label>
                                     <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.toolLife"
-                                        type="text" inputmode="numeric" :rules="[rules.required]"></v-text-field>
+                                        type="text" inputmode="numeric" readonly></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label class="require-field">Warning Amt </label>
+                                    <label>Warning Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.warningAmt"
-                                        type="text" :rules="[rules.required]"></v-text-field>
+                                        type="text" readonly></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label class="require-field">Alert Amt </label>
+                                    <label>Alert Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" v-model="form.alertAmt" type="text"
-                                        inputmode="numeric" reverse :rules="[rules.required]"></v-text-field>
+                                        inputmode="numeric" reverse readonly></v-text-field>
                                 </v-col>
                                 <v-col cols="6">
-                                    <label class="require-field">Alarm Amt </label>
+                                    <label>Alarm Amt </label>
                                     <v-text-field v-maska="markNumberFormatOptions" type="text" v-model="form.alarmAmt"
-                                        reverse :rules="[rules.required]"></v-text-field>
+                                        reverse readonly></v-text-field>
                                 </v-col>
                                 <v-col v-if="mode === 'Edit'" cols="6">
                                     <label>Actual Amt </label>
@@ -74,7 +74,7 @@
                                 </v-col>
 
                                 <v-col cols="6">
-                                    <label>Map Code </label>
+                                    <label>Prog No </label>
                                     <v-text-field v-model="form.mapCd"></v-text-field>
                                 </v-col>
                                 <v-col :cols="mode === 'Edit' ? '6' : '12'">
@@ -165,15 +165,20 @@ const headers = [
             return commaFormattedNumber(item.Actual_Amt);
         },
     },
-    { title: "Reset", key: "reset", sortable: false },
-    { title: "Status", key: "Status_Name", sortable: false },
-    { title: "Updated By", key: "Updated_By", sortable: false },
+    {
+        title: "Prog No", key: "Prog_No", sortable: false,
+        value: (item) => {
+            return item.Prog_No || '-';
+        },
+    },
+    { title: "Status", key: "is_Active", sortable: false },
+    { title: "Updated By", key: "Updated_By_Name", sortable: false },
     {
         title: "Updated Date",
-        key: "Updated_Date",
+        key: "UPDATED_DATE",
         sortable: false,
         value: (item) => {
-            return getDateFormat(item.Updated_Date);
+            return getDateFormat(item.UPDATED_DATE);
         },
     },
 ];
@@ -277,11 +282,18 @@ const saveClick = async () => {
         let res = null;
 
         form.value.processCd = route.params.processCd;
-        let params = { ...form.value }
-        params.toolLife = convertCommaToPureNumber(params.toolLife);
-        params.warningAmt = convertCommaToPureNumber(params.warningAmt);
-        params.alarmAmt = convertCommaToPureNumber(params.alarmAmt);
-        params.alertAmt = convertCommaToPureNumber(params.alertAmt);
+        // let params = { ...form.value }
+        // params.toolLife = null; // convertCommaToPureNumber(params.toolLife);
+        // params.warningAmt = null; //convertCommaToPureNumber(params.warningAmt);
+        // params.alarmAmt = null; //convertCommaToPureNumber(params.alarmAmt);
+        // params.alertAmt = null; //convertCommaToPureNumber(params.alertAmt);
+        let {
+            toolLife,
+            warningAmt,
+            alarmAmt,
+            alertAmt,
+            ...params
+        } = form.value;
         params.actualAmt = convertCommaToPureNumber(params.actualAmt);
         params.machineNo = props.machineItem?.machineNo;
 
