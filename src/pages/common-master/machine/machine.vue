@@ -47,145 +47,75 @@
       </v-card-text>
     </v-card>
 
-    <!-- <v-dialog v-model="dialog" max-width="600px">
-      <v-form ref="frmInfo">
-        <v-card>
-          <v-card-title>
-            <span class="headline">{{ mode }} Master - Model Information</span>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col cols="6">
-                  <label class="require-field">Model </label>
-                  <v-text-field v-model="form.Model_CD" :rules="[rules.required]"
-                    :readonly="mode === 'Edit'"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <label class="require-field">Product Code </label>
-                  <v-text-field v-model="form.Product_CD" :rules="[rules.required]"></v-text-field>
-                </v-col>
-
-                <v-col cols="6">
-                  <label class="require-field">Cycle Time (mins) </label>
-                  <v-text-field v-model="form.Cycle_Time_Min" :rules="[rules.required]" type="number"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <label>Part Name </label>
-                  <v-text-field v-model="form.predefineCd"></v-text-field>
-                </v-col>
-
-                <v-col cols="6">
-                  <label class="require-field">Part No </label>
-                  <v-text-field v-model="form.Part_No" :rules="[rules.required]"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <label class="require-field">Part Upper </label>
-                  <v-text-field v-model="form.Part_Upper" :rules="[rules.required]"></v-text-field>
-                </v-col>
-
-                <v-col cols="6">
-                  <label class="require-field">Part Lower </label>
-                  <v-text-field v-model="form.Part_Lower" :rules="[rules.required]"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <label class="require-field">Status </label>
-                  <v-select v-model="form.Status" :rules="[rules.required]" :items="[...statusList]"></v-select>
-                </v-col>
-                <v-col cols="6" v-if="mode === 'Edit'">
-                  <label class="require-field">Updated By </label>
-                  <v-text-field v-model="form.Updated_By" :rules="[rules.required]"
-                    :readonly="mode === 'Edit'"></v-text-field>
-                </v-col>
-
-                <v-col cols="6" v-if="mode === 'Edit'">
-                  <label class="require-field">Updated Date </label>
-                  <v-text-field v-model="form.Updated_Date" :rules="[rules.required]" :readonly="mode === 'Edit'"
-                    placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
-                </v-col>
-
-              </v-row>
-            </v-container>
-          </v-card-text>
-
-          <v-divider></v-divider>
-          <div class="d-flex justify-center py-3">
-            <n-btn-save @click="saveClick" class="me-3"></n-btn-save>
-            <n-btn-cancel text @click="dialog = false"></n-btn-cancel>
-          </div>
-        </v-card>
-      </v-form>
-      <n-loading :loading="isDialogLoading" />
-    </v-dialog> -->
-
-    <v-dialog v-model="dialog" max-width="600px">
+    <v-dialog v-model="dialog" max-width="900px">
       <v-form ref="frmInfo">
         <v-card>
           <v-card-title class="d-flex align-center justify-space-between">
             <span class="headline">Tool Life Alarm Setup</span>
-            <n-btn-add label="Add" @click="onAdd"></n-btn-add>
+            <n-btn-add label="Add" @click="onAddTooLifeAlarm"></n-btn-add>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>
+            <v-data-table-server v-model:page="toolLifeCurrentPage" v-model:items-per-page="toolLifePageSize"
+              :headers="toolLifeHeaders" :items="toolLifeItems" :items-length="toolLifeTotalItems"
+              @update:options="loadToolLifeAlarm">
+              <template v-slot:[`item.action`]="{ item }">
+                <n-gbtn-edit :permission="false" @click="onToolLifeEdit(item)"></n-gbtn-edit>
+
+                <n-gbtn-delete :permission="false" @click="onToolLifeDelete(item.ID)"></n-gbtn-delete>
+              </template>
+
+              <template v-slot:bottom>
+                <n-pagination v-model:currentPage="toolLifeCurrentPage" v-model:itemPerPage="toolLifePageSize"
+                  v-model:totalItems="toolLifeTotalItems"></n-pagination>
+              </template>
+            </v-data-table-server>
+          </v-card-text>
+        </v-card>
+      </v-form>
+      <n-loading :loading="isDialogLoading" />
+    </v-dialog>
+
+    <v-dialog v-model="addDialog" max-width="600px">
+      <v-form ref="frmInfo">
+        <v-card>
+          <v-card-title class="d-flex align-center justify-space-between">
+            <span class="headline">{{ toolLifeMode }}: Tool Life Alarm Setup</span>
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col cols="6">
-                  <label class="require-field">H Code</label>
-                  <v-text-field v-model="form.hCode" :rules="[rules.required]"
-                    :readonly="mode === 'Edit'"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <label class="require-field">Tool No. </label>
-                  <v-text-field v-model="form.toolCd" :rules="[rules.required]"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <label class="require-field">Tool Name </label>
-                  <v-text-field v-model="form.toolName" :rules="[rules.required]"></v-text-field>
-                </v-col>
 
                 <v-col cols="6">
-                  <label>Tool Life </label>
-                  <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.toolLife" type="text"
-                    inputmode="numeric" readonly></v-text-field>
+                  <label class="require-field">Tool Life </label>
+                  <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.toolLifeLimit" type="text"
+                    inputmode="numeric" :rules="[rules.requiredMoreThanZero]"></v-text-field>
                 </v-col>
                 <v-col cols="6">
-                  <label>Warning Amt </label>
+                  <label class="require-field">Warning Amt </label>
                   <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.warningAmt" type="text"
-                    readonly></v-text-field>
+                    :rules="[rules.requiredMoreThanZero]"></v-text-field>
                 </v-col>
                 <v-col cols="6">
-                  <label>Alert Amt </label>
+                  <label class="require-field">Alert Amt </label>
                   <v-text-field v-maska="markNumberFormatOptions" v-model="form.alertAmt" type="text"
-                    inputmode="numeric" reverse readonly></v-text-field>
+                    inputmode="numeric" reverse :rules="[rules.requiredMoreThanZero]"></v-text-field>
                 </v-col>
                 <v-col cols="6">
-                  <label>Alarm Amt </label>
+                  <label class="require-field">Alarm Amt </label>
                   <v-text-field v-maska="markNumberFormatOptions" type="text" v-model="form.alarmAmt" reverse
-                    readonly></v-text-field>
-                </v-col>
-                <v-col v-if="mode === 'Edit'" cols="6">
-                  <label>Actual Amt </label>
-                  <v-text-field v-maska="markNumberFormatOptions" reverse v-model="form.actualAmt" type="text"
-                    readonly></v-text-field>
+                    :rules="[rules.requiredMoreThanZero]"></v-text-field>
                 </v-col>
 
-                <v-col cols="6">
-                  <label>Prog No </label>
-                  <v-text-field v-model="form.mapCd"></v-text-field>
-                </v-col>
-                <v-col :cols="mode === 'Edit' ? '6' : '12'">
-                  <label class="require-field">Status </label>
-                  <v-select v-model="form.isActive" :rules="[rules.required]" :items="[...statusList]"></v-select>
-                </v-col>
-                <v-col cols="6" v-if="mode === 'Edit'">
+                <v-col cols="6" v-if="toolLifeMode === 'Edit'">
                   <label>Updated By </label>
-                  <v-text-field v-model="form.updatedBy" :readonly="mode === 'Edit'"></v-text-field>
+                  <v-text-field v-model="form.updatedBy" :readonly="toolLifeMode === 'Edit'"></v-text-field>
                 </v-col>
 
-                <v-col cols="6" v-if="mode === 'Edit'">
+                <v-col cols="6" v-if="toolLifeMode === 'Edit'">
                   <label>Updated Date </label>
-                  <v-text-field v-model="form.updatedDate" :readonly="mode === 'Edit'"
+                  <v-text-field v-model="form.updatedDate" :readonly="toolLifeMode === 'Edit'"
                     placeholder="DD/MM/YYYY HH:mm:ss"></v-text-field>
                 </v-col>
 
@@ -196,7 +126,7 @@
           <v-divider></v-divider>
           <div class="d-flex justify-center py-3">
             <n-btn-save @click="saveClick" class="me-3"></n-btn-save>
-            <n-btn-cancel text @click="dialog = false"></n-btn-cancel>
+            <n-btn-cancel text @click="addDialog = false"></n-btn-cancel>
           </div>
         </v-card>
       </v-form>
@@ -212,7 +142,7 @@ import { getPaging } from "@/utils/utils.js";
 import * as ddlApi from "@/api/dropdown-list.js";
 import * as api from "@/api/machine.js";
 import rules from "@/utils/rules";
-import { getDateFormat } from "@/utils/utils";
+import { getDateFormat, markNumberFormatOptions, convertCommaToPureNumber, commaFormattedNumber } from "@/utils/utils";
 import { usePageState } from '@/stores/search/master-machine'
 const pageState = usePageState()
 
@@ -227,7 +157,10 @@ const formSearch = ref({
 const form = ref({});
 const mode = ref("Add");
 const dialog = ref(false);
+const addDialog = ref(false);
 const statusList = ref([]);
+const toolLifeMode = ref('Add');
+const selectedToolLifeId = ref('');
 
 const headers = [
   { title: "", key: "action", sortable: false },
@@ -245,7 +178,43 @@ const headers = [
     },
   },
 ];
+
+const toolLifeHeaders = [
+  { title: "Action", key: "action", sortable: false, nowrap: true },
+  {
+    title: "Tool Life Limit", key: "Tool_Life_Limit", sortable: false, value: (item) => {
+      return commaFormattedNumber(item.Tool_Life_Limit);
+    }
+  },
+  {
+    title: "Warning Amt", key: "Warning_Amt", sortable: false, value: (item) => {
+      return commaFormattedNumber(item.Warning_Amt);
+    }
+  },
+  {
+    title: "Alert Amt", key: "Alert_Amt", sortable: false, value: (item) => {
+      return commaFormattedNumber(item.Alert_Amt);
+    }
+  },
+  {
+    title: "Alarm Amt", key: "Alarm_Amt", sortable: false, value: (item) => {
+      return commaFormattedNumber(item.Alarm_Amt);
+    }
+  },
+
+  {
+    title: "Updated Date",
+    key: "Updated_Date",
+    sortable: false,
+    value: (item) => {
+      return getDateFormat(item.Updated_Date);
+    },
+  },
+  { title: "Updated By", key: "Updated_By", sortable: false },
+];
+
 let items = ref([]);
+let toolLifeItems = ref([]);
 
 let isLoading = ref(false);
 let isDialogLoading = ref(false);
@@ -253,11 +222,21 @@ let currentPage = ref(1);
 let pageSize = ref(20);
 let totalItems = ref(0);
 
+let toolLifeCurrentPage = ref(1);
+let toolLifePageSize = ref(20);
+let toolLifeTotalItems = ref(0);
+
 onMounted(() => {
   ddlApi.getPredefine({ group: "Is_Active", sortby: "text" }).then((data) => {
     statusList.value = data;
   });
+  onLoadToolLife();
 });
+
+const onLoadToolLife = async () => {
+  toolLifeCurrentPage.value = 1;
+  loadToolLifeAlarm({ page: toolLifeCurrentPage.value, itemsPerPage: toolLifePageSize.value });
+}
 
 const onSearch = async () => {
   currentPage.value = 1;
@@ -289,6 +268,29 @@ const loadData = async (paginate) => {
   isLoading.value = false;
 };
 
+const loadToolLifeAlarm = async (paginate) => {
+  const { page, itemsPerPage } = paginate;
+
+  const searchOptions = getPaging({ page, itemsPerPage });
+
+  try {
+    isDialogLoading.value = true;
+    const data = {
+      searchOptions,
+    };
+
+    const response = await api.getToolLifeAlarm(data);
+
+    toolLifeItems.value = response.data;
+    toolLifeTotalItems.value = response.total_record;
+  } catch (error) {
+    console.error("Error fetching API:", error);
+    itetoolLifeItemsms.value = [];
+    toolLifeTotalItems.value = 0;
+  }
+  isDialogLoading.value = false;
+};
+
 const onReset = () => {
   formSearch.value = {
     isActive: "Y",
@@ -302,9 +304,64 @@ const onAdd = () => {
   router.push({ name: "machine-info" });
 };
 
+const onAddTooLifeAlarm = () => {
+  console.log("onadd toollife");
+  toolLifeMode.value = 'Add';
+  form.value = {};
+  addDialog.value = true;
+}
+
 const onEdit = (machineNo, processCd) => {
   router.push({ name: `machine-info`, params: { id: machineNo, processCd: processCd } });
 };
+
+const onToolLifeEdit = (item) => {
+  toolLifeMode.value = 'Edit';
+
+  form.value.toolLifeLimit = item.Tool_Life_Limit;
+  form.value.warningAmt = item.Warning_Amt;
+  form.value.alertAmt = item.Alert_Amt;
+  form.value.alarmAmt = item.Alarm_Amt;
+  form.value.updatedBy = item.Updated_By;
+  form.value.updatedDate = getDateFormat(item.Updated_Date);
+
+  selectedToolLifeId.value = item.ID;
+
+  addDialog.value = true;
+};
+
+const onToolLifeDelete = (id) => {
+  console.log("onDelete : ", id);
+  Alert.confirm("Are you sure you want to delete this tool life alarm ?").then(
+    ({ isConfirmed }) => {
+      if (isConfirmed) {
+        isDialogLoading.value = true;
+        api
+          .removeToolLifeAlarm(id)
+          .then((res) => {
+            isDialogLoading.value = false;
+            if (res.status === 0) {
+              addDialog.value = false;
+              Alert.success("Delete successfully");
+              onLoadToolLife();
+            } else if (res.status === 1) {
+              Alert.warning(res.message);
+            } else {
+              Alert.error(res.message);
+            }
+          })
+          .catch((error) => {
+            isDialogLoading.value = false;
+            console.error("Error fetching API:", error);
+            Alert.error(error.message);
+          });
+      }
+    }
+  );
+
+};
+
+
 
 const saveClick = async () => {
   try {
@@ -312,18 +369,27 @@ const saveClick = async () => {
     if (!valid) return;
     isDialogLoading.value = true;
     let res = null;
-    if (mode.value === "Add") {
+
+    let params = { ...form.value }
+    params.toolLifeLimit = convertCommaToPureNumber(params.toolLifeLimit);
+    params.warningAmt = convertCommaToPureNumber(params.warningAmt);
+    params.alarmAmt = convertCommaToPureNumber(params.alarmAmt);
+    params.alertAmt = convertCommaToPureNumber(params.alertAmt);
+
+    if (toolLifeMode.value === "Add") {
       console.log("Add");
-      res = await api.add(form.value);
+      res = await api.addToolLifeAlarm(params);
     } else {
       console.log("Edit");
-      res = await api.update(form.value.Model_CD, form.value);
+      res = await api.updateToolLifeAlarm(selectedToolLifeId.value, params);
     }
     isDialogLoading.value = false;
     if (res.status === 0) {
-      Alert.success();
-      dialog.value = false;
-      onSearch();
+      isDialogLoading.value = false;
+      onLoadToolLife();
+      await Alert.success();
+      addDialog.value = false;
+
     } else {
       Alert.warning(res.message);
     }

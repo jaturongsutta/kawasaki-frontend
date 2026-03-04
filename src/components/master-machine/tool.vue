@@ -142,9 +142,9 @@ const headers = [
         },
     },
     {
-        title: "Warning Amt", key: "Warning_Amt", sortable: false,
+        title: "Warning Amt", key: "Warn_Amt", sortable: false,
         value: (item) => {
-            return commaFormattedNumber(item.Warning_Amt);
+            return commaFormattedNumber(item.Warn_Amt);
         },
     },
     {
@@ -237,19 +237,23 @@ const onEdit = async (item) => {
     form.value = {
     };
     dialog.value = true;
-    isDialogLoading.value = true;
     try {
-        const res = await api.getById(props.machineItem?.machineNo, item.Process_CD, item.H_Code);
-        isDialogLoading.value = false;
-        if (res.status === 2) {
-            Alert.error("Error ", res.message);
-            return;
-        }
-        form.value = res.data;
-        form.value.updatedDate = getDateFormat(form.value.updatedDate);
+        console.log("item: ", item);
+        form.value.hCode = item.H_Code;
+        form.value.toolCd = item.Tool_CD;
+        form.value.toolName = item.Tool_Name;
+        form.value.toolLife = item.Tool_Life;
+        form.value.warningAmt = item.Warn_Amt;
+        form.value.alertAmt = item.Alert_Amt;
+        form.value.alarmAmt = item.Alarm_Amt;
+        form.value.actualAmt = item.Actual_Amt;
+        form.value.mapCd = item.Prog_No;
+        form.value.isActive = item.is_Active;
+        form.value.updatedBy = item.Updated_By_Name;
+        form.value.updatedDate = getDateFormat(item.UPDATED_DATE);
+
     }
     catch (e) {
-        isDialogLoading.value = false;
         console.log('Error: ', e);
         Alert.error("Error ", e.message);
     }
@@ -282,11 +286,6 @@ const saveClick = async () => {
         let res = null;
 
         form.value.processCd = route.params.processCd;
-        // let params = { ...form.value }
-        // params.toolLife = null; // convertCommaToPureNumber(params.toolLife);
-        // params.warningAmt = null; //convertCommaToPureNumber(params.warningAmt);
-        // params.alarmAmt = null; //convertCommaToPureNumber(params.alarmAmt);
-        // params.alertAmt = null; //convertCommaToPureNumber(params.alertAmt);
         let {
             toolLife,
             warningAmt,

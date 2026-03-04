@@ -8,6 +8,15 @@ export const search = async (data) => {
   }
 };
 
+export const getToolLifeAlarm = async (data) => {
+  try {
+    const response = await axios.post(`/machine/tooLifeAlarm`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getById = async (machineNo, processCd) => {
   try {
     const response = await axios.get(`/machine/getById/${machineNo}/${processCd}`);
@@ -38,6 +47,33 @@ export const update = async (machineNo, processCd, data) => {
 export const remove = async (id) => {
   try {
     const response = await axios.delete(`/machine/delete/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addToolLifeAlarm = async (data) => {
+  try {
+    const response = await axios.post(`/machine/addToolLifeAlarm`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const removeToolLifeAlarm = async (id) => {
+  try {
+    const response = await axios.delete(`/machine/deleteToolLifeAlarm/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateToolLifeAlarm = async (id, data) => {
+  try {
+    const response = await axios.put(`/machine/updateToolLifeAlarm/${id}`, data);
     return response.data;
   } catch (error) {
     throw error;

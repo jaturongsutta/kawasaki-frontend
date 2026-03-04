@@ -5,6 +5,20 @@ const rules = {
     }
     return true;
   },
+  requiredMoreThanZero(val) {
+    if (val === undefined || val === null || val === '') {
+      return "This field is required";
+    }
+
+    const cleaned = String(val).replace(/,/g, '');
+    const numericValue = Number(cleaned);
+
+    if (isNaN(numericValue) || numericValue <= 0) {
+      return "Value must be greater than 0";
+    }
+
+    return true;
+  },
   integer: function (val) {
     if (!Number.isInteger(Number(val))) {
       return "This field must be an integer";
